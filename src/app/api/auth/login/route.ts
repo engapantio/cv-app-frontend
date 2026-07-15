@@ -4,12 +4,9 @@ import { createServerApolloClient } from "@/lib/apollo/server-client";
 import { setAuthCookies } from "@/lib/auth/cookies";
 import { LOGIN_QUERY } from "@/lib/graphql/auth/login.query";
 
-
 export async function POST(req: NextRequest) {
   const body = await req.json();
-  const client = createServerApolloClient(
-    req.headers.get("cookie") ?? undefined,
-  );
+  const client = createServerApolloClient(req.headers.get("cookie") ?? undefined);
 
   try {
     const { data } = await client.query({
@@ -33,12 +30,14 @@ export async function POST(req: NextRequest) {
       user: authResult.user,
     });
 
-    setAuthCookies(response, {
-      accessToken: authResult.access_token,
-      refreshToken: authResult.refresh_token,
-    });
-
-    return response;
+    return setAuthCookies(
+      response,
+      {
+        accessToken: authResult.access_token,
+        refreshToken: authResult.refresh_token,
+      },
+      authResult.user,
+    );
   } catch (error: unknown) {
     if (CombinedGraphQLErrors.is(error)) {
       return NextResponse.json({ message: error.message }, { status: 401 });

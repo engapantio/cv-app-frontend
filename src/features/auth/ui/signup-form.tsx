@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-type LoginResponse = {
+type SignupResponse = {
   user?: {
     id: string;
     email: string;
@@ -22,24 +22,42 @@ type LoginResponse = {
   message?: string;
 };
 
-function normalizeFullName(user: NonNullable<LoginResponse["user"]>) {
+function normalizeFullName(user: NonNullable<SignupResponse["user"]>) {
   if (user.fullName?.trim()) return user.fullName.trim();
   const combined = `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim();
   return combined || user.email;
 }
 
-export function LoginForm() {
+function validateSignup(email: string, password: string, confirmPassword: string) {
+  if (!email.trim() || !password.trim() || !confirmPassword.trim()) {
+    return "All fields are required.";
+  }
+
+  if (password.length < 8) {
+    return "Password must contain at least 8 characters.";
+  }
+
+  if (password !== confirmPassword) {
+    return "Passwords do not match.";
+  }
+
+  return null;
+}
+
+export function SignupForm() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function onSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (!email.trim() || !password.trim()) {
-      setError("Email and password are required.");
+    const validationError = validateSignup(email, password, confirmPassword);
+    if (validationError) {
+      setError(validationError);
       return;
     }
 
@@ -47,7 +65,7 @@ export function LoginForm() {
     setError(null);
 
     try {
-      const response = await fetch("/api/auth/login", {
+      const response = await fetch("/api/auth/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -59,10 +77,10 @@ export function LoginForm() {
         }),
       });
 
-      const payload = (await response.json()) as LoginResponse;
+      const payload = (await response.json()) as SignupResponse;
 
       if (!response.ok || !payload.user) {
-        setError(payload.message ?? "Unable to sign in.");
+        setError(payload.message ?? "Unable to create account.");
         return;
       }
 
@@ -84,17 +102,17 @@ export function LoginForm() {
 
   return (
     <AuthFormShell
-      title="Log in"
-      description="Enter your credentials to continue to the CV workspace."
-      footerText="Don’t have an account?"
-      footerLinkLabel="Create one"
-      footerHref="/auth/signup"
+      title="Sign up"
+      description="Create an account to start managing CVs, skills, languages, and projects."
+      footerText="Already have an account?"
+      footerLinkLabel="Log in"
+      footerHref="/auth/login"
     >
       <form className="space-y-5" onSubmit={onSubmit}>
         <div className="space-y-2">
-          <Label htmlFor="login-email">Email</Label>
+          <Label htmlFor="signup-email">Email</Label>
           <Input
-            id="login-email"
+            id="signup-email"
             type="email"
             placeholder="name@example.com"
             autoComplete="email"
@@ -105,13 +123,25 @@ export function LoginForm() {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="login-password">Password</Label>
+          <Label htmlFor="signup-password">Password</Label>
           <PasswordField
-            id="login-password"
-            placeholder="Enter your password"
-            autoComplete="current-password"
+            id="signup-password"
+            placeholder="Create a password"
+            autoComplete="new-password"
             value={password}
             onChange={setPassword}
+            disabled={submitting}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="signup-confirm-password">Confirm password</Label>
+          <PasswordField
+            id="signup-confirm-password"
+            placeholder="Repeat your password"
+            autoComplete="new-password"
+            value={confirmPassword}
+            onChange={setConfirmPassword}
             disabled={submitting}
           />
         </div>
@@ -126,10 +156,10 @@ export function LoginForm() {
           {submitting ? (
             <>
               <Loader2 className="mr-2 size-4 animate-spin" />
-              Logging in...
+              Creating account...
             </>
           ) : (
-            "Log in"
+            "Sign up"
           )}
         </Button>
       </form>

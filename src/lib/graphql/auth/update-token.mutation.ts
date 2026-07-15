@@ -7,10 +7,7 @@ type UpdateTokenData = {
 
 type UpdateTokenVars = Record<string, never>;
 
-export const UPDATE_TOKEN_MUTATION: TypedDocumentNode<
-  UpdateTokenData,
-  UpdateTokenVars
-> = gql`
+export const UPDATE_TOKEN_MUTATION: TypedDocumentNode<UpdateTokenData, UpdateTokenVars> = gql`
   mutation UpdateToken {
     updateToken {
       access_token

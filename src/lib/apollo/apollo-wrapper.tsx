@@ -1,4 +1,3 @@
-// src/lib/apollo/apollo-wrapper.tsx
 "use client";
 
 import { HttpLink } from "@apollo/client";
@@ -9,11 +8,28 @@ import {
 } from "@apollo/client-integration-nextjs";
 import { ErrorLink } from "@apollo/client/link/error";
 import { CombinedGraphQLErrors } from "@apollo/client/errors";
+import { clearSession } from "@/lib/auth/session";
 
 const errorLink = new ErrorLink(({ error, operation }) => {
   if (CombinedGraphQLErrors.is(error)) {
+    const unauthorized = error.errors.some(({ message }) =>
+      /unauthorized|forbidden|expired/i.test(message),
+    );
+
     for (const { message } of error.errors) {
       console.error(`[GraphQL error] ${operation.operationName}: ${message}`);
+    }
+
+    if (unauthorized) {
+      fetch("/api/auth/logout", {
+        method: "POST",
+        credentials: "include",
+      }).finally(() => {
+        clearSession();
+        if (window.location.pathname !== "/auth/login") {
+          window.location.assign("/auth/login");
+        }
+      });
     }
   } else {
     console.error(`[Network error] ${operation.operationName}:`, error);
@@ -21,13 +37,10 @@ const errorLink = new ErrorLink(({ error, operation }) => {
 });
 
 function makeClient() {
-  const NEXT_PUBLIC_GRAPHQL_API_URL = process.env.NEXT_PUBLIC_GRAPHQL_API_URL;
-  if (!NEXT_PUBLIC_GRAPHQL_API_URL) {
-    throw new Error("NEXT_PUBLIC_GRAPHQL_API_URL is not set");
-  }
   const httpLink = new HttpLink({
-    uri: NEXT_PUBLIC_GRAPHQL_API_URL,
-    fetchOptions: { credentials: "include" },
+    uri: "/api/graphql",
+    credentials: "include",
+    fetchOptions: { cache: "no-store" },
   });
 
   return new ApolloClient({
@@ -37,9 +50,5 @@ function makeClient() {
 }
 
 export function ApolloWrapper({ children }: { children: React.ReactNode }) {
-  return (
-    <ApolloNextAppProvider makeClient={makeClient}>
-      {children}
-    </ApolloNextAppProvider>
-  );
+  return <ApolloNextAppProvider makeClient={makeClient}>{children}</ApolloNextAppProvider>;
 }

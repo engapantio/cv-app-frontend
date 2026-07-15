@@ -14,7 +14,8 @@
     "prepare": "husky",
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",
-    "test:ci": "jest --ci --coverage --runInBand"
+    "test:ci": "jest --ci --coverage --runInBand",
+    "clean": "rm -rf .next coverage"
   },
   "dependencies": {
     "@apollo/client": "^4.2.7",
