@@ -2,9 +2,14 @@ import { ApolloClient, InMemoryCache, HttpLink } from "@apollo/client";
 import { ErrorLink } from "@apollo/client/link/error";
 import { CombinedGraphQLErrors } from "@apollo/client/errors";
 
-const GRAPHQL_URI = process.env.GRAPHQL_API_URL;
-if (!GRAPHQL_URI) {
-  throw new Error("GRAPHQL_API_URL is not set");
+function getGraphqlUri() {
+  const value = process.env.GRAPHQL_API_URL;
+
+  if (!value) {
+    throw new Error("GRAPHQL_API_URL is not set");
+  }
+
+  return value;
 }
 
 const errorLink = new ErrorLink(({ error, operation }) => {
@@ -19,7 +24,7 @@ const errorLink = new ErrorLink(({ error, operation }) => {
 
 function createHttpLink(cookieHeader?: string) {
   return new HttpLink({
-    uri: GRAPHQL_URI,
+    uri: getGraphqlUri(),
     fetchOptions: { cache: "no-store" },
     headers: cookieHeader ? { cookie: cookieHeader } : undefined,
   });
