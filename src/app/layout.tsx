@@ -1,17 +1,21 @@
 import "./globals.css";
-import type { Metadata } from "next";
+import { ApolloWrapper } from "@/lib/apollo/apollo-wrapper";
 
-export const metadata: Metadata = {
+export const metadata = {
   title: "CV App",
-  description: "Internal CV management frontend"
+  description: "Curriculum Vitae management application",
 };
 
 export default function RootLayout({
-  children
-}: Readonly<{ children: React.ReactNode }>) {
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <html lang="en" className="dark">
-      <body>{children}</body>
+    <html lang="en" suppressHydrationWarning>
+      <body>
+        <ApolloWrapper>{children}</ApolloWrapper>
+      </body>
     </html>
   );
 }
