@@ -21,8 +21,12 @@ export const sessionStateVar = makeVar<SessionState>({
 });
 
 let bootstrapped = false;
+let bootstrapAbortController: AbortController | null = null;
 
 export function setAuthenticatedSession(user: SessionUser) {
+
+  bootstrapAbortController?.abort();
+  
   sessionStateVar({
     status: user ? "authenticated" : "anonymous",
     user,
@@ -30,6 +34,8 @@ export function setAuthenticatedSession(user: SessionUser) {
 }
 
 export function clearSession() {
+  bootstrapped = false;
+  bootstrapAbortController = null;
   sessionStateVar({
     status: "anonymous",
     user: null,
@@ -37,6 +43,8 @@ export function clearSession() {
 }
 
 export function resetSessionToLoading() {
+  bootstrapped = false; 
+  bootstrapAbortController = null;
   sessionStateVar({
     status: "loading",
     user: null,
@@ -47,10 +55,13 @@ export function bootstrapSession() {
   if (bootstrapped) return;
   bootstrapped = true;
 
+  bootstrapAbortController = new AbortController();
+
   fetch("/api/auth/session", {
     method: "GET",
     credentials: "include",
     cache: "no-store",
+    signal: bootstrapAbortController.signal,
   })
     .then(async (res) => {
       if (!res.ok) throw new Error("Failed to load session");
@@ -62,8 +73,10 @@ export function bootstrapSession() {
         user: data.user ?? null,
       });
     })
-    .catch(() => {
-      clearSession();
+    .catch((error) => {
+      if (error.name !== "AbortError") {
+        clearSession();
+       }
     });
 }
 

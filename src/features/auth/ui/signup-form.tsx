@@ -1,34 +1,15 @@
 "use client";
 
-import { SubmitEvent, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { Loader2 } from "lucide-react";
-import { setAuthenticatedSession } from "@/lib/auth/session";
-import { AuthFormShell } from "@/components/auth/auth-form -shell";
+import { useAuthForm } from "@/lib/auth/auth-form-hooks";
+import { AuthFormShell } from "@/components/auth/auth-form-shell";
 import { PasswordField } from "@/components/auth/password-field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-type SignupResponse = {
-  user?: {
-    id: string;
-    email: string;
-    fullName?: string;
-    firstName?: string;
-    lastName?: string;
-    role: "Admin" | "Employee";
-  };
-  message?: string;
-};
-
-function normalizeFullName(user: NonNullable<SignupResponse["user"]>) {
-  if (user.fullName?.trim()) return user.fullName.trim();
-  const combined = `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim();
-  return combined || user.email;
-}
-
-function validateSignup(email: string, password: string, confirmPassword: string) {
+function validateSignup(email: string, password: string, confirmPassword: string): string | null {
   if (!email.trim() || !password.trim() || !confirmPassword.trim()) {
     return "All fields are required.";
   }
@@ -45,60 +26,11 @@ function validateSignup(email: string, password: string, confirmPassword: string
 }
 
 export function SignupForm() {
-  const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const { email, setEmail, password, setPassword, submitting, error, handleSubmit } = useAuthForm({
+    endpoint: "/api/auth/signup",
+  });
+
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  async function onSubmit(event: SubmitEvent<HTMLFormElement>) {
-    event.preventDefault();
-
-    const validationError = validateSignup(email, password, confirmPassword);
-    if (validationError) {
-      setError(validationError);
-      return;
-    }
-
-    setSubmitting(true);
-    setError(null);
-
-    try {
-      const response = await fetch("/api/auth/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          email: email.trim(),
-          password,
-        }),
-      });
-
-      const payload = (await response.json()) as SignupResponse;
-
-      if (!response.ok || !payload.user) {
-        setError(payload.message ?? "Unable to create account.");
-        return;
-      }
-
-      setAuthenticatedSession({
-        id: payload.user.id,
-        email: payload.user.email,
-        fullName: normalizeFullName(payload.user),
-        role: payload.user.role,
-      });
-
-      router.replace("/users");
-      router.refresh();
-    } catch {
-      setError("Unexpected error. Please try again.");
-    } finally {
-      setSubmitting(false);
-    }
-  }
 
   return (
     <AuthFormShell
@@ -108,7 +40,10 @@ export function SignupForm() {
       footerLinkLabel="Log in"
       footerHref="/auth/login"
     >
-      <form className="space-y-5" onSubmit={onSubmit}>
+      <form
+        className="space-y-5"
+        onSubmit={(e) => handleSubmit(e, () => validateSignup(email, password, confirmPassword))}
+      >
         <div className="space-y-2">
           <Label htmlFor="signup-email">Email</Label>
           <Input

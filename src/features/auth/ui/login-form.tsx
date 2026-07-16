@@ -1,96 +1,27 @@
 "use client";
 
-import { SubmitEvent, useState } from "react";
-import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
-import { setAuthenticatedSession } from "@/lib/auth/session";
-import { AuthFormShell } from "@/components/auth/auth-form -shell";
+import { useAuthForm } from "@/lib/auth/auth-form-hooks";
+import { AuthFormShell } from "@/components/auth/auth-form-shell";
 import { PasswordField } from "@/components/auth/password-field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-type LoginResponse = {
-  user?: {
-    id: string;
-    email: string;
-    fullName?: string;
-    firstName?: string;
-    lastName?: string;
-    role: "Admin" | "Employee";
-  };
-  message?: string;
-};
-
-function normalizeFullName(user: NonNullable<LoginResponse["user"]>) {
-  if (user.fullName?.trim()) return user.fullName.trim();
-  const combined = `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim();
-  return combined || user.email;
-}
-
 export function LoginForm() {
-  const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  async function onSubmit(event: SubmitEvent<HTMLFormElement>) {
-    event.preventDefault();
-
-    if (!email.trim() || !password.trim()) {
-      setError("Email and password are required.");
-      return;
-    }
-
-    setSubmitting(true);
-    setError(null);
-
-    try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          email: email.trim(),
-          password,
-        }),
-      });
-
-      const payload = (await response.json()) as LoginResponse;
-
-      if (!response.ok || !payload.user) {
-        setError(payload.message ?? "Unable to sign in.");
-        return;
-      }
-
-      setAuthenticatedSession({
-        id: payload.user.id,
-        email: payload.user.email,
-        fullName: normalizeFullName(payload.user),
-        role: payload.user.role,
-      });
-
-      router.replace("/users");
-      router.refresh();
-    } catch {
-      setError("Unexpected error. Please try again.");
-    } finally {
-      setSubmitting(false);
-    }
-  }
+  const { email, setEmail, password, setPassword, submitting, error, handleSubmit } = useAuthForm({
+    endpoint: "/api/auth/login",
+  });
 
   return (
     <AuthFormShell
       title="Log in"
       description="Enter your credentials to continue to the CV workspace."
-      footerText="Don’t have an account?"
+      footerText="Don't have an account?"
       footerLinkLabel="Create one"
       footerHref="/auth/signup"
     >
-      <form className="space-y-5" onSubmit={onSubmit}>
+      <form className="space-y-5" onSubmit={(e) => handleSubmit(e)}>
         <div className="space-y-2">
           <Label htmlFor="login-email">Email</Label>
           <Input

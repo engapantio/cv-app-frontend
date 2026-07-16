@@ -10,6 +10,8 @@ import { ErrorLink } from "@apollo/client/link/error";
 import { CombinedGraphQLErrors } from "@apollo/client/errors";
 import { clearSession } from "@/lib/auth/session";
 
+const isLoggingOutRef = {current: false}
+
 const errorLink = new ErrorLink(({ error, operation }) => {
   if (CombinedGraphQLErrors.is(error)) {
     const unauthorized = error.errors.some(({ message }) =>
@@ -20,17 +22,35 @@ const errorLink = new ErrorLink(({ error, operation }) => {
       console.error(`[GraphQL error] ${operation.operationName}: ${message}`);
     }
 
-    if (unauthorized) {
-      fetch("/api/auth/logout", {
-        method: "POST",
-        credentials: "include",
-      }).finally(() => {
-        clearSession();
-        if (window.location.pathname !== "/auth/login") {
-          window.location.assign("/auth/login");
-        }
-      });
-    }
+ if (unauthorized && !isLoggingOutRef.current) {
+   isLoggingOutRef.current = true;
+
+   fetch("/api/auth/logout", {
+     method: "POST",
+     credentials: "include",
+   })
+     .then(async (res) => {
+       if (!res.ok) {
+         throw new Error(`Logout failed: ${res.status}`);
+       }
+     })
+     .then(() => {
+       clearSession();
+       if (window.location.pathname !== "/auth/login") {
+         window.location.assign("/auth/login");
+       }
+     })
+     .catch((logoutError) => {
+       console.error("[Logout error] Failed to notify server:", logoutError);
+       clearSession();
+       if (window.location.pathname !== "/auth/login") {
+         window.location.assign("/auth/login");
+       }
+     })
+     .finally(() => {
+       isLoggingOutRef.current = false;
+     });
+ }
   } else {
     console.error(`[Network error] ${operation.operationName}:`, error);
   }
