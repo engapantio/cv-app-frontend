@@ -1,19 +1,13 @@
 import { NextResponse } from "next/server";
 import { createServerApolloClient } from "@/lib/apollo/server-client";
 import { UPDATE_TOKEN_MUTATION } from "@/lib/graphql/auth/update-token.mutation";
-import {
-  getServerRefreshToken,
-  setAuthCookies,
-  clearAuthCookies,
-} from "@/lib/auth/cookies";
+import { getServerRefreshToken, setAuthCookies, clearAuthCookies } from "@/lib/auth/cookies";
 
 export async function POST() {
   const refreshToken = await getServerRefreshToken();
 
   if (!refreshToken) {
-    return clearAuthCookies(
-      NextResponse.json({ message: "No refresh token" }, { status: 401 }),
-    );
+    return clearAuthCookies(NextResponse.json({ message: "No refresh token" }, { status: 401 }));
   }
 
   try {
@@ -23,9 +17,7 @@ export async function POST() {
     });
 
     if (!data?.updateToken) {
-      return clearAuthCookies(
-        NextResponse.json({ message: "Session expired" }, { status: 401 }),
-      );
+      return clearAuthCookies(NextResponse.json({ message: "Session expired" }, { status: 401 }));
     }
 
     const response = NextResponse.json({ ok: true });
@@ -34,8 +26,6 @@ export async function POST() {
       refreshToken: data.updateToken.refresh_token,
     });
   } catch {
-    return clearAuthCookies(
-      NextResponse.json({ message: "Session expired" }, { status: 401 }),
-    );
+    return clearAuthCookies(NextResponse.json({ message: "Session expired" }, { status: 401 }));
   }
 }

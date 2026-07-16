@@ -9,9 +9,7 @@ export function ProtectedShell({ children }: { children: React.ReactNode }) {
     <SidebarProvider>
       {/* <AppSidebar /> */}
       <SidebarInset>
-        <main className="min-h-dvh px-4 pb-20 pt-6 md:px-8 md:pb-8">
-          {children}
-        </main>
+        <main className="min-h-dvh px-4 pb-20 pt-6 md:px-8 md:pb-8">{children}</main>
       </SidebarInset>
       {/* <MobileBottomNav /> */}
     </SidebarProvider>

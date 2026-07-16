@@ -1,39 +1,69 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { sessionVar } from "@/lib/auth/session";
+import { Loader2 } from "lucide-react";
+import { useAuthForm } from "@/lib/auth/auth-form-hooks";
+import { AuthFormShell } from "@/components/auth/auth-form-shell";
+import { PasswordField } from "@/components/auth/password-field";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export function LoginForm() {
-  const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
-
-  async function handleSubmit(formData: FormData) {
-    setError(null);
-    const res = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email: formData.get("email"),
-        password: formData.get("password"),
-      }),
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      setError(data.message ?? "Login failed");
-      return;
-    }
-
-    sessionVar(data.user);
-    router.push("/users");
-  }
+  const { email, setEmail, password, setPassword, submitting, error, handleSubmit } = useAuthForm({
+    endpoint: "/api/auth/login",
+  });
 
   return (
-    <form action={handleSubmit} className="space-y-4">
-      {/* inputs */}
-      {error && <p className="text-sm text-destructive">{error}</p>}
-    </form>
+    <AuthFormShell
+      title="Log in"
+      description="Enter your credentials to continue to the CV workspace."
+      footerText="Don't have an account?"
+      footerLinkLabel="Create one"
+      footerHref="/auth/signup"
+    >
+      <form className="space-y-5" onSubmit={(e) => handleSubmit(e)}>
+        <div className="space-y-2">
+          <Label htmlFor="login-email">Email</Label>
+          <Input
+            id="login-email"
+            type="email"
+            placeholder="name@example.com"
+            autoComplete="email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            disabled={submitting}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="login-password">Password</Label>
+          <PasswordField
+            id="login-password"
+            placeholder="Enter your password"
+            autoComplete="current-password"
+            value={password}
+            onChange={setPassword}
+            disabled={submitting}
+          />
+        </div>
+
+        {error ? (
+          <p className="rounded-xl border border-destructive/20 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+            {error}
+          </p>
+        ) : null}
+
+        <Button type="submit" className="w-full" disabled={submitting}>
+          {submitting ? (
+            <>
+              <Loader2 className="mr-2 size-4 animate-spin" />
+              Logging in...
+            </>
+          ) : (
+            "Log in"
+          )}
+        </Button>
+      </form>
+    </AuthFormShell>
   );
 }

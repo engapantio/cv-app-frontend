@@ -9,10 +9,7 @@ export async function POST(request: NextRequest) {
     const { email, password } = await request.json();
 
     if (!email || !password) {
-      return NextResponse.json(
-        { message: "Email and password are required" },
-        { status: 400 },
-      );
+      return NextResponse.json({ message: "Email and password are required" }, { status: 400 });
     }
 
     const client = createServerApolloClient();
@@ -28,10 +25,14 @@ export async function POST(request: NextRequest) {
     const { user, access_token, refresh_token } = data.signup;
 
     const response = NextResponse.json({ user });
-    return setAuthCookies(response, {
-      accessToken: access_token,
-      refreshToken: refresh_token,
-    });
+    return setAuthCookies(
+      response,
+      {
+        accessToken: access_token,
+        refreshToken: refresh_token,
+      },
+      user,
+    );
   } catch (error: unknown) {
     if (CombinedGraphQLErrors.is(error)) {
       return NextResponse.json({ message: error.message }, { status: 401 });

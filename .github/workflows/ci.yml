@@ -14,8 +14,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Setup pnpm
+      - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 10.26.2
@@ -37,3 +36,6 @@ jobs:
 
       - name: Test
         run: pnpm test -- --ci
+
+      - name: Build
+        run: pnpm build
