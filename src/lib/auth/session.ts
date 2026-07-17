@@ -4,7 +4,6 @@ import { useReactiveVar } from "@apollo/client/react";
 import { useEffect } from "react";
 import type { SessionUser } from "@/lib/auth/cookies";
 
-
 export type SessionState = {
   status: "loading" | "authenticated" | "anonymous";
   user: SessionUser | null;
@@ -22,7 +21,7 @@ export function setAuthenticatedSession(user: SessionUser) {
   bootstrapAbortController?.abort();
 
   sessionStateVar({
-    status:  "authenticated",
+    status: "authenticated",
     user,
   });
 }

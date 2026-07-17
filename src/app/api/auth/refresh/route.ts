@@ -6,11 +6,16 @@ import {
   type UpdateTokenMutation,
   type UpdateTokenMutationVariables,
 } from "@/gql/generated/graphql";
-import { getServerRefreshToken, getServerUserId, setAuthCookies, clearAuthCookies } from "@/lib/auth/cookies";
+import {
+  getServerRefreshToken,
+  getServerUserId,
+  setAuthCookies,
+  clearAuthCookies,
+} from "@/lib/auth/cookies";
 
 export async function POST() {
-    const refreshToken = await getServerRefreshToken();
-    const userId = Number(await getServerUserId());
+  const refreshToken = await getServerRefreshToken();
+  const userId = Number(await getServerUserId());
 
   if (!refreshToken || !userId) {
     return clearAuthCookies(NextResponse.json({ message: "Session expired" }, { status: 401 }));
@@ -27,10 +32,12 @@ export async function POST() {
     }
 
     const response = NextResponse.json({ ok: true });
-    return setAuthCookies(response, {
-      accessToken: data.updateToken.access_token,
-      refreshToken: data.updateToken.refresh_token,
-    },
+    return setAuthCookies(
+      response,
+      {
+        accessToken: data.updateToken.access_token,
+        refreshToken: data.updateToken.refresh_token,
+      },
       userId,
     );
   } catch {

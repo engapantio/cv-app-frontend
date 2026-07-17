@@ -14,14 +14,13 @@ export async function GET() {
   try {
     const client = createServerApolloClient(accessToken);
 
-     const result = await client.query<UserQuery, UserQueryVariables>({
-       query: UserDocument,
-       variables: { userId },
-       fetchPolicy: "no-cache",
-     });
+    const result = await client.query<UserQuery, UserQueryVariables>({
+      query: UserDocument,
+      variables: { userId },
+      fetchPolicy: "no-cache",
+    });
 
-const user = result.data?.user ?? null;
-
+    const user = result.data?.user ?? null;
 
     return NextResponse.json({
       authenticated: !!user,

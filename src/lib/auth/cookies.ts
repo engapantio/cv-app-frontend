@@ -36,15 +36,15 @@ export function setAuthCookies(
     maxAge: 60 * 60 * 24 * 7,
   });
 
-    response.cookies.set({
-      name: USER_ID_COOKIE,
-      value: userId.toString(),
-      httpOnly: false,
-      secure: isProd,
-      sameSite: "lax",
-      path: "/",
-      maxAge: 60 * 60 * 24 * 7,
-    });
+  response.cookies.set({
+    name: USER_ID_COOKIE,
+    value: userId.toString(),
+    httpOnly: false,
+    secure: isProd,
+    sameSite: "lax",
+    path: "/",
+    maxAge: 60 * 60 * 24 * 7,
+  });
 
   return response;
 }

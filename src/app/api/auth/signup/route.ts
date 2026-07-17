@@ -8,7 +8,6 @@ import {
   type SignupMutationVariables,
 } from "@/gql/generated/graphql";
 
-
 export async function POST(request: NextRequest) {
   try {
     const { email, password } = await request.json();
@@ -18,7 +17,7 @@ export async function POST(request: NextRequest) {
     }
 
     const client = createServerApolloClient();
-    const { data } = await client.mutate<SignupMutation,SignupMutationVariables>({
+    const { data } = await client.mutate<SignupMutation, SignupMutationVariables>({
       mutation: SignupDocument,
       variables: { auth: { email, password } },
     });

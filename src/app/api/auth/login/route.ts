@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
       fetchPolicy: "no-cache",
     });
 
-    if (!data?.login){
+    if (!data?.login) {
       return NextResponse.json({ message: "Login failed" }, { status: 401 });
     }
 
