@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerAccessToken } from "@/lib/auth/cookies";
+import { cookies } from "next/headers";
+import { ACCESS_TOKEN_COOKIE } from "@/lib/auth/cookies";
 
 export async function POST(request: NextRequest) {
-  const accessToken = await getServerAccessToken();
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get(ACCESS_TOKEN_COOKIE)?.value;
+  
   const body = await request.text();
 
   const res = await fetch(process.env.GRAPHQL_API_URL!, {

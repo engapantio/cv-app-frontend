@@ -1,0 +1,8 @@
+mutation RemoveCvProject($project: RemoveCvProjectInput!) {
+  removeCvProject(project: $project) {
+    id
+    created_at
+    name
+    description
+  }
+}

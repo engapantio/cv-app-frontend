@@ -1,0 +1,7 @@
+query Positions {
+  positions {
+    id
+    created_at
+    name
+  }
+}

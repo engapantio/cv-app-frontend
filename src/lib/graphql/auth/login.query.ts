@@ -19,6 +19,10 @@ export const LOGIN_QUERY: TypedDocumentNode<LoginData, LoginVars> = gql`
         is_verified
         profile {
           id
+          first_name
+          last_name
+          full_name
+          avatar
         }
         cvs {
           id

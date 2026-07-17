@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { CombinedGraphQLErrors } from "@apollo/client/errors";
 import { createServerApolloClient } from "@/lib/apollo/server-client";
-import { SIGNUP_MUTATION } from "@/lib/graphql/auth/signup.mutation";
 import { setAuthCookies } from "@/lib/auth/cookies";
+import {
+  SignupDocument,
+  type SignupMutation,
+  type SignupMutationVariables,
+} from "@/gql/generated/graphql";
+
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,25 +18,26 @@ export async function POST(request: NextRequest) {
     }
 
     const client = createServerApolloClient();
-    const { data } = await client.mutate({
-      mutation: SIGNUP_MUTATION,
+    const { data } = await client.mutate<SignupMutation,SignupMutationVariables>({
+      mutation: SignupDocument,
       variables: { auth: { email, password } },
     });
 
-    if (!data?.signup) {
+    const signup = data?.signup;
+
+    if (!signup?.user || !signup.access_token || !signup.refresh_token) {
       return NextResponse.json({ message: "Signup failed" }, { status: 400 });
     }
 
-    const { user, access_token, refresh_token } = data.signup;
+    const response = NextResponse.json({ user: signup.user });
 
-    const response = NextResponse.json({ user });
     return setAuthCookies(
       response,
       {
-        accessToken: access_token,
-        refreshToken: refresh_token,
+        accessToken: signup.access_token,
+        refreshToken: signup.refresh_token,
       },
-      user,
+      Number(signup.user.id),
     );
   } catch (error: unknown) {
     if (CombinedGraphQLErrors.is(error)) {

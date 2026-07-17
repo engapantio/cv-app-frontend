@@ -19,6 +19,10 @@ export const SIGNUP_MUTATION: TypedDocumentNode<SignupData, SignupVars> = gql`
         is_verified
         profile {
           id
+          first_name
+          last_name
+          full_name
+          avatar
         }
         cvs {
           id

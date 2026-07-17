@@ -1,33 +1,33 @@
 import { NextResponse } from "next/server";
-import {
-  clearAuthCookies,
-  getServerAccessToken,
-  getServerRefreshToken,
-  getServerSessionUser,
-} from "@/lib/auth/cookies";
+import { createServerApolloClient } from "@/lib/apollo/server-client";
+import { getServerAccessToken, getServerUserId } from "@/lib/auth/cookies";
+import { UserDocument, type UserQuery, type UserQueryVariables } from "@/gql/generated/graphql";
 
 export async function GET() {
   const accessToken = await getServerAccessToken();
-  const refreshToken = await getServerRefreshToken();
-  const user = await getServerSessionUser();
+  const userId = Number(await getServerUserId());
 
-  if (!accessToken && !refreshToken) {
-    return clearAuthCookies(
-      NextResponse.json(
-        {
-          authenticated: false,
-          user: null,
-        },
-        { status: 200 },
-      ),
-    );
+  if (!accessToken || !userId) {
+    return NextResponse.json({ authenticated: false, user: null });
   }
 
-  return NextResponse.json(
-    {
-      authenticated: Boolean(accessToken || refreshToken),
+  try {
+    const client = createServerApolloClient(accessToken);
+
+     const result = await client.query<UserQuery, UserQueryVariables>({
+       query: UserDocument,
+       variables: { userId },
+       fetchPolicy: "no-cache",
+     });
+
+const user = result.data?.user ?? null;
+
+
+    return NextResponse.json({
+      authenticated: !!user,
       user,
-    },
-    { status: 200 },
-  );
+    });
+  } catch {
+    return NextResponse.json({ authenticated: false, user: null });
+  }
 }
