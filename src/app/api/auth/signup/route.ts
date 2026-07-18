@@ -3,9 +3,7 @@ import { CombinedGraphQLErrors } from "@apollo/client/errors";
 import { createServerApolloClient } from "@/lib/apollo/server-client";
 import { setAuthCookies } from "@/lib/auth/cookies";
 import {
-  SignupDocument,
-  type SignupMutation,
-  type SignupMutationVariables,
+  SignupDocument
 } from "@/gql/generated/graphql";
 
 export async function POST(request: NextRequest) {
@@ -17,7 +15,7 @@ export async function POST(request: NextRequest) {
     }
 
     const client = createServerApolloClient();
-    const { data } = await client.mutate<SignupMutation, SignupMutationVariables>({
+    const { data } = await client.mutate({
       mutation: SignupDocument,
       variables: { auth: { email, password } },
     });

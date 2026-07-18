@@ -1,11 +1,6 @@
 import { NextResponse } from "next/server";
 import { createServerApolloClient } from "@/lib/apollo/server-client";
-// import { UPDATE_TOKEN_MUTATION } from "@/lib/graphql/auth/update-token.mutation";
-import {
-  UpdateTokenDocument,
-  type UpdateTokenMutation,
-  type UpdateTokenMutationVariables,
-} from "@/gql/generated/graphql";
+import { UpdateTokenDocument } from "@/gql/generated/graphql";
 import {
   getServerRefreshToken,
   getServerUserId,
@@ -23,7 +18,7 @@ export async function POST() {
 
   try {
     const client = createServerApolloClient(refreshToken);
-    const { data } = await client.mutate<UpdateTokenMutation, UpdateTokenMutationVariables>({
+    const { data } = await client.mutate({
       mutation: UpdateTokenDocument,
     });
 

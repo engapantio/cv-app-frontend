@@ -2,14 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { CombinedGraphQLErrors } from "@apollo/client/errors";
 import { createServerApolloClient } from "@/lib/apollo/server-client";
 import { setAuthCookies } from "@/lib/auth/cookies";
-import { LoginDocument, LoginQuery, LoginQueryVariables } from "@/gql/generated/graphql";
+import { LoginDocument } from "@/gql/generated/graphql";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
   const client = createServerApolloClient(req.headers.get("cookie") ?? undefined);
 
   try {
-    const { data } = await client.query<LoginQuery, LoginQueryVariables>({
+    const { data } = await client.query({
       query: LoginDocument,
       variables: {
         auth: {

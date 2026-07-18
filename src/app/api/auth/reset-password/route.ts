@@ -2,9 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { CombinedGraphQLErrors } from "@apollo/client/errors";
 import { createServerApolloClient } from "@/lib/apollo/server-client";
 import {
-  ResetPasswordDocument,
-  type ResetPasswordMutation,
-  type ResetPasswordMutationVariables,
+  ResetPasswordDocument
 } from "@/gql/generated/graphql";
 
 export async function POST(request: NextRequest) {
@@ -17,7 +15,7 @@ export async function POST(request: NextRequest) {
 
     // token from the email link is passed as Bearer if needed
     const client = createServerApolloClient(token ?? undefined);
-    await client.mutate<ResetPasswordMutation, ResetPasswordMutationVariables>({
+    await client.mutate({
       mutation: ResetPasswordDocument,
       variables: { auth: { newPassword } },
     });

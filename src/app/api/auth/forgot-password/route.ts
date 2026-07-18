@@ -2,9 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { CombinedGraphQLErrors } from "@apollo/client/errors";
 import { createServerApolloClient } from "@/lib/apollo/server-client";
 import {
-  ForgotPasswordDocument,
-  type ForgotPasswordMutation,
-  type ForgotPasswordMutationVariables,
+  ForgotPasswordDocument
 } from "@/gql/generated/graphql";
 
 export async function POST(request: NextRequest) {
@@ -17,7 +15,7 @@ export async function POST(request: NextRequest) {
 
     const client = createServerApolloClient();
 
-    await client.mutate<ForgotPasswordMutation, ForgotPasswordMutationVariables>({
+    await client.mutate({
       mutation: ForgotPasswordDocument,
       variables: {
         auth: {

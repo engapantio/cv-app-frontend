@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createServerApolloClient } from "@/lib/apollo/server-client";
 import { getServerAccessToken, getServerUserId } from "@/lib/auth/cookies";
-import { UserDocument, type UserQuery, type UserQueryVariables } from "@/gql/generated/graphql";
+import { UserDocument} from "@/gql/generated/graphql";
 
 export async function GET() {
   const accessToken = await getServerAccessToken();
@@ -14,7 +14,7 @@ export async function GET() {
   try {
     const client = createServerApolloClient(accessToken);
 
-    const result = await client.query<UserQuery, UserQueryVariables>({
+    const result = await client.query({
       query: UserDocument,
       variables: { userId },
       fetchPolicy: "no-cache",
