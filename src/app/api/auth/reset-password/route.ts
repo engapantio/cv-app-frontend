@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { CombinedGraphQLErrors } from "@apollo/client/errors";
 import { createServerApolloClient } from "@/lib/apollo/server-client";
-import {
-  ResetPasswordDocument
-} from "@/gql/generated/graphql";
+import { ResetPasswordDocument } from "@/gql/generated/graphql";
 
 export async function POST(request: NextRequest) {
   try {

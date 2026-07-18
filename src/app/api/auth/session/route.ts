@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createServerApolloClient } from "@/lib/apollo/server-client";
 import { getServerAccessToken, getServerUserId } from "@/lib/auth/cookies";
-import { UserDocument} from "@/gql/generated/graphql";
+import { UserDocument } from "@/gql/generated/graphql";
 
 export async function GET() {
   const accessToken = await getServerAccessToken();

@@ -2,9 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { CombinedGraphQLErrors } from "@apollo/client/errors";
 import { createServerApolloClient } from "@/lib/apollo/server-client";
 import { setAuthCookies } from "@/lib/auth/cookies";
-import {
-  SignupDocument
-} from "@/gql/generated/graphql";
+import { SignupDocument } from "@/gql/generated/graphql";
 
 export async function POST(request: NextRequest) {
   try {
