@@ -16,6 +16,7 @@ export * from "./pagination";
 export { Label } from "./label";
 export { Input } from "./input";
 export * from "./input-group";
+export * from "./select";
 export * from "./field";
 export * from "./dropdown-menu";
 export * from "./dialog";
