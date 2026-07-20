@@ -1,0 +1,7 @@
+mutation UpdateDepartment($department: UpdateDepartmentInput!) {
+  updateDepartment(department: $department) {
+    id
+    created_at
+    name
+  }
+}

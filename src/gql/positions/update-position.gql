@@ -1,0 +1,7 @@
+mutation UpdatePosition($position: UpdatePositionInput!) {
+  updatePosition(position: $position) {
+    id
+    created_at
+    name
+  }
+}

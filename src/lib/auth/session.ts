@@ -2,17 +2,11 @@
 import { makeVar } from "@apollo/client";
 import { useReactiveVar } from "@apollo/client/react";
 import { useEffect } from "react";
-
-export type SessionUser = {
-  id: string;
-  email: string;
-  fullName: string;
-  role: "Admin" | "Employee";
-} | null;
+import type { SessionUser } from "@/lib/auth/cookies";
 
 export type SessionState = {
   status: "loading" | "authenticated" | "anonymous";
-  user: SessionUser;
+  user: SessionUser | null;
 };
 
 export const sessionStateVar = makeVar<SessionState>({
@@ -24,11 +18,10 @@ let bootstrapped = false;
 let bootstrapAbortController: AbortController | null = null;
 
 export function setAuthenticatedSession(user: SessionUser) {
-
   bootstrapAbortController?.abort();
-  
+
   sessionStateVar({
-    status: user ? "authenticated" : "anonymous",
+    status: "authenticated",
     user,
   });
 }
@@ -43,7 +36,7 @@ export function clearSession() {
 }
 
 export function resetSessionToLoading() {
-  bootstrapped = false; 
+  bootstrapped = false;
   bootstrapAbortController = null;
   sessionStateVar({
     status: "loading",
@@ -51,7 +44,7 @@ export function resetSessionToLoading() {
   });
 }
 
-export function bootstrapSession() {
+export async function bootstrapSession() {
   if (bootstrapped) return;
   bootstrapped = true;
 
@@ -76,7 +69,7 @@ export function bootstrapSession() {
     .catch((error) => {
       if (error.name !== "AbortError") {
         clearSession();
-       }
+      }
     });
 }
 

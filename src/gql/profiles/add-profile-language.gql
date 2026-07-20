@@ -1,0 +1,10 @@
+mutation AddProfileLanguage($language: AddProfileLanguageInput!) {
+  addProfileLanguage(language: $language) {
+    id
+    created_at
+    languages {
+      name
+      proficiency
+    }
+  }
+}

@@ -1,0 +1,8 @@
+mutation UpdateCvSkill($skill: UpdateCvSkillInput!) {
+  updateCvSkill(skill: $skill) {
+    id
+    created_at
+    name
+    description
+  }
+}

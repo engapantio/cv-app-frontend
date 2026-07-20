@@ -1,6 +1,7 @@
-import { ApolloClient, InMemoryCache, HttpLink } from "@apollo/client";
+import { ApolloClient, InMemoryCache, HttpLink, ApolloLink } from "@apollo/client";
 import { ErrorLink } from "@apollo/client/link/error";
 import { CombinedGraphQLErrors } from "@apollo/client/errors";
+import { typePolicies } from "@/lib/apollo/cache";
 
 function getGraphqlUri() {
   const value = process.env.GRAPHQL_API_URL;
@@ -22,17 +23,29 @@ const errorLink = new ErrorLink(({ error, operation }) => {
   }
 });
 
-function createHttpLink(cookieHeader?: string) {
-  return new HttpLink({
-    uri: getGraphqlUri(),
-    fetchOptions: { cache: "no-store" },
-    headers: cookieHeader ? { cookie: cookieHeader } : undefined,
+function createAuthLink(token?: string) {
+  return new ApolloLink((operation, forward) => {
+    operation.setContext(({ headers = {} }) => ({
+      headers: {
+        ...headers,
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+    }));
+
+    return forward(operation);
   });
 }
 
-export function createServerApolloClient(cookieHeader?: string) {
+function createHttpLink() {
+  return new HttpLink({
+    uri: getGraphqlUri(),
+    fetchOptions: { cache: "no-store" },
+  });
+}
+
+export function createServerApolloClient(token?: string) {
   return new ApolloClient({
-    cache: new InMemoryCache(),
-    link: errorLink.concat(createHttpLink(cookieHeader)),
+    cache: new InMemoryCache({ typePolicies }),
+    link: errorLink.concat(createAuthLink(token).concat(createHttpLink())),
   });
 }

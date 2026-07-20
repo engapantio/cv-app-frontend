@@ -1,0 +1,11 @@
+mutation AddProfileSkill($skill: AddProfileSkillInput!) {
+  addProfileSkill(skill: $skill) {
+    id
+    created_at
+    skills {
+      name
+      mastery
+      categoryId
+    }
+  }
+}

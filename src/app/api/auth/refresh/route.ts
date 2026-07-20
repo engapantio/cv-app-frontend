@@ -1,19 +1,25 @@
 import { NextResponse } from "next/server";
 import { createServerApolloClient } from "@/lib/apollo/server-client";
-import { UPDATE_TOKEN_MUTATION } from "@/lib/graphql/auth/update-token.mutation";
-import { getServerRefreshToken, setAuthCookies, clearAuthCookies } from "@/lib/auth/cookies";
+import { UpdateTokenDocument } from "@/gql/generated/graphql";
+import {
+  getServerRefreshToken,
+  getServerUserId,
+  setAuthCookies,
+  clearAuthCookies,
+} from "@/lib/auth/cookies";
 
 export async function POST() {
   const refreshToken = await getServerRefreshToken();
+  const userId = await getServerUserId();
 
-  if (!refreshToken) {
-    return clearAuthCookies(NextResponse.json({ message: "No refresh token" }, { status: 401 }));
+  if (!refreshToken || !userId) {
+    return clearAuthCookies(NextResponse.json({ message: "Session expired" }, { status: 401 }));
   }
 
   try {
     const client = createServerApolloClient(refreshToken);
     const { data } = await client.mutate({
-      mutation: UPDATE_TOKEN_MUTATION,
+      mutation: UpdateTokenDocument,
     });
 
     if (!data?.updateToken) {
@@ -21,10 +27,14 @@ export async function POST() {
     }
 
     const response = NextResponse.json({ ok: true });
-    return setAuthCookies(response, {
-      accessToken: data.updateToken.access_token,
-      refreshToken: data.updateToken.refresh_token,
-    });
+    return setAuthCookies(
+      response,
+      {
+        accessToken: data.updateToken.access_token,
+        refreshToken: data.updateToken.refresh_token,
+      },
+      userId,
+    );
   } catch {
     return clearAuthCookies(NextResponse.json({ message: "Session expired" }, { status: 401 }));
   }

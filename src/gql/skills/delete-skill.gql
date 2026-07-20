@@ -1,0 +1,5 @@
+mutation DeleteSkill($skill: DeleteSkillInput!) {
+  deleteSkill(skill: $skill) {
+    affected
+  }
+}

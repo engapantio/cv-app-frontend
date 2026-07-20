@@ -1,0 +1,42 @@
+query Login($auth: AuthInput!) {
+  login(auth: $auth) {
+    user {
+      id
+      created_at
+      email
+      is_verified
+      profile {
+        id
+        first_name
+        last_name
+        full_name
+        avatar
+        skills {
+          name
+          mastery
+        }
+        languages {
+          name
+          proficiency
+        }
+      }
+      cvs {
+        id
+        name
+        education
+        description
+      }
+      department {
+        id
+      }
+      department_name
+      position {
+        id
+      }
+      position_name
+      role
+    }
+    access_token
+    refresh_token
+  }
+}
