@@ -78,7 +78,7 @@ export function DataTable<T, V>({
           placeholder="Search"
           value={globalFilter ?? ""}
           onChange={(e) => setGlobalFilter(e.target.value)}
-          className="pl-8 rounded-2xl"
+          className="pl-8 rounded-[40px] text-base"
         />
       </div>
 

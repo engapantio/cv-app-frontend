@@ -35,6 +35,7 @@ const SortableHeader = ({ column, label }: { column: Column<User, unknown>; labe
 export const usersColumns: ColumnDef<User, unknown>[] = [
   {
     id: "avatar",
+    header: "",
     cell: ({ row }) => {
       const user = row.original;
       return (
