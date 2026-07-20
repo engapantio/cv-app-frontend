@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
         accessToken: authResult.access_token,
         refreshToken: authResult.refresh_token,
       },
-      Number(authResult.user.id),
+      authResult.user.id,
     );
   } catch (error: unknown) {
     if (CombinedGraphQLErrors.is(error)) {

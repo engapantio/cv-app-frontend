@@ -10,7 +10,7 @@ import {
 
 export async function POST() {
   const refreshToken = await getServerRefreshToken();
-  const userId = Number(await getServerUserId());
+  const userId = await getServerUserId();
 
   if (!refreshToken || !userId) {
     return clearAuthCookies(NextResponse.json({ message: "Session expired" }, { status: 401 }));

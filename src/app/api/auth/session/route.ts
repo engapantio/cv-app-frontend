@@ -5,7 +5,7 @@ import { UserDocument } from "@/gql/generated/graphql";
 
 export async function GET() {
   const accessToken = await getServerAccessToken();
-  const userId = Number(await getServerUserId());
+  const userId = await getServerUserId();
 
   if (!accessToken || !userId) {
     return NextResponse.json({ authenticated: false, user: null });

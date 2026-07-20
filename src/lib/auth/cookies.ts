@@ -14,7 +14,7 @@ const expired = new Date(0);
 export function setAuthCookies(
   response: NextResponse,
   tokens: { accessToken: string; refreshToken: string },
-  userId: number,
+  userId: string | number,
 ) {
   response.cookies.set({
     name: ACCESS_TOKEN_COOKIE,
@@ -38,7 +38,7 @@ export function setAuthCookies(
 
   response.cookies.set({
     name: USER_ID_COOKIE,
-    value: userId.toString(),
+    value: String(userId),
     httpOnly: false,
     secure: isProd,
     sameSite: "lax",

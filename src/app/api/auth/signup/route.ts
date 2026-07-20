@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
         accessToken: signup.access_token,
         refreshToken: signup.refresh_token,
       },
-      Number(signup.user.id),
+      signup.user.id,
     );
   } catch (error: unknown) {
     if (CombinedGraphQLErrors.is(error)) {

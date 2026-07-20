@@ -54,7 +54,12 @@ export function useAuthForm({ endpoint, onSuccess }: UseAuthFormOptions) {
 
       const payload = await response.json();
 
-      if (!response.ok || !payload.user) {
+      if (
+        !response.ok ||
+        !payload.user ||
+        typeof payload.user !== "object" ||
+        Array.isArray(payload.user)
+      ) {
         setError(payload.message ?? "Unable to authenticate.");
         return;
       }
