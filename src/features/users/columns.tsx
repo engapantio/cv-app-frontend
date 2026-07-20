@@ -3,28 +3,20 @@ import { User } from "cv-graphql";
 import { Avatar, AvatarFallback, AvatarImage, Button } from "@/components/ui";
 import { ArrowDown, ArrowUp, ChevronRight } from "lucide-react";
 
-const splitFullName = (fullName?: string | null) => {
-  if (!fullName) return { firstName: "", lastName: "" };
-  const parts = fullName.trim().split(/\s+/);
-  return parts.length === 1
-    ? { firstName: parts[0], lastName: "" }
-    : { firstName: parts[0], lastName: parts.slice(1).join(" ") };
-};
-
 const SortableHeader = ({ column, label }: { column: Column<User, unknown>; label: string }) => {
   const sorted = column.getIsSorted();
   let icon = null;
   if (sorted === "asc") {
-    icon = <ArrowDown className="ml-2 h-4 w-4" />;
+    icon = <ArrowDown className="ml-2  h-[18px] w-[18px]" />;
   } else if (sorted === "desc") {
-    icon = <ArrowUp className="ml-2 h-4 w-4" />;
+    icon = <ArrowUp className="ml-2  h-[18px] w-[18px]" />;
   }
 
   return (
     <Button
       variant="ghost"
       onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-      className="px-0 hover:bg-transparent font-semibold"
+      className="px-0 hover:bg-transparent"
     >
       {label}
       {icon}
@@ -36,10 +28,12 @@ export const usersColumns: ColumnDef<User, unknown>[] = [
   {
     id: "avatar",
     header: "",
+    enableSorting: false,
+    enableGlobalFilter: false,
     cell: ({ row }) => {
       const user = row.original;
       return (
-        <Avatar>
+        <Avatar className="size-10">
           <AvatarImage src={user.profile?.avatar ?? undefined} />
           <AvatarFallback>{user.profile?.full_name?.[0] || user.email[0]}</AvatarFallback>
         </Avatar>
@@ -50,14 +44,14 @@ export const usersColumns: ColumnDef<User, unknown>[] = [
   {
     id: "first_name",
     header: ({ column }) => <SortableHeader column={column} label="First Name" />,
-    cell: ({ row }) => splitFullName(row.original.profile?.full_name).firstName,
-    accessorFn: (row) => splitFullName(row.profile?.full_name).firstName,
+    cell: ({ row }) => row.original.profile?.last_name || "",
+    accessorFn: (row) => row.profile?.last_name,
   },
   {
     id: "last_name",
     header: ({ column }) => <SortableHeader column={column} label="Last Name" />,
-    cell: ({ row }) => splitFullName(row.original.profile?.full_name).lastName,
-    accessorFn: (row) => splitFullName(row.profile?.full_name).lastName,
+    cell: ({ row }) => row.original.profile?.last_name || "",
+    accessorFn: (row) => row.profile?.last_name,
   },
   {
     id: "email",
@@ -79,9 +73,11 @@ export const usersColumns: ColumnDef<User, unknown>[] = [
   {
     id: "actions",
     header: () => <span className="sr-only">Actions</span>,
+    enableSorting: false,
+    enableGlobalFilter: false,
     cell: () => (
       <div className="flex items-center gap-2">
-        <Button variant="ghost" size="icon">
+        <Button variant="ghost" size="icon" className="rounded-[20px]">
           <ChevronRight />
         </Button>
       </div>

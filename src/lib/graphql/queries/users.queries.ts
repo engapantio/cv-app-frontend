@@ -9,6 +9,8 @@ export const GET_USERS = gql`
       profile {
         id
         full_name
+        first_name
+        last_name
         avatar
       }
       department_name

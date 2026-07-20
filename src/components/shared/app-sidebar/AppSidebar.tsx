@@ -13,6 +13,9 @@ import {
   AvatarFallback,
   AvatarImage,
   useSidebar,
+  Skeleton,
+  TableRow,
+  TableCell,
 } from "@/components/ui";
 import { Users, Languages, TrendingUp, FileUser, ChevronLeft } from "lucide-react";
 import Link from "next/link";
@@ -101,7 +104,13 @@ export function AppSidebar() {
       </SidebarContent>
       <SidebarFooter className="m-4">
         {loading ? (
-          <div className="text-sm">Loading...</div>
+          <div className="flex items-center gap-3">
+            <Skeleton className="h-10 w-10 rounded-full" />
+            <div className="flex-1 space-y-2">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-3 w-16" />
+            </div>
+          </div>
         ) : error ? (
           <div className="text-sm text-red-500">Error loading profile</div>
         ) : (

@@ -1,6 +1,7 @@
 "use client";
 
-import { DataTable } from "@/components/shared";
+import { DataTable } from "@/components/shared/";
+import { Button } from "@/components/ui";
 import { usersColumns } from "@/features/users/columns";
 import { useDataTable } from "@/hooks/use-data-table";
 import { GET_USERS } from "@/lib/graphql/queries/users.queries";
@@ -11,13 +12,20 @@ type UsersResponse = {
 };
 
 export default function UsersPage() {
-  const { data, isLoading, error } = useDataTable<UsersResponse, User>({
+  const { data, isLoading, error, refetch } = useDataTable<UsersResponse, User>({
     query: GET_USERS,
     getData: (data) => data.users,
   });
 
   if (error) {
-    return <div>Error: {error.message}</div>;
+    return (
+      <div className="flex flex-col items-center justify-center py-12 text-center">
+        <p className="text-muted-foreground mb-4">Failed to load users</p>
+        <Button variant="outline" onClick={() => refetch()}>
+          Try again
+        </Button>
+      </div>
+    );
   }
 
   return (

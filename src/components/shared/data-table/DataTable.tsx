@@ -25,8 +25,10 @@ import {
   TableRow,
   Input,
   PaginationEllipsis,
+  PaginationPrevious,
+  PaginationNext,
 } from "@/components/ui";
-import { Search } from "lucide-react";
+import { Inbox, Search } from "lucide-react";
 import { generatePagination } from "@/lib/utils/pagination";
 
 interface DataTableProps<T, V> {
@@ -106,8 +108,11 @@ export function DataTable<T, V>({
               </TableRow>
             ) : data.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={columns.length} className="text-center">
-                  {emptyMessage}
+                <TableCell colSpan={columns.length}>
+                  <div className="flex flex-col items-center py-12 text-muted-foreground">
+                    <Inbox className="h-12 w-12 mb-2" />
+                    <p>{emptyMessage}</p>
+                  </div>
                 </TableCell>
               </TableRow>
             ) : (
@@ -128,6 +133,11 @@ export function DataTable<T, V>({
       <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
         <Pagination>
           <PaginationContent>
+            <PaginationPrevious
+              onClick={() => table.previousPage()}
+              aria-disabled={!table.getCanPreviousPage()}
+              className={!table.getCanPreviousPage() ? "pointer-events-none opacity-50" : ""}
+            />
             {pageNumbers.map((page, i) => (
               <PaginationItem key={i}>
                 {page === "..." ? (
@@ -142,6 +152,11 @@ export function DataTable<T, V>({
                 )}
               </PaginationItem>
             ))}
+            <PaginationNext
+              onClick={() => table.nextPage()}
+              aria-disabled={!table.getCanNextPage()}
+              className={!table.getCanNextPage() ? "pointer-events-none opacity-50" : ""}
+            />
           </PaginationContent>
         </Pagination>
       </div>
