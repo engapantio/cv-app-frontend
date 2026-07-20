@@ -35,7 +35,7 @@ export const usersColumns: ColumnDef<User, unknown>[] = [
       return (
         <Avatar className="size-10">
           <AvatarImage src={user.profile?.avatar ?? undefined} />
-          <AvatarFallback>{user.profile?.full_name?.[0] || user.email[0]}</AvatarFallback>
+          <AvatarFallback>{user.profile?.full_name?.[0].toUpperCase() || user.email[0].toUpperCase()}</AvatarFallback>
         </Avatar>
       );
     },
@@ -44,8 +44,8 @@ export const usersColumns: ColumnDef<User, unknown>[] = [
   {
     id: "first_name",
     header: ({ column }) => <SortableHeader column={column} label="First Name" />,
-    cell: ({ row }) => row.original.profile?.last_name || "",
-    accessorFn: (row) => row.profile?.last_name,
+    cell: ({ row }) => row.original.profile?.first_name || "",
+    accessorFn: (row) => row.profile?.first_name,
   },
   {
     id: "last_name",
