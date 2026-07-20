@@ -1,0 +1,8 @@
+mutation AddCvProject($project: AddCvProjectInput!) {
+  addCvProject(project: $project) {
+    id
+    created_at
+    name
+    description
+  }
+}

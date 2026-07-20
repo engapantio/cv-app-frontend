@@ -1,0 +1,5 @@
+mutation DeletePosition($position: DeletePositionInput!) {
+  deletePosition(position: $position) {
+    affected
+  }
+}

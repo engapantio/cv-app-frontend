@@ -1,0 +1,9 @@
+mutation UpdateCv($cv: UpdateCvInput!) {
+  updateCv(cv: $cv) {
+    id
+    created_at
+    name
+    education
+    description
+  }
+}

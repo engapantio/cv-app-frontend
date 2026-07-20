@@ -1,0 +1,19 @@
+query Profile($userId: ID!) {
+  profile(userId: $userId) {
+    id
+    created_at
+    first_name
+    last_name
+    full_name
+    avatar
+    skills {
+      name
+      mastery
+      categoryId
+    }
+    languages {
+      name
+      proficiency
+    }
+  }
+}

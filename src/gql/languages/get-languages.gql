@@ -1,0 +1,9 @@
+query Languages {
+  languages {
+    id
+    created_at
+    iso2
+    name
+    native_name
+  }
+}

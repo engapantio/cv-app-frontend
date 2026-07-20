@@ -1,0 +1,5 @@
+mutation DeleteLanguage($language: DeleteLanguageInput!) {
+  deleteLanguage(language: $language) {
+    affected
+  }
+}

@@ -1,0 +1,10 @@
+import { ResetPasswordForm } from "@/features/auth/ui/reset-password-form";
+
+type ResetPasswordPageProps = {
+  searchParams: Promise<{ token?: string }>;
+};
+
+export default async function ResetPasswordPage({ searchParams }: ResetPasswordPageProps) {
+  const { token } = await searchParams;
+  return <ResetPasswordForm token={token} />;
+}

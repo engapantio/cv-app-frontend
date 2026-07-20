@@ -1,0 +1,17 @@
+query SkillCategories {
+  skillCategories {
+    id
+    name
+    order
+    parent {
+      id
+      name
+      order
+    }
+    children {
+      id
+      name
+      order
+    }
+  }
+}

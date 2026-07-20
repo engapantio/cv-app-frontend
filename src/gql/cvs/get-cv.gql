@@ -1,0 +1,27 @@
+query Cv($cvId: ID!) {
+  cv(cvId: $cvId) {
+    id
+    created_at
+    name
+    education
+    description
+    user {
+      id
+      email
+      profile {
+        id
+        full_name
+        avatar
+      }
+    }
+    projects {
+      __typename
+    }
+    skills {
+      __typename
+    }
+    languages {
+      __typename
+    }
+  }
+}

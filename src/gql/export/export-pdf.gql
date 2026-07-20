@@ -1,0 +1,3 @@
+mutation ExportPdf($pdf: ExportPdfInput!) {
+  exportPdf(pdf: $pdf)
+}

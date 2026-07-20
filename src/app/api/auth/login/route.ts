@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { CombinedGraphQLErrors } from "@apollo/client/errors";
 import { createServerApolloClient } from "@/lib/apollo/server-client";
 import { setAuthCookies } from "@/lib/auth/cookies";
-import { LOGIN_QUERY } from "@/lib/graphql/auth/login.query";
+import { LoginDocument } from "@/gql/generated/graphql";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const { data } = await client.query({
-      query: LOGIN_QUERY,
+      query: LoginDocument,
       variables: {
         auth: {
           email: body.email,
@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
         accessToken: authResult.access_token,
         refreshToken: authResult.refresh_token,
       },
-      authResult.user,
+      authResult.user.id,
     );
   } catch (error: unknown) {
     if (CombinedGraphQLErrors.is(error)) {

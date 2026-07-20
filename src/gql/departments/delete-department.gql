@@ -1,0 +1,5 @@
+mutation DeleteDepartment($department: DeleteDepartmentInput!) {
+  deleteDepartment(department: $department) {
+    affected
+  }
+}
