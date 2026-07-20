@@ -1,77 +1,116 @@
 "use client";
 
-import { Loader2 } from "lucide-react";
-import { useResetPasswordForm } from "@/lib/auth/auth-form-hooks";
-import { AuthFormShell } from "@/components/auth/auth-form-shell";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { PasswordField } from "@/components/auth/password-field";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
+import { AuthFormHeader } from "@/components/auth/auth-form-header";
+import { AuthFormRootError } from "@/components/auth/auth-form-root-error";
+import { AuthFormSubmitButton } from "@/components/auth/auth-form-submit-button";
+
+const resetSchema = z
+  .object({
+    newPassword: z.string().min(8, "Password must be at least 8 characters"),
+    confirmPassword: z.string().min(1, "Please confirm your password"),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
+
+type ResetFormData = z.infer<typeof resetSchema>;
 
 type ResetPasswordFormProps = {
   token?: string;
 };
 
 export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
+  const router = useRouter();
   const {
-    newPassword,
-    setNewPassword,
-    confirmPassword,
-    setConfirmPassword,
-    submitting,
-    error,
+    register,
     handleSubmit,
-  } = useResetPasswordForm({ token });
+    setError,
+    formState: { errors, isSubmitting },
+  } = useForm<ResetFormData>({
+    resolver: zodResolver(resetSchema),
+  });
+
+  const onSubmit = async (data: ResetFormData) => {
+    try {
+      const response = await fetch("/api/auth/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ newPassword: data.newPassword, token }),
+      });
+
+      const payload = await response.json();
+
+      if (!response.ok) {
+        setError("root", { message: payload.message ?? "Something went wrong." });
+        return;
+      }
+
+      router.replace("/auth/login");
+    } catch {
+      setError("root", { message: "Unexpected error. Please try again." });
+    }
+  };
 
   return (
-    <AuthFormShell
-      title="Reset password"
-      description="Enter your new password below."
-      footerText="Remembered your password?"
-      footerLinkLabel="Log in"
-      footerHref="/auth/login"
-    >
-      <form className="space-y-5" onSubmit={handleSubmit}>
-        <div className="space-y-2">
-          <Label htmlFor="reset-new-password">New password</Label>
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <AuthFormHeader
+        title="Reset password"
+        subtitle="Enter your new password below."
+      />
+
+      <div className="space-y-5">
+        <div className="relative">
           <PasswordField
             id="reset-new-password"
-            placeholder="Enter new password"
+            placeholder="New password"
             autoComplete="new-password"
-            value={newPassword}
-            onChange={setNewPassword}
-            disabled={submitting}
+            disabled={isSubmitting}
+            {...register("newPassword")}
           />
+          {errors.newPassword && (
+            <p className="absolute left-0 top-full text-sm text-destructive">
+              {errors.newPassword.message}
+            </p>
+          )}
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="reset-confirm-password">Confirm new password</Label>
+        <div className="relative">
           <PasswordField
             id="reset-confirm-password"
-            placeholder="Repeat new password"
+            placeholder="Confirm new password"
             autoComplete="new-password"
-            value={confirmPassword}
-            onChange={setConfirmPassword}
-            disabled={submitting}
+            disabled={isSubmitting}
+            {...register("confirmPassword")}
           />
-        </div>
-
-        {error ? (
-          <p className="rounded-xl border border-destructive/20 bg-destructive/10 px-3 py-2 text-sm text-destructive">
-            {error}
-          </p>
-        ) : null}
-
-        <Button type="submit" className="w-full" disabled={submitting}>
-          {submitting ? (
-            <>
-              <Loader2 className="mr-2 size-4 animate-spin" />
-              Resetting...
-            </>
-          ) : (
-            "Reset password"
+          {errors.confirmPassword && (
+            <p className="absolute left-0 top-full text-sm text-destructive">
+              {errors.confirmPassword.message}
+            </p>
           )}
-        </Button>
-      </form>
-    </AuthFormShell>
+        </div>
+      </div>
+
+      <AuthFormRootError message={errors.root?.message} />
+
+      <div className="mt-14 flex flex-col items-center gap-2">
+        <AuthFormSubmitButton loading={isSubmitting} loadingText="Resetting...">
+          Reset password
+        </AuthFormSubmitButton>
+
+        <Link
+          href="/auth/login"
+          className="text-sm tracking-[0.4px] uppercase text-muted-foreground transition-colors hover:text-foreground"
+        >
+          Back to login
+        </Link>
+      </div>
+    </form>
   );
 }

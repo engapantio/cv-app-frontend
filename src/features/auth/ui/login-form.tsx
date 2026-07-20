@@ -1,69 +1,120 @@
 "use client";
 
 import Link from "next/link";
-import { Loader2 } from "lucide-react";
-import { useAuthForm } from "@/lib/auth/auth-form-hooks";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { setAuthenticatedSession } from "@/lib/auth/session";
 import { PasswordField } from "@/components/auth/password-field";
-import { Button } from "@/components/ui/button";
+import { AuthFormHeader } from "@/components/auth/auth-form-header";
+import { AuthFormRootError } from "@/components/auth/auth-form-root-error";
+import { AuthFormSubmitButton } from "@/components/auth/auth-form-submit-button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+
+const loginSchema = z.object({
+  email: z.string().min(1, "Email is required").email("Invalid email format"),
+  password: z.string().min(1, "Password is required"),
+});
+
+type LoginFormData = z.infer<typeof loginSchema>;
 
 export function LoginForm() {
-  const { email, setEmail, password, setPassword, submitting, error, handleSubmit } = useAuthForm({
-    endpoint: "/api/auth/login",
+  const router = useRouter();
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
   });
 
+  const onSubmit = async (data: LoginFormData) => {
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(data),
+      });
+
+      const payload = await response.json();
+
+      if (
+        !response.ok ||
+        !payload.user ||
+        typeof payload.user !== "object" ||
+        Array.isArray(payload.user)
+      ) {
+        setError("root", { message: payload.message ?? "Unable to authenticate." });
+        return;
+      }
+
+      setAuthenticatedSession(payload.user);
+      router.replace("/users");
+      router.refresh();
+    } catch {
+      setError("root", { message: "Unexpected error. Please try again." });
+    }
+  };
+
   return (
-    <form className="space-y-5" onSubmit={(e) => handleSubmit(e)}>
-      <div className="space-y-2">
-        <Label htmlFor="login-email">Email</Label>
-        <Input
-          id="login-email"
-          type="email"
-          placeholder="name@example.com"
-          autoComplete="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          disabled={submitting}
-        />
-      </div>
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <AuthFormHeader
+        title="Welcome back"
+        subtitle="Nice to see you! Log in to continue"
+      />
 
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <Label htmlFor="login-password">Password</Label>
-          <Link
-            href="/auth/forgot-password"
-            className="text-xs text-muted-foreground underline underline-offset-4 hover:text-foreground"
-          >
-            Forgot password?
-          </Link>
+      <div className="space-y-5">
+        <div className="relative">
+          <Input
+            id="login-email"
+            type="email"
+            placeholder="Email"
+            autoComplete="email"
+            disabled={isSubmitting}
+            className="rounded-none placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-primary"
+            {...register("email")}
+          />
+          {errors.email && (
+            <p className="absolute left-0 top-full text-sm text-destructive">
+              {errors.email.message}
+            </p>
+          )}
         </div>
-        <PasswordField
-          id="login-password"
-          placeholder="Enter your password"
-          autoComplete="current-password"
-          value={password}
-          onChange={setPassword}
-          disabled={submitting}
-        />
+
+        <div className="relative">
+          <PasswordField
+            id="login-password"
+            placeholder="Password"
+            autoComplete="current-password"
+            disabled={isSubmitting}
+            className="focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-primary"
+            {...register("password")}
+          />
+          {errors.password && (
+            <p className="absolute left-0 top-full text-sm text-destructive">
+              {errors.password.message}
+            </p>
+          )}
+        </div>
       </div>
 
-      {error && (
-        <p className="rounded-xl border border-destructive/20 bg-destructive/10 px-3 py-2 text-sm text-destructive">
-          {error}
-        </p>
-      )}
+      <AuthFormRootError message={errors.root?.message} />
 
-      <Button type="submit" className="w-full" disabled={submitting}>
-        {submitting ? (
-          <>
-            <Loader2 className="mr-2 size-4 animate-spin" />
-            Logging in...
-          </>
-        ) : (
-          "Log in"
-        )}
-      </Button>
+      <div className="mt-14 flex flex-col items-center gap-2">
+        <AuthFormSubmitButton loading={isSubmitting} loadingText="Logging in...">
+          Log in
+        </AuthFormSubmitButton>
+
+        <Link
+          href="/auth/forgot-password"
+          className="text-sm tracking-[0.4px] uppercase text-muted-foreground transition-colors hover:text-foreground"
+        >
+          Forgot password?
+        </Link>
+      </div>
     </form>
   );
 }
