@@ -2,7 +2,6 @@ import { redirect } from "next/navigation";
 import { getServerAccessToken, getServerRefreshToken } from "@/lib/auth/cookies";
 import { ProtectedShell } from "@/components/layout/protected-shell";
 import { SidebarProvider } from "@/components/ui";
-import { AppSidebar } from "@/components/shared";
 
 export default async function ProtectedLayout({ children }: { children: React.ReactNode }) {
   const accessToken = await getServerAccessToken();
@@ -10,11 +9,8 @@ export default async function ProtectedLayout({ children }: { children: React.Re
   if (!accessToken && !refreshToken) redirect("/auth/login");
 
   return (
-    <ProtectedShell>
-      <SidebarProvider>
-        <AppSidebar />
-        {children}
-      </SidebarProvider>
-    </ProtectedShell>
+    <SidebarProvider style={{ display: "contents" }}>
+      <ProtectedShell>{children}</ProtectedShell>
+    </SidebarProvider>
   );
 }
