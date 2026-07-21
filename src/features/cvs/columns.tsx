@@ -2,7 +2,7 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreVertical, ArrowUp, ArrowDown } from "lucide-react";
-import { Button, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui";
+import { Button, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui";
 import type { UserQuery } from "@/gql/generated/graphql";
 
 type CvItem = NonNullable<UserQuery["user"]["cvs"]>[number];
@@ -49,6 +49,7 @@ export function createCvsColumns(
       ),
       accessorFn: (row) => row.education ?? "",
       enableGlobalFilter: true,
+      meta: { className: "max-md:hidden" },
     },
     {
       id: "employee",
@@ -86,22 +87,21 @@ export function createCvsColumns(
                 }
               />
               <DropdownMenuContent align="end" className="min-w-32">
-                <DropdownMenuItem onClick={() => actions.onOpen(cv.id)} className="justify-center">
+                <DropdownMenuItem onClick={() => actions.onOpen(cv.id)} className="justify-center cursor-pointer">
                   Open
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => actions.onOpen(cv.id)}
                   disabled={!canMutate}
-                  className="justify-center"
+                  className="justify-center cursor-pointer"
                 >
                   Update
                 </DropdownMenuItem>
-                <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onClick={() => actions.onDelete(cv)}
                   disabled={!canMutate}
                   variant="destructive"
-                  className="justify-center"
+                  className="justify-center cursor-pointer"
                 >
                   Delete
                 </DropdownMenuItem>
