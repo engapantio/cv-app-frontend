@@ -38,7 +38,17 @@ query User($userId: ID!) {
       id
       created_at
       name
+      education
       description
+      user {
+        id
+        email
+        profile {
+          id
+          full_name
+          avatar
+        }
+      }
     }
   }
 }
