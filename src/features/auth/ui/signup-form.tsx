@@ -1,85 +1,120 @@
 "use client";
 
-import { useState } from "react";
-import { Loader2 } from "lucide-react";
-import { useAuthForm } from "@/lib/auth/auth-form-hooks";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { setAuthenticatedSession } from "@/lib/auth/session";
 import { PasswordField } from "@/components/auth/password-field";
-import { Button } from "@/components/ui/button";
+import { AuthFormHeader } from "@/components/auth/auth-form-header";
+import { AuthFormRootError } from "@/components/auth/auth-form-root-error";
+import { AuthFormSubmitButton } from "@/components/auth/auth-form-submit-button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 
-function validateSignup(email: string, password: string, confirmPassword: string): string | null {
-  if (!email.trim() || !password.trim() || !confirmPassword.trim())
-    return "All fields are required.";
-  if (password.length < 8) return "Password must be at least 8 characters.";
-  if (password !== confirmPassword) return "Passwords do not match.";
-  return null;
-}
+const signupSchema = z.object({
+  email: z.string().min(1, "Email is required").email("Invalid email format"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+});
+
+type SignupFormData = z.infer<typeof signupSchema>;
 
 export function SignupForm() {
-  const { email, setEmail, password, setPassword, submitting, error, handleSubmit } = useAuthForm({
-    endpoint: "/api/auth/signup",
+  const router = useRouter();
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors, isSubmitting },
+  } = useForm<SignupFormData>({
+    resolver: zodResolver(signupSchema),
   });
-  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const onSubmit = async (data: SignupFormData) => {
+    try {
+      const response = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(data),
+      });
+
+      const payload = await response.json();
+
+      if (
+        !response.ok ||
+        !payload.user ||
+        typeof payload.user !== "object" ||
+        Array.isArray(payload.user)
+      ) {
+        setError("root", { message: payload.message ?? "Unable to create account." });
+        return;
+      }
+
+      setAuthenticatedSession(payload.user);
+      router.replace("/users");
+      router.refresh();
+    } catch {
+      setError("root", { message: "Unexpected error. Please try again." });
+    }
+  };
 
   return (
-    <form
-      className="space-y-5"
-      onSubmit={(e) => handleSubmit(e, () => validateSignup(email, password, confirmPassword))}
-    >
-      <div className="space-y-2">
-        <Label htmlFor="signup-email">Email</Label>
-        <Input
-          id="signup-email"
-          type="email"
-          placeholder="name@example.com"
-          autoComplete="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          disabled={submitting}
-        />
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <AuthFormHeader
+        title="Sign up"
+        subtitle="Welcome! Create an account to continue"
+      />
+
+      <div className="space-y-5">
+        <div className="relative">
+          <Input
+            id="signup-email"
+            type="email"
+            placeholder="Email"
+            autoComplete="email"
+            disabled={isSubmitting}
+            className="rounded-none placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-primary"
+            {...register("email")}
+          />
+          {errors.email && (
+            <p className="absolute left-0 top-full text-sm text-destructive">
+              {errors.email.message}
+            </p>
+          )}
+        </div>
+
+        <div className="relative">
+          <PasswordField
+            id="signup-password"
+            placeholder="Password"
+            autoComplete="new-password"
+            disabled={isSubmitting}
+            className="focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-primary"
+            {...register("password")}
+          />
+          {errors.password && (
+            <p className="absolute left-0 top-full text-sm text-destructive">
+              {errors.password.message}
+            </p>
+          )}
+        </div>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="signup-password">Password</Label>
-        <PasswordField
-          id="signup-password"
-          placeholder="Create a password"
-          autoComplete="new-password"
-          value={password}
-          onChange={setPassword}
-          disabled={submitting}
-        />
+      <AuthFormRootError message={errors.root?.message} />
+
+      <div className="mt-14 flex flex-col items-center gap-2">
+        <AuthFormSubmitButton loading={isSubmitting} loadingText="Creating account...">
+          Create account
+        </AuthFormSubmitButton>
+
+        <Link
+          href="/auth/login"
+          className="text-sm tracking-[0.4px] uppercase text-muted-foreground transition-colors hover:text-foreground"
+        >
+          I have an account
+        </Link>
       </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="signup-confirm-password">Confirm password</Label>
-        <PasswordField
-          id="signup-confirm-password"
-          placeholder="Repeat your password"
-          autoComplete="new-password"
-          value={confirmPassword}
-          onChange={setConfirmPassword}
-          disabled={submitting}
-        />
-      </div>
-
-      {error && (
-        <p className="rounded-xl border border-destructive/20 bg-destructive/10 px-3 py-2 text-sm text-destructive">
-          {error}
-        </p>
-      )}
-
-      <Button type="submit" className="w-full" disabled={submitting}>
-        {submitting ? (
-          <>
-            <Loader2 className="mr-2 size-4 animate-spin" />
-            Creating account...
-          </>
-        ) : (
-          "Sign up"
-        )}
-      </Button>
     </form>
   );
 }
