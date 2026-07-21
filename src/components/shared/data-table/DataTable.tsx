@@ -75,17 +75,17 @@ export function DataTable<T, V>({
   return (
     <div className="space-y-4">
       <div className="relative max-w-sm">
-        <Search className="absolute left-2.5 top-2 h-4 w-4 text-muted-foreground" />
+        <Search className="absolute left-2.5 top-4 h-4 w-4 text-muted-foreground" />
         <Input
           placeholder="Search"
           value={globalFilter ?? ""}
           onChange={(e) => setGlobalFilter(e.target.value)}
-          className="pl-8 rounded-[40px] text-base"
+          className="pl-8 rounded-[40px]  placeholder:!text-muted-foreground !bg-white"
         />
       </div>
 
       <div>
-        <Table>
+        <Table className="[&_tr]:border-b-gray-200">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
