@@ -32,10 +32,12 @@ export default function UserCvsClient({
   userId,
   initialCvs,
   initialUserEmail,
+  serverError,
 }: {
   userId: string;
   initialCvs: CvItem[];
   initialUserEmail?: string | null;
+  serverError?: string | null;
 }) {
   const {
     loading,
@@ -103,7 +105,15 @@ export default function UserCvsClient({
                   </TableRow>
                 ))}
               </TableHeader>
-              {loading || rows.length === 0 ? (
+              {serverError ? (
+                <TableBody>
+                  <TableRow>
+                    <TableCell colSpan={columnCount} className="text-center text-destructive">
+                      {serverError}
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              ) : loading || rows.length === 0 ? (
                 <TableBody>
                   {loading ? (
                     <TableRow>
@@ -124,7 +134,7 @@ export default function UserCvsClient({
                 </TableBody>
               ) : (
                 rows.map((row) => (
-                  <tbody key={row.id} className="group">
+                  <TableBody key={row.id} className="group">
                     <TableRow
                       className="cursor-pointer border-b-0 group-hover:bg-muted/50"
                       onClick={() => handleOpen(row.original.id)}
@@ -143,7 +153,7 @@ export default function UserCvsClient({
                         {row.original.description}
                       </TableCell>
                     </TableRow>
-                  </tbody>
+                  </TableBody>
                 ))
               )}
             </Table>

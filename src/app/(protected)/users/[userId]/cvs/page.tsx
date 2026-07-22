@@ -16,6 +16,7 @@ export default async function UserCvsPage({
 
   let initialCvs: CvItem[] = [];
   let initialUserEmail: string | null = null;
+  let serverError: string | null = null;
 
   try {
     const { data } = await client.query({
@@ -26,7 +27,8 @@ export default async function UserCvsPage({
     });
     initialCvs = data?.user?.cvs ?? [];
     initialUserEmail = data?.user?.email ?? null;
-  } catch {
+  } catch (e) {
+    serverError = e instanceof Error ? e.message : "Failed to load CVs";
   }
 
   return (
@@ -34,6 +36,7 @@ export default async function UserCvsPage({
       userId={userId}
       initialCvs={initialCvs}
       initialUserEmail={initialUserEmail}
+      serverError={serverError}
     />
   );
 }
