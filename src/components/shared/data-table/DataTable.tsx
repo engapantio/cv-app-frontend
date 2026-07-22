@@ -75,17 +75,17 @@ export function DataTable<T, V>({
   return (
     <div className="space-y-4">
       <div className="relative max-w-sm">
-        <Search className="absolute left-2.5 top-4 h-4 w-4 text-muted-foreground" />
+        <Search className="absolute left-3 top-3.5 h-5 w-5 text-icon" />
         <Input
           placeholder="Search"
           value={globalFilter ?? ""}
           onChange={(e) => setGlobalFilter(e.target.value)}
-          className="pl-8 rounded-[40px]  placeholder:!text-muted-foreground !bg-white"
+          className="pl-10 rounded-[40px] text-foreground !bg-background"
         />
       </div>
 
       <div>
-        <Table className="[&_tr]:border-b-gray-200">
+        <Table className="[&_tr]:border-b-border">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -119,7 +119,7 @@ export function DataTable<T, V>({
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id}>
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell key={cell.id} className="text-muted-foreground">
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
