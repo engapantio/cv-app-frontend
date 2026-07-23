@@ -69,10 +69,11 @@ function CvDetailsForm({
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors, isDirty, isSubmitting },
   } = useForm<CvDetailsFormData>({
     resolver: zodResolver(cvDetailsSchema),
-    values: {
+    defaultValues: {
       name: cv?.name ?? "",
       education: cv?.education ?? "",
       description: cv?.description ?? "",
@@ -91,6 +92,7 @@ function CvDetailsForm({
           },
         },
       });
+      reset(formData);
       toast("CV updated successfully");
     } catch {
       toast("Failed to update CV");

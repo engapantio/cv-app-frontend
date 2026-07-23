@@ -95,6 +95,7 @@ export function useCvsTable({
     [currentUserId, isAdmin, handleOpen, handleDelete],
   );
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data: cvsList,
     columns,

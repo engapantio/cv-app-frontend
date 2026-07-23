@@ -78,7 +78,7 @@ export function CreateCvDialog({
                 disabled={isSubmitting}
                 className="peer border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none pt-5 pb-1"
               />
-              <span className="absolute left-3 bg-background px-1 text-sm text-muted-foreground transition-all duration-200 pointer-events-none peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-sm peer-focus:-top-2.5 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-primary -top-2.5 translate-y-0 text-xs">
+              <span className="absolute left-3 bg-background px-1 text-xs text-muted-foreground transition-all duration-200 pointer-events-none peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-sm peer-focus:-top-2.5 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-primary -top-2.5 translate-y-0">
                 Name
               </span>
             </div>
@@ -94,7 +94,7 @@ export function CreateCvDialog({
                 disabled={isSubmitting}
                 className="peer border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none pt-5 pb-1"
               />
-              <span className="absolute left-3 bg-background px-1 text-sm text-muted-foreground transition-all duration-200 pointer-events-none peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-sm peer-focus:-top-2.5 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-primary -top-2.5 translate-y-0 text-xs">
+              <span className="absolute left-3 bg-background px-1 text-xs text-muted-foreground transition-all duration-200 pointer-events-none peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-sm peer-focus:-top-2.5 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-primary -top-2.5 translate-y-0">
                 Education
               </span>
             </div>
@@ -110,7 +110,7 @@ export function CreateCvDialog({
                 disabled={isSubmitting}
                 className="peer flex w-full bg-background px-4 pt-6 pb-3 text-sm focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 border-0 min-h-30 resize-none disabled:opacity-50 disabled:cursor-not-allowed"
               />
-              <span className="absolute left-3 bg-background px-1 text-sm text-muted-foreground transition-all duration-200 pointer-events-none peer-placeholder-shown:top-4 peer-placeholder-shown:-translate-y-0 peer-placeholder-shown:text-sm peer-focus:-top-2.5 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-primary -top-2.5 translate-y-0 text-xs">
+              <span className="absolute left-3 bg-background px-1 text-xs text-muted-foreground transition-all duration-200 pointer-events-none peer-placeholder-shown:top-4 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-sm peer-focus:-top-2.5 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-primary -top-2.5 translate-y-0">
                 Description
               </span>
             </div>

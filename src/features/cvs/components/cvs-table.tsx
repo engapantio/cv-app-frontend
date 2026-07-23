@@ -77,7 +77,7 @@ export function CvsTable({
               placeholder="Search"
               value={globalFilter ?? ""}
               onChange={(e) => setGlobalFilter(e.target.value)}
-              className="pl-10 rounded-[40px] placeholder:!text-muted-foreground"
+              className="pl-10 rounded-[40px] placeholder:text-muted-foreground"
             />
           </div>
           {canCreate && (
