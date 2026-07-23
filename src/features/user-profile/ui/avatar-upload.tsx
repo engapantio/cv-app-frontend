@@ -41,24 +41,21 @@ export function AvatarUpload({ userId, currentAvatar, fullName, isOwner }: Avata
     setIsUploading(true);
     try {
       const reader = new FileReader();
-      reader.onloadend = async () => {
-        const base64 = (reader.result as string).split(",")[1];
-        await uploadAvatar({
-          variables: {
-            avatar: {
-              userId,
-              base64,
-              size: file.size,
-              type: file.type,
-            },
-          },
-        });
-        toast.success("Avatar uploaded successfully");
-        setIsUploading(false);
-      };
-      reader.readAsDataURL(file);
+      const base64 = await new Promise<string>((resolve, reject) => {
+        reader.onload = () => resolve((reader.result as string).split(",")[1]);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+      await uploadAvatar({
+        variables: {
+          avatar: { userId, base64, size: file.size, type: file.type },
+        },
+      });
+      toast.success("Avatar uploaded successfully");
     } catch {
       toast.error("Failed to upload avatar");
+      setIsUploading(false);
+    } finally {
       setIsUploading(false);
     }
   };
@@ -115,7 +112,7 @@ export function AvatarUpload({ userId, currentAvatar, fullName, isOwner }: Avata
             <div>Upload avatar image</div>
           </div>
         )}
-        <p className="text-xs text-muted-foreground text-center max-w-50">
+        <p className="text-base text-muted-foreground text-center max-w-50">
           {isOwner ? "png, jpg or gif no more than 0.5MB" : ""}
         </p>
       </div>

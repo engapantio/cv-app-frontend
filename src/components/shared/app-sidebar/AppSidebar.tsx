@@ -103,10 +103,8 @@ function LanguageSwitcher() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>
-        <Button variant="ghost" size="icon">
-          <Globe className="text-icon" />
-        </Button>
+      <DropdownMenuTrigger render={<Button variant="ghost" size="icon" />}>
+        <Globe className="text-icon" />
       </DropdownMenuTrigger>
       <DropdownMenuContent className={"flex justify-around"}>
         {LANGUAGES.map((lang) => (

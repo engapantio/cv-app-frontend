@@ -43,7 +43,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
           >
             Employees
           </Link>
-          <ChevronRight className="text-icon w-4 h-4" />
+          <ChevronRight className="text-icon w-5 h-5" />
           <div className="text-primary flex gap-2">
             <User className="w-5 h-5" />
             {user.profile.full_name}

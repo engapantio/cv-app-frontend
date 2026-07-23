@@ -81,25 +81,29 @@ export function ProfileForm({ userId, defaultValues, isOwner }: ProfileFormProps
 
   const onSubmit = async (data: ProfileFormValues) => {
     try {
-      await updateProfile({
-        variables: {
-          profile: {
-            userId,
-            first_name: data.first_name,
-            last_name: data.last_name,
+      const [profileResult, userResult] = await Promise.all([
+        updateProfile({
+          variables: {
+            profile: {
+              userId,
+              first_name: data.first_name,
+              last_name: data.last_name,
+            },
           },
-        },
-      });
-
-      await updateUser({
-        variables: {
-          user: {
-            userId,
-            departmentId: data.departmentId || null,
-            positionId: data.positionId || null,
+        }),
+        updateUser({
+          variables: {
+            user: {
+              userId,
+              departmentId: data.departmentId || null,
+              positionId: data.positionId || null,
+            },
           },
-        },
-      });
+        }),
+      ]);
+      if (profileResult.error || userResult.error) {
+        throw new Error("Partial update — some fields failed");
+      }
 
       toast.success("Profile updated successfully");
       reset(data);
@@ -197,7 +201,7 @@ export function ProfileForm({ userId, defaultValues, isOwner }: ProfileFormProps
           <div />
           <div>
             <Button
-              variant={"secondary"}
+              variant="default"
               type="submit"
               disabled={!isDirty || isSubmitting}
               className="w-full uppercase"

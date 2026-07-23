@@ -3,7 +3,8 @@
 import { UserQuery } from "@/gql/generated/graphql";
 import { AvatarUpload } from "./avatar-upload";
 import { ProfileForm } from "./profile-form";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui";
 
 type User = NonNullable<UserQuery["user"]>;
 
@@ -14,12 +15,20 @@ interface UserProfileClientProps {
 
 export function UserProfileClient({ user, isOwner }: UserProfileClientProps) {
   const pathname = usePathname();
+  const router = useRouter();
 
   const tabs = [
     { name: "profile", href: `/users/${user.id}/profile` },
     { name: "skills", href: `/users/${user.id}/skills` },
     { name: "languages", href: `/users/${user.id}/languages` },
   ];
+
+  const currentTab = pathname.split("/").pop() || "profile";
+
+  const handleTabChange = (value: string) => {
+    const tab = tabs.find((t) => t.name === value);
+    if (tab) router.push(tab.href);
+  };
 
   const fullName = user.profile?.full_name || "";
   const avatar = user.profile?.avatar;
@@ -41,28 +50,30 @@ export function UserProfileClient({ user, isOwner }: UserProfileClientProps) {
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-wrap ">
-        {tabs.map((tab) => {
-          const isActive = pathname === tab.href;
-          return (
-            <a
-              key={tab.name}
-              href={tab.href}
-              className={`
-                flex justify-center items-center text-sm w-37 h-12 uppercase
-                border-b-2 transition-colors duration-200 font-semibold
-                ${
-                  isActive
-                    ? "border-primary text-primary"
-                    : "border-transparent text-foreground hover:border-primary hover:text-primary"
+      <Tabs value={currentTab} onValueChange={handleTabChange}>
+        <TabsList variant="line" className="flex flex-wrap mb-8">
+          {tabs.map((tab) => {
+            const isActive = pathname === tab.href;
+            return (
+              <TabsTrigger
+                key={tab.name}
+                value={tab.name}
+                className={`
+                flex justify-center items-center
+                w-37.5 h-12
+                uppercase text-sm font-medium
+                transition-colors duration-200
+                cursor-pointer ${
+                  isActive ? "border-primary text-primary!" : "text-foreground! hover:text-primary!"
                 }
               `}
-            >
-              {tab.name}
-            </a>
-          );
-        })}
-      </div>
+              >
+                {tab.name}
+              </TabsTrigger>
+            );
+          })}
+        </TabsList>
+      </Tabs>
 
       <div>
         <div className="flex flex-col items-center gap-8">
@@ -73,9 +84,9 @@ export function UserProfileClient({ user, isOwner }: UserProfileClientProps) {
             isOwner={isOwner}
           />
           <div className="flex flex-col items-center mb-16">
-            <h2 className="mb-2 font-semibold text-xl">{fullName}</h2>
-            <p className="text-muted-foreground text-sm">{user.email}</p>
-            <p className="text-sm text-foreground">A member since {formattedDate}</p>
+            <h2 className="mb-2 font-normal text-2xl">{fullName}</h2>
+            <p className="text-muted-foreground text-base">{user.email}</p>
+            <p className="text-base text-foreground">A member since {formattedDate}</p>
           </div>
         </div>
 
