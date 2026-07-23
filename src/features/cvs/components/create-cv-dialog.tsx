@@ -6,15 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation } from "@apollo/client/react";
 import { CreateCvDocument, type CreateCvMutation } from "@/gql/generated/graphql";
-import {
-  Button,
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-  Input,
-} from "@/components/ui";
+import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, Input } from "@/components/ui";
 
 const createCvSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -65,7 +57,8 @@ export function CreateCvDialog({
         }
         onOpenChange(false);
         reset();
-      } catch {}
+      } catch {
+      }
     },
     [createCv, userId, onCreated, onOpenChange, reset],
   );
@@ -78,32 +71,49 @@ export function CreateCvDialog({
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="relative mb-5">
-            <Input
-              placeholder="Name"
-              {...register("name")}
-              disabled={isSubmitting}
-              className="rounded-none placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-primary"
-            />
-            {errors.name && <p className="text-sm text-destructive mt-1">{errors.name.message}</p>}
+            <div className="relative rounded-none border border-border transition-colors focus-within:border-primary">
+              <Input
+                {...register("name")}
+                placeholder=" "
+                disabled={isSubmitting}
+                className="peer border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none pt-5 pb-1"
+              />
+              <span className="absolute left-3 bg-background px-1 text-sm text-muted-foreground transition-all duration-200 pointer-events-none peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-sm peer-focus:-top-2.5 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-primary -top-2.5 translate-y-0 text-xs">
+                Name
+              </span>
+            </div>
+            {errors.name && (
+              <p className="text-sm text-destructive mt-1">{errors.name.message}</p>
+            )}
           </div>
           <div className="relative mb-5">
-            <Input
-              placeholder="Education"
-              {...register("education")}
-              disabled={isSubmitting}
-              className="rounded-none placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-primary"
-            />
+            <div className="relative rounded-none border border-border transition-colors focus-within:border-primary">
+              <Input
+                {...register("education")}
+                placeholder=" "
+                disabled={isSubmitting}
+                className="peer border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none pt-5 pb-1"
+              />
+              <span className="absolute left-3 bg-background px-1 text-sm text-muted-foreground transition-all duration-200 pointer-events-none peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-sm peer-focus:-top-2.5 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-primary -top-2.5 translate-y-0 text-xs">
+                Education
+              </span>
+            </div>
             {errors.education && (
               <p className="text-sm text-destructive mt-1">{errors.education.message}</p>
             )}
           </div>
           <div className="relative mb-3">
-            <textarea
-              placeholder="Description"
-              {...register("description")}
-              disabled={isSubmitting}
-              className="flex w-full bg-background px-4 py-3 text-sm placeholder:text-black/60 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 border border-input min-h-30 resize-none"
-            />
+            <div className="relative rounded-none border border-border transition-colors focus-within:border-primary">
+              <textarea
+                {...register("description")}
+                placeholder=" "
+                disabled={isSubmitting}
+                className="peer flex w-full bg-background px-4 pt-6 pb-3 text-sm focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 border-0 min-h-30 resize-none disabled:opacity-50 disabled:cursor-not-allowed"
+              />
+              <span className="absolute left-3 bg-background px-1 text-sm text-muted-foreground transition-all duration-200 pointer-events-none peer-placeholder-shown:top-4 peer-placeholder-shown:-translate-y-0 peer-placeholder-shown:text-sm peer-focus:-top-2.5 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-primary -top-2.5 translate-y-0 text-xs">
+                Description
+              </span>
+            </div>
             {errors.description && (
               <p className="text-sm text-destructive mt-1">{errors.description.message}</p>
             )}

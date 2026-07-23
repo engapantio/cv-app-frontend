@@ -95,7 +95,19 @@ const getUserIdFromCookie = (): string | null => {
 };
 
 const isActivePath = (pathname: string, href: string): boolean => {
-  return pathname === href || pathname === href + "/" || pathname.startsWith(href + "/");
+  if (pathname === href || pathname === href + "/") {
+    return true;
+  }
+  if (pathname.startsWith(href + "/")) {
+    if (href === "/users" && (pathname.endsWith("/cvs") || pathname.includes("/cvs/"))) {
+      return false;
+    }
+    return true;
+  }
+  if (href === "/cvs" && (pathname.endsWith("/cvs") || pathname.includes("/cvs/"))) {
+    return true;
+  }
+  return false;
 };
 
 function LanguageSwitcher() {
@@ -239,7 +251,7 @@ export function AppSidebar({ isSidebarOpen, setIsSidebarOpen, isTablet }: AppSid
         item={item}
         isActive={isActivePath(pathname, item.href)}
         isMobile={isMobile}
-        onClick={closeSidebar}
+        onClick={() => {}}
       />
     ));
 

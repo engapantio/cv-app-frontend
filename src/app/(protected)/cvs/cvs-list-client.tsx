@@ -3,20 +3,20 @@
 
 import { type UserQuery } from "@/gql/generated/graphql";
 import { CvsTable } from "@/features/cvs/components/cvs-table";
-import { useCvsPage } from "@/features/cvs/hooks";
+import { useCvsListPage } from "@/features/cvs/hooks";
+import { useSession } from "@/lib/auth/session";
 
 type CvItem = NonNullable<UserQuery["user"]["cvs"]>[number];
 
-export default function UserCvsClient({
-  userId,
+export default function CvsListClient({
   initialCvs,
   serverError,
 }: {
-  userId: string;
   initialCvs: CvItem[];
   serverError?: string | null;
 }) {
-  const tableData = useCvsPage({ userId, initialCvs });
+  const { user: currentUser } = useSession();
+  const tableData = useCvsListPage(initialCvs);
 
   return (
     <div className="flex w-full">
@@ -27,8 +27,8 @@ export default function UserCvsClient({
         <CvsTable
           {...tableData}
           serverError={serverError}
-          createUserId={userId}
-          tableClassName="table-fixed w-full"
+          createUserId={currentUser?.id ?? ""}
+          tableClassName="[&_tr]:border-b-gray-200 w-full"
         />
       </main>
     </div>
