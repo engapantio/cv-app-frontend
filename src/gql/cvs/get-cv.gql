@@ -18,7 +18,9 @@ query Cv($cvId: ID!) {
       __typename
     }
     skills {
-      __typename
+      name
+      mastery
+      categoryId
     }
     languages {
       __typename
