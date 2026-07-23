@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
-import { ThemeProvider } from "next-themes";
 import { ApolloWrapper } from "@/lib/apollo/apollo-wrapper";
+import { ThemeProvider } from "next-themes";
 import "./globals.css";
 
 const roboto = Roboto({
