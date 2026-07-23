@@ -131,6 +131,7 @@ function ProfileSection({
   initial,
   compact = false,
   showLanguageSwitcher = true,
+  userId,
 }: {
   loading: boolean;
   error?: Error | null;
@@ -139,6 +140,7 @@ function ProfileSection({
   initial: string;
   compact?: boolean;
   showLanguageSwitcher?: boolean;
+  userId?: string | null;
 }) {
   if (loading) {
     return (
@@ -158,15 +160,27 @@ function ProfileSection({
     return <div className="text-sm text-destructive">Error loading profile</div>;
   }
 
-  return (
-    <div className="flex items-center gap-3">
-      {showLanguageSwitcher && <LanguageSwitcher />}
-      {compact && <h2>{fullName}</h2>}
+  const content = (
+    <>
+      {compact && fullName && <h2>{fullName}</h2>}
       <Avatar className="h-10 w-10">
         <AvatarFallback>{initial}</AvatarFallback>
         <AvatarImage src={avatar ?? undefined} />
       </Avatar>
       {!compact && <p className="text-sm font-medium truncate">{fullName}</p>}
+    </>
+  );
+
+  return (
+    <div className="flex items-center gap-3">
+      {showLanguageSwitcher && <LanguageSwitcher />}
+      {userId ? (
+        <Link href={`/users/${userId}/profile`} className="flex items-center gap-3">
+          {content}
+        </Link>
+      ) : (
+        content
+      )}
     </div>
   );
 }
@@ -255,6 +269,7 @@ export function AppSidebar({ isSidebarOpen, setIsSidebarOpen, isTablet }: AppSid
               initial={initial}
               compact
               showLanguageSwitcher={false}
+              userId={userId}
             />
           </div>
         </Container>
@@ -286,6 +301,7 @@ export function AppSidebar({ isSidebarOpen, setIsSidebarOpen, isTablet }: AppSid
             initial={initial}
             compact={false}
             showLanguageSwitcher={false}
+            userId={userId}
           />
           <Button variant="ghost" size="icon" className="h-8 w-8 mt-2" onClick={closeSidebar}>
             <ChevronLeft className="text-icon" />
@@ -309,6 +325,7 @@ export function AppSidebar({ isSidebarOpen, setIsSidebarOpen, isTablet }: AppSid
             initial={initial}
             compact
             showLanguageSwitcher={false}
+            userId={userId}
           />
         </div>
       </footer>
