@@ -40,7 +40,7 @@ function PaginationLink({ className, isActive, size = "icon", ...props }: Pagina
     <Button
       variant={isActive ? "outline" : "ghost"}
       size={size}
-      className={cn(className)}
+      className={cn("cursor-pointer", className)}
       nativeButton={false}
       render={
         <a
