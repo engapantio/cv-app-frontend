@@ -1,5 +1,4 @@
 "use client";
-"use no memo";
 
 import { type UserQuery } from "@/gql/generated/graphql";
 import { CvsTable } from "@/features/cvs/components/cvs-table";

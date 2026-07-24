@@ -146,7 +146,7 @@ export function CvsTable({
               </TableBody>
             ) : (
               rows.map((row, idx) => (
-                <TableBody key={row.id} className="group [&_tr:last-child]:border-b">
+                <TableBody key={row.id} className={cn("group", idx < rows.length - 1 && "[&_tr:last-child]:border-b")}>
                   <TableRow
                     className="cursor-pointer border-b-0 group-hover:bg-muted/50"
                     onClick={() => handleOpen(row.original.id)}
@@ -164,10 +164,7 @@ export function CvsTable({
                     ))}
                   </TableRow>
                   <TableRow
-                    className={cn(
-                      "cursor-pointer group-hover:bg-muted/50",
-                      idx === rows.length - 1 ? "border-b-0" : "",
-                    )}
+                    className="cursor-pointer border-b-0 group-hover:bg-muted/50"
                     onClick={() => handleOpen(row.original.id)}
                   >
                     <TableCell

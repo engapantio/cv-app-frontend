@@ -2,11 +2,9 @@
 
 import { useQuery, useMutation } from "@apollo/client/react";
 import { CvDocument, UpdateCvDocument } from "@/gql/generated/graphql";
-import { useSession } from "@/lib/auth/session";
+import { usePermissions } from "@/lib/auth/permissions";
 
 export function useCvDetails(cvId: string) {
-  const { user: currentUser } = useSession();
-
   const { data, loading } = useQuery(CvDocument, {
     variables: { cvId },
     fetchPolicy: "network-only",
@@ -16,11 +14,7 @@ export function useCvDetails(cvId: string) {
   const [updateCv, { loading: updating }] = useMutation(UpdateCvDocument);
 
   const cv = data?.cv ?? null;
-  const cvUserId = cv?.user?.id;
-  const currentUserId = currentUser?.id;
-  const isAdmin = currentUser?.role === "Admin";
-  const isOwner = currentUserId === cvUserId;
-  const canEdit = !!(isOwner || isAdmin);
+  const { canEdit, isOwner, isAdmin } = usePermissions(cv?.user?.id);
 
   return {
     cv,

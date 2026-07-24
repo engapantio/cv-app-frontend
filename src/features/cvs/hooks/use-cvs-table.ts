@@ -13,7 +13,7 @@ import {
   type SortingState,
 } from "@tanstack/react-table";
 import { type UserQuery } from "@/gql/generated/graphql";
-import { useSession } from "@/lib/auth/session";
+import { usePermissions } from "@/lib/auth/permissions";
 import { createCvsColumns } from "@/features/cvs/columns";
 import { generatePagination } from "@/lib/utils/pagination";
 
@@ -42,7 +42,7 @@ export function useCvsTable({
     errorPolicy: "all",
   });
 
-  const { user: currentUser } = useSession();
+  const { currentUserId, isAdmin, user: currentUser } = usePermissions();
 
   const [cvsList, setCvsList] = useState<CvItem[]>(initialCvs);
 
@@ -80,8 +80,6 @@ export function useCvsTable({
     refetch();
   }, [refetch]);
 
-  const currentUserId = currentUser?.id;
-  const isAdmin = currentUser?.role === "Admin";
   const canCreate = userId != null
     ? currentUserId === userId || isAdmin
     : !!currentUser;

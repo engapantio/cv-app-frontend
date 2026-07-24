@@ -1,5 +1,4 @@
 "use client";
-"use no memo";
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,7 +7,7 @@ import { useMutation } from "@apollo/client/react";
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { UpdateCvDocument, type CvQuery } from "@/gql/generated/graphql";
-import { useSession } from "@/lib/auth/session";
+import { usePermissions } from "@/lib/auth/permissions";
 import { Button, Input, Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui";
 import { toast } from "sonner";
 
@@ -57,14 +56,8 @@ function CvDetailsForm({
   cv: NonNullable<CvData>;
   cvId: string;
 }) {
-  const { user: currentUser } = useSession();
+  const { canEdit } = usePermissions(cv.user?.id);
   const [updateCv, { loading: updating }] = useMutation(UpdateCvDocument);
-
-  const cvUserId = cv.user?.id;
-  const currentUserId = currentUser?.id;
-  const isAdmin = currentUser?.role === "Admin";
-  const isOwner = currentUserId === cvUserId;
-  const canEdit = !!(isOwner || isAdmin);
 
   const {
     register,
