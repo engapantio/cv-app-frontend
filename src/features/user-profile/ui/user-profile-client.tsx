@@ -1,10 +1,12 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { UserQuery } from "@/gql/generated/graphql";
 import { AvatarUpload } from "./avatar-upload";
 import { ProfileForm } from "./profile-form";
 import { usePathname, useRouter } from "next/navigation";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui";
+import { useSession } from "@/lib/auth/session";
 
 type User = NonNullable<UserQuery["user"]>;
 
@@ -16,11 +18,22 @@ interface UserProfileClientProps {
 export function UserProfileClient({ user, isOwner }: UserProfileClientProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const { user: currentUser } = useSession();
+  const isAdmin = currentUser?.role === "Admin";
+  const [canEdit, setCanEdit] = useState(isOwner);
+
+  useEffect(() => {
+    if (isAdmin) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setCanEdit(true);
+    }
+  }, [isAdmin]);
 
   const tabs = [
     { name: "profile", href: `/users/${user.id}/profile` },
     { name: "skills", href: `/users/${user.id}/skills` },
     { name: "languages", href: `/users/${user.id}/languages` },
+    { name: "cvs", href: `/users/${user.id}/cvs` },
   ];
 
   const currentTab = pathname.split("/").pop() || "profile";
@@ -81,7 +94,7 @@ export function UserProfileClient({ user, isOwner }: UserProfileClientProps) {
             userId={user.id}
             currentAvatar={avatar}
             fullName={fullName}
-            isOwner={isOwner}
+            isOwner={canEdit}
           />
           <div className="flex flex-col items-center mb-16">
             <h2 className="mb-2 font-normal text-2xl">{fullName}</h2>
@@ -99,7 +112,9 @@ export function UserProfileClient({ user, isOwner }: UserProfileClientProps) {
               departmentId,
               positionId,
             }}
-            isOwner={isOwner}
+            userDepartmentName={user.department_name}
+            userPositionName={user.position_name}
+            isOwner={canEdit}
           />
         </div>
       </div>

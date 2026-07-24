@@ -7,7 +7,6 @@ import { z } from "zod";
 import {
   Button,
   Input,
-  Label,
   Select,
   SelectContent,
   SelectItem,
@@ -41,10 +40,18 @@ interface ProfileFormProps {
     departmentId?: string | null;
     positionId?: string | null;
   };
+  userDepartmentName?: string | null;
+  userPositionName?: string | null;
   isOwner: boolean;
 }
 
-export function ProfileForm({ userId, defaultValues, isOwner }: ProfileFormProps) {
+export function ProfileForm({
+  userId,
+  defaultValues,
+  userDepartmentName,
+  userPositionName,
+  isOwner,
+}: ProfileFormProps) {
   const {
     control,
     handleSubmit,
@@ -115,84 +122,120 @@ export function ProfileForm({ userId, defaultValues, isOwner }: ProfileFormProps
   const departments = departmentsData?.departments || [];
   const positions = positionsData?.positions || [];
 
-  const fieldClasses = "!h-12 rounded-none w-full pt-2 !bg-background";
-  const labelClasses = "absolute left-3 -top-2.5 px-1 text-xs text-muted-foreground";
+  const fieldGroupClasses =
+    "group relative rounded-none border border-border transition-colors focus-within:border-primary h-12";
+  const fieldLabelClasses =
+    "absolute -top-2.5 left-3 bg-background px-1 text-xs text-foreground transition-colors group-focus-within:text-primary";
+  const fieldInputClasses =
+    "border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none h-full w-full";
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="relative">
-          <Label htmlFor="first_name" className={labelClasses}>
-            First Name
-          </Label>
-          <Controller
-            name="first_name"
-            control={control}
-            render={({ field }) => (
-              <Input id="first_name" {...field} disabled={!isOwner} className={fieldClasses} />
-            )}
-          />
+          <div className={fieldGroupClasses}>
+            <span className={fieldLabelClasses}>First Name</span>
+            <Controller
+              name="first_name"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  id="first_name"
+                  {...field}
+                  disabled={!isOwner}
+                  placeholder=""
+                  className={fieldInputClasses}
+                />
+              )}
+            />
+          </div>
         </div>
         <div className="relative">
-          <Label htmlFor="last_name" className={labelClasses}>
-            Last Name
-          </Label>
-          <Controller
-            name="last_name"
-            control={control}
-            render={({ field }) => (
-              <Input id="last_name" {...field} disabled={!isOwner} className={fieldClasses} />
-            )}
-          />
+          <div className={fieldGroupClasses}>
+            <span className={fieldLabelClasses}>Last Name</span>
+            <Controller
+              name="last_name"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  id="last_name"
+                  {...field}
+                  disabled={!isOwner}
+                  placeholder=""
+                  className={fieldInputClasses}
+                />
+              )}
+            />
+          </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="relative">
-          <Label htmlFor="department" className={labelClasses}>
-            Department
-          </Label>
-          <Controller
-            name="departmentId"
-            control={control}
-            render={({ field }) => (
-              <Select value={field.value || ""} onValueChange={field.onChange} disabled={!isOwner}>
-                <SelectTrigger id="department" className={fieldClasses}>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className={"rounded-none"}>
-                  {departments.map((dept) => (
-                    <SelectItem key={dept.id} value={dept.id}>
-                      {dept.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-          />
+          <div className={fieldGroupClasses}>
+            <span className={fieldLabelClasses}>Department</span>
+            <Controller
+              name="departmentId"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  value={field.value || ""}
+                  onValueChange={field.onChange}
+                  disabled={!isOwner}
+                >
+                  <SelectTrigger
+                    id="department"
+                    className="border-0 rounded-none focus-visible:ring-0 focus-visible:ring-offset-0 w-full bg-transparent shadow-none data-[size=default]:h-full py-0"
+                  >
+                    <SelectValue className="flex items-center h-full">
+                      {departments.find((d) => d.id === field.value)?.name ||
+                        userDepartmentName ||
+                        ""}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent className="rounded-none">
+                    {departments.map((dept) => (
+                      <SelectItem key={dept.id} value={dept.id}>
+                        {dept.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+          </div>
         </div>
         <div className="relative">
-          <Label htmlFor="position" className={labelClasses}>
-            Position
-          </Label>
-          <Controller
-            name="positionId"
-            control={control}
-            render={({ field }) => (
-              <Select value={field.value || ""} onValueChange={field.onChange} disabled={!isOwner}>
-                <SelectTrigger id="position" className={fieldClasses}>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className={"rounded-none"}>
-                  {positions.map((pos) => (
-                    <SelectItem key={pos.id} value={pos.id}>
-                      {pos.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-          />
+          <div className={fieldGroupClasses}>
+            <span className={fieldLabelClasses}>Position</span>
+            <Controller
+              name="positionId"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  value={field.value || ""}
+                  onValueChange={field.onChange}
+                  disabled={!isOwner}
+                >
+                  <SelectTrigger
+                    id="position"
+                    className="border-0 rounded-none focus-visible:ring-0 focus-visible:ring-offset-0 w-full bg-transparent shadow-none data-[size=default]:h-full py-0"
+                  >
+                    <SelectValue className="flex items-center h-full">
+                      {positions.find((p) => p.id === field.value)?.name || userPositionName || ""}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent className="rounded-none">
+                    {positions.map((pos) => (
+                      <SelectItem key={pos.id} value={pos.id}>
+                        {pos.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+          </div>
         </div>
       </div>
 

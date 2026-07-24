@@ -60,10 +60,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <AuthFormHeader
-        title="Reset password"
-        subtitle="Enter your new password below."
-      />
+      <AuthFormHeader title="Reset password" subtitle="Enter your new password below." />
 
       <div className="space-y-5">
         <div className="relative">

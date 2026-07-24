@@ -2,7 +2,13 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreVertical, ArrowUp, ArrowDown } from "lucide-react";
-import { Button, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui";
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui";
 import type { UserQuery } from "@/gql/generated/graphql";
 
 type CvItem = NonNullable<UserQuery["user"]["cvs"]>[number];
@@ -87,7 +93,10 @@ export function createCvsColumns(
                 }
               />
               <DropdownMenuContent align="end" className="min-w-32">
-                <DropdownMenuItem onClick={() => actions.onOpen(cv.id)} className="justify-center cursor-pointer">
+                <DropdownMenuItem
+                  onClick={() => actions.onOpen(cv.id)}
+                  className="justify-center cursor-pointer"
+                >
                   Open
                 </DropdownMenuItem>
                 <DropdownMenuItem

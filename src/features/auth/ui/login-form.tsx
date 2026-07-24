@@ -61,10 +61,7 @@ export function LoginForm() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <AuthFormHeader
-        title="Welcome back"
-        subtitle="Nice to see you! Log in to continue"
-      />
+      <AuthFormHeader title="Welcome back" subtitle="Nice to see you! Log in to continue" />
 
       <div className="space-y-5">
         <div className="relative">

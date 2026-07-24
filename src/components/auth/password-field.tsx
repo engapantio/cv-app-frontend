@@ -18,10 +18,7 @@ export function PasswordField({
       <Input
         type={visible ? "text" : "password"}
         disabled={disabled}
-        className={cn(
-          "rounded-none pr-12 placeholder:text-muted-foreground",
-          className,
-        )}
+        className={cn("rounded-none pr-12 placeholder:text-muted-foreground", className)}
         {...props}
       />
       <Button

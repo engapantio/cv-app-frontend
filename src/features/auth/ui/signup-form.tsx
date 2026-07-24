@@ -61,10 +61,7 @@ export function SignupForm() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <AuthFormHeader
-        title="Sign up"
-        subtitle="Welcome! Create an account to continue"
-      />
+      <AuthFormHeader title="Sign up" subtitle="Welcome! Create an account to continue" />
 
       <div className="space-y-5">
         <div className="relative">

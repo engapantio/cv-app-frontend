@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
-import { getServerAccessToken, getServerUserId } from "@/lib/auth/cookies";
+import { getServerAccessToken, getServerRefreshToken, getServerUserId } from "@/lib/auth/cookies";
 import { createServerApolloClient } from "@/lib/apollo/server-client";
-import { UserDocument } from "@/gql/generated/graphql";
+import { UserDocument, UpdateTokenDocument } from "@/gql/generated/graphql";
 import { UserProfileClient } from "@/features/user-profile/ui/user-profile-client";
 import { ChevronRight, User } from "lucide-react";
 import Link from "next/link";
@@ -12,8 +12,21 @@ interface ProfilePageProps {
 
 export default async function ProfilePage({ params }: ProfilePageProps) {
   const { userId } = await params;
-  const token = await getServerAccessToken();
+  let token = await getServerAccessToken();
+  const refreshToken = await getServerRefreshToken();
   const currentUserId = await getServerUserId();
+
+  if (!token && refreshToken) {
+    try {
+      const refreshClient = createServerApolloClient(refreshToken);
+      const { data } = await refreshClient.mutate({
+        mutation: UpdateTokenDocument,
+      });
+      if (data?.updateToken) {
+        token = data.updateToken.access_token;
+      }
+    } catch {}
+  }
 
   if (!token) {
     return notFound();

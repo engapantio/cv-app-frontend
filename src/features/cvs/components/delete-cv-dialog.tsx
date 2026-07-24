@@ -24,8 +24,7 @@ export function DeleteCvDialog({
       await deleteCv({ variables: { cv: { cvId: target.id } } });
       onDeleted(target.id);
       onClose();
-    } catch {
-    }
+    } catch {}
   }, [target, deleteCv, onDeleted, onClose]);
 
   return (
@@ -37,7 +36,10 @@ export function DeleteCvDialog({
         <p className="text-sm text-muted-foreground">
           Are you sure you want to delete CV <strong>{target?.name}</strong>?
         </p>
-        <div className="flex flex-row justify-end items-center gap-3 mt-2 py-3" style={{ paddingRight: "48px" }}>
+        <div
+          className="flex flex-row justify-end items-center gap-3 mt-2 py-3"
+          style={{ paddingRight: "48px" }}
+        >
           <Button
             variant="ghost"
             className="uppercase min-w-30 border border-border py-1.5"

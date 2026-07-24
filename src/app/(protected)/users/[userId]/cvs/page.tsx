@@ -5,11 +5,7 @@ import UserCvsClient from "./cvs-client";
 
 type CvItem = NonNullable<UserQuery["user"]["cvs"]>[number];
 
-export default async function UserCvsPage({
-  params,
-}: {
-  params: Promise<{ userId: string }>;
-}) {
+export default async function UserCvsPage({ params }: { params: Promise<{ userId: string }> }) {
   const { userId } = await params;
   const token = await getServerAccessToken();
   const client = createServerApolloClient(token ?? undefined);
