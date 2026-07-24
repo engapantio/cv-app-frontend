@@ -49,34 +49,44 @@ export function AddSkillDialog({
         <DialogHeader>
           <DialogTitle className="text-left text-base font-semibold">Add skill</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4 py-4">
-          <Select value={selectedSkill} onValueChange={(v) => setSelectedSkill(v)}>
-            <SelectTrigger className="w-full" disabled={availableSkills.length === 0}>
-              <SelectValue placeholder={availableSkills.length === 0 ? "No available skills" : "Select skill"} />
-            </SelectTrigger>
-            <SelectContent>
-              {availableSkills.map((skill) => (
-                <SelectItem key={skill.name} value={skill.name}>
-                  {skill.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select
-            value={selectedMastery}
-            onValueChange={(v) => v && setSelectedMastery(v as Mastery)}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select mastery" />
-            </SelectTrigger>
-            <SelectContent>
-              {MASTERY_OPTIONS.map((m) => (
-                <SelectItem key={m} value={m}>
-                  {m}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        <div className="space-y-6 py-4">
+          <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
+            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-foreground transition-colors group-focus-within:text-primary">
+              Skill
+            </span>
+            <Select value={selectedSkill} onValueChange={(v) => setSelectedSkill(v)}>
+              <SelectTrigger className="w-full border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none h-12 py-1 text-lg" disabled={availableSkills.length === 0}>
+                <SelectValue placeholder={availableSkills.length === 0 ? "No available skills" : "Select skill"} />
+              </SelectTrigger>
+              <SelectContent>
+                {availableSkills.map((skill) => (
+                  <SelectItem key={skill.name} value={skill.name}>
+                    {skill.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
+            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-foreground transition-colors group-focus-within:text-primary">
+              Mastery
+            </span>
+            <Select
+              value={selectedMastery}
+              onValueChange={(v) => v && setSelectedMastery(v as Mastery)}
+            >
+              <SelectTrigger className="w-full border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none h-12 py-1 text-lg">
+                <SelectValue placeholder="Select mastery" />
+              </SelectTrigger>
+              <SelectContent>
+                {MASTERY_OPTIONS.map((m) => (
+                  <SelectItem key={m} value={m}>
+                    {m}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
         <DialogFooter className="gap-3 border-t-0 bg-transparent mx-0 mb-0 py-0">
           <Button

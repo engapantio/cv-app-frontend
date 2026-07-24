@@ -26,7 +26,7 @@ type Documents = {
     "mutation CreateCv($cv: CreateCvInput!) {\n  createCv(cv: $cv) {\n    id\n    created_at\n    name\n    education\n    description\n  }\n}": typeof types.CreateCvDocument,
     "mutation DeleteCvSkill($skill: DeleteCvSkillInput!) {\n  deleteCvSkill(skill: $skill) {\n    id\n    created_at\n    name\n    description\n  }\n}": typeof types.DeleteCvSkillDocument,
     "mutation DeleteCv($cv: DeleteCvInput!) {\n  deleteCv(cv: $cv) {\n    affected\n  }\n}": typeof types.DeleteCvDocument,
-    "query Cv($cvId: ID!) {\n  cv(cvId: $cvId) {\n    id\n    created_at\n    name\n    education\n    description\n    user {\n      id\n      email\n      profile {\n        id\n        full_name\n        avatar\n      }\n    }\n    projects {\n      __typename\n    }\n    skills {\n      __typename\n    }\n    languages {\n      __typename\n    }\n  }\n}": typeof types.CvDocument,
+    "query Cv($cvId: ID!) {\n  cv(cvId: $cvId) {\n    id\n    created_at\n    name\n    education\n    description\n    user {\n      id\n      email\n    }\n    projects {\n      __typename\n    }\n    skills {\n      name\n      mastery\n      categoryId\n    }\n    languages {\n      __typename\n    }\n  }\n}": typeof types.CvDocument,
     "query Cvs {\n  cvs {\n    id\n    created_at\n    name\n    education\n    description\n    user {\n      id\n      email\n    }\n    projects {\n      __typename\n    }\n    skills {\n      __typename\n    }\n    languages {\n      __typename\n    }\n  }\n}": typeof types.CvsDocument,
     "mutation RemoveCvProject($project: RemoveCvProjectInput!) {\n  removeCvProject(project: $project) {\n    id\n    created_at\n    name\n    description\n  }\n}": typeof types.RemoveCvProjectDocument,
     "mutation UpdateCvProject($project: UpdateCvProjectInput!) {\n  updateCvProject(project: $project) {\n    id\n    created_at\n    name\n    description\n  }\n}": typeof types.UpdateCvProjectDocument,
@@ -62,7 +62,7 @@ type Documents = {
     "mutation CreateSkill($skill: CreateSkillInput!) {\n  createSkill(skill: $skill) {\n    id\n    created_at\n    name\n    category_name\n    category_parent_name\n  }\n}": typeof types.CreateSkillDocument,
     "mutation DeleteSkill($skill: DeleteSkillInput!) {\n  deleteSkill(skill: $skill) {\n    affected\n  }\n}": typeof types.DeleteSkillDocument,
     "query SkillCategories {\n  skillCategories {\n    id\n    name\n    order\n    parent {\n      id\n      name\n      order\n    }\n    children {\n      id\n      name\n      order\n    }\n  }\n}": typeof types.SkillCategoriesDocument,
-    "query Skills {\n  skills {\n    id\n    created_at\n    name\n    category_name\n    category_parent_name\n    category {\n      id\n      name\n      order\n      parent {\n        id\n        name\n        order\n      }\n      children {\n        id\n        name\n        order\n      }\n    }\n  }\n}": typeof types.SkillsDocument,
+    "query Skills {\n  skills {\n    id\n    created_at\n    name\n    category_name\n    category_parent_name\n    category {\n      id\n      name\n      order\n      parent {\n        id\n        name\n        order\n      }\n    }\n  }\n}": typeof types.SkillsDocument,
     "mutation UpdateSkill($skill: UpdateSkillInput!) {\n  updateSkill(skill: $skill) {\n    id\n    created_at\n    name\n    category_name\n    category_parent_name\n  }\n}": typeof types.UpdateSkillDocument,
     "mutation CreateUser($user: CreateUserInput!) {\n  createUser(user: $user) {\n    id\n    created_at\n    email\n    is_verified\n    role\n  }\n}": typeof types.CreateUserDocument,
     "mutation DeleteUser($userId: ID!) {\n  deleteUser(userId: $userId) {\n    affected\n  }\n}": typeof types.DeleteUserDocument,
@@ -83,7 +83,7 @@ const documents: Documents = {
     "mutation CreateCv($cv: CreateCvInput!) {\n  createCv(cv: $cv) {\n    id\n    created_at\n    name\n    education\n    description\n  }\n}": types.CreateCvDocument,
     "mutation DeleteCvSkill($skill: DeleteCvSkillInput!) {\n  deleteCvSkill(skill: $skill) {\n    id\n    created_at\n    name\n    description\n  }\n}": types.DeleteCvSkillDocument,
     "mutation DeleteCv($cv: DeleteCvInput!) {\n  deleteCv(cv: $cv) {\n    affected\n  }\n}": types.DeleteCvDocument,
-    "query Cv($cvId: ID!) {\n  cv(cvId: $cvId) {\n    id\n    created_at\n    name\n    education\n    description\n    user {\n      id\n      email\n      profile {\n        id\n        full_name\n        avatar\n      }\n    }\n    projects {\n      __typename\n    }\n    skills {\n      __typename\n    }\n    languages {\n      __typename\n    }\n  }\n}": types.CvDocument,
+    "query Cv($cvId: ID!) {\n  cv(cvId: $cvId) {\n    id\n    created_at\n    name\n    education\n    description\n    user {\n      id\n      email\n    }\n    projects {\n      __typename\n    }\n    skills {\n      name\n      mastery\n      categoryId\n    }\n    languages {\n      __typename\n    }\n  }\n}": types.CvDocument,
     "query Cvs {\n  cvs {\n    id\n    created_at\n    name\n    education\n    description\n    user {\n      id\n      email\n    }\n    projects {\n      __typename\n    }\n    skills {\n      __typename\n    }\n    languages {\n      __typename\n    }\n  }\n}": types.CvsDocument,
     "mutation RemoveCvProject($project: RemoveCvProjectInput!) {\n  removeCvProject(project: $project) {\n    id\n    created_at\n    name\n    description\n  }\n}": types.RemoveCvProjectDocument,
     "mutation UpdateCvProject($project: UpdateCvProjectInput!) {\n  updateCvProject(project: $project) {\n    id\n    created_at\n    name\n    description\n  }\n}": types.UpdateCvProjectDocument,
@@ -119,7 +119,7 @@ const documents: Documents = {
     "mutation CreateSkill($skill: CreateSkillInput!) {\n  createSkill(skill: $skill) {\n    id\n    created_at\n    name\n    category_name\n    category_parent_name\n  }\n}": types.CreateSkillDocument,
     "mutation DeleteSkill($skill: DeleteSkillInput!) {\n  deleteSkill(skill: $skill) {\n    affected\n  }\n}": types.DeleteSkillDocument,
     "query SkillCategories {\n  skillCategories {\n    id\n    name\n    order\n    parent {\n      id\n      name\n      order\n    }\n    children {\n      id\n      name\n      order\n    }\n  }\n}": types.SkillCategoriesDocument,
-    "query Skills {\n  skills {\n    id\n    created_at\n    name\n    category_name\n    category_parent_name\n    category {\n      id\n      name\n      order\n      parent {\n        id\n        name\n        order\n      }\n      children {\n        id\n        name\n        order\n      }\n    }\n  }\n}": types.SkillsDocument,
+    "query Skills {\n  skills {\n    id\n    created_at\n    name\n    category_name\n    category_parent_name\n    category {\n      id\n      name\n      order\n      parent {\n        id\n        name\n        order\n      }\n    }\n  }\n}": types.SkillsDocument,
     "mutation UpdateSkill($skill: UpdateSkillInput!) {\n  updateSkill(skill: $skill) {\n    id\n    created_at\n    name\n    category_name\n    category_parent_name\n  }\n}": types.UpdateSkillDocument,
     "mutation CreateUser($user: CreateUserInput!) {\n  createUser(user: $user) {\n    id\n    created_at\n    email\n    is_verified\n    role\n  }\n}": types.CreateUserDocument,
     "mutation DeleteUser($userId: ID!) {\n  deleteUser(userId: $userId) {\n    affected\n  }\n}": types.DeleteUserDocument,
@@ -193,7 +193,7 @@ export function graphql(source: "mutation DeleteCv($cv: DeleteCvInput!) {\n  del
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "query Cv($cvId: ID!) {\n  cv(cvId: $cvId) {\n    id\n    created_at\n    name\n    education\n    description\n    user {\n      id\n      email\n      profile {\n        id\n        full_name\n        avatar\n      }\n    }\n    projects {\n      __typename\n    }\n    skills {\n      __typename\n    }\n    languages {\n      __typename\n    }\n  }\n}"): (typeof documents)["query Cv($cvId: ID!) {\n  cv(cvId: $cvId) {\n    id\n    created_at\n    name\n    education\n    description\n    user {\n      id\n      email\n      profile {\n        id\n        full_name\n        avatar\n      }\n    }\n    projects {\n      __typename\n    }\n    skills {\n      __typename\n    }\n    languages {\n      __typename\n    }\n  }\n}"];
+export function graphql(source: "query Cv($cvId: ID!) {\n  cv(cvId: $cvId) {\n    id\n    created_at\n    name\n    education\n    description\n    user {\n      id\n      email\n    }\n    projects {\n      __typename\n    }\n    skills {\n      name\n      mastery\n      categoryId\n    }\n    languages {\n      __typename\n    }\n  }\n}"): (typeof documents)["query Cv($cvId: ID!) {\n  cv(cvId: $cvId) {\n    id\n    created_at\n    name\n    education\n    description\n    user {\n      id\n      email\n    }\n    projects {\n      __typename\n    }\n    skills {\n      name\n      mastery\n      categoryId\n    }\n    languages {\n      __typename\n    }\n  }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -337,7 +337,7 @@ export function graphql(source: "query SkillCategories {\n  skillCategories {\n 
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "query Skills {\n  skills {\n    id\n    created_at\n    name\n    category_name\n    category_parent_name\n    category {\n      id\n      name\n      order\n      parent {\n        id\n        name\n        order\n      }\n      children {\n        id\n        name\n        order\n      }\n    }\n  }\n}"): (typeof documents)["query Skills {\n  skills {\n    id\n    created_at\n    name\n    category_name\n    category_parent_name\n    category {\n      id\n      name\n      order\n      parent {\n        id\n        name\n        order\n      }\n      children {\n        id\n        name\n        order\n      }\n    }\n  }\n}"];
+export function graphql(source: "query Skills {\n  skills {\n    id\n    created_at\n    name\n    category_name\n    category_parent_name\n    category {\n      id\n      name\n      order\n      parent {\n        id\n        name\n        order\n      }\n    }\n  }\n}"): (typeof documents)["query Skills {\n  skills {\n    id\n    created_at\n    name\n    category_name\n    category_parent_name\n    category {\n      id\n      name\n      order\n      parent {\n        id\n        name\n        order\n      }\n    }\n  }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

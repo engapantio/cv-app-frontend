@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { ChevronDown } from "lucide-react";
 import {
   Button,
   Dialog,
@@ -48,27 +49,38 @@ export function UpdateSkillDialog({
         <DialogHeader>
           <DialogTitle className="text-left text-base font-semibold">Update skill</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4 py-4">
-          <Input
-            value={skillName}
-            readOnly
-            className="w-full rounded-none opacity-60"
-          />
-          <Select
-            value={selectedMastery}
-            onValueChange={(v) => v && setSelectedMastery(v as Mastery)}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select mastery" />
-            </SelectTrigger>
-            <SelectContent>
-              {MASTERY_OPTIONS.map((m) => (
-                <SelectItem key={m} value={m}>
-                  {m}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        <div className="space-y-6 py-4">
+          <div className="group relative rounded-none border border-border transition-colors">
+            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-foreground">
+              Skill
+            </span>
+            <Input
+              value={skillName}
+              readOnly
+              className="border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none opacity-60 h-12 py-1 text-lg"
+            />
+            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
+          </div>
+          <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
+            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-foreground transition-colors group-focus-within:text-primary">
+              Mastery
+            </span>
+            <Select
+              value={selectedMastery}
+              onValueChange={(v) => v && setSelectedMastery(v as Mastery)}
+            >
+              <SelectTrigger className="w-full border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none h-12 py-1 text-lg">
+                <SelectValue placeholder="Select mastery" />
+              </SelectTrigger>
+              <SelectContent>
+                {MASTERY_OPTIONS.map((m) => (
+                  <SelectItem key={m} value={m}>
+                    {m}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
         <DialogFooter className="gap-3 border-t-0 bg-transparent mx-0 mb-0 py-0">
           <Button

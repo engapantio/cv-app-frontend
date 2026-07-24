@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState, useSyncExternalStore } from "react";
 import { useQuery } from "@apollo/client/react";
 import { cn } from "@/lib/utils";
 import {
@@ -33,7 +34,6 @@ import {
 } from "lucide-react";
 import { GET_ME, GetMeResponse } from "@/lib/graphql/queries/me.queries";
 import { Container } from "../container";
-import { useState } from "react";
 import { useTheme } from "next-themes";
 
 interface AppSidebarProps {
@@ -53,6 +53,11 @@ const LANGUAGES = ["EN", "PL", "RU"];
 
 function ThemeToggle() {
   const { theme, setTheme } = useTheme();
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
   const isDark = theme === "dark";
 
   return (
@@ -63,7 +68,7 @@ function ThemeToggle() {
       aria-label="Toggle theme"
       className="rounded-full"
     >
-      {isDark ? <Sun className="h-5 w-5 text-icon" /> : <Moon className="h-5 w-5 text-icon" />}
+      {!mounted ? <span className="h-5 w-5" /> : isDark ? <Sun className="h-5 w-5 text-icon" /> : <Moon className="h-5 w-5 text-icon" />}
     </Button>
   );
 }

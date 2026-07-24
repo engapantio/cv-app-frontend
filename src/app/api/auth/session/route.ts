@@ -45,7 +45,7 @@ export async function GET() {
 
   try {
     const user = await fetchUser(accessToken, userId);
-    return NextResponse.json({ authenticated: !!user, user });
+    return NextResponse.json({ authenticated: !!user, user, accessToken, refreshToken: await getServerRefreshToken() });
   } catch {
     const refreshed = await refreshTokens();
     if (!refreshed) {
@@ -54,7 +54,12 @@ export async function GET() {
 
     try {
       const user = await fetchUser(refreshed.accessToken, userId);
-      const res = NextResponse.json({ authenticated: !!user, user });
+      const res = NextResponse.json({
+        authenticated: !!user,
+        user,
+        accessToken: refreshed.accessToken,
+        refreshToken: refreshed.refreshToken,
+      });
       return setAuthCookies(res, refreshed, refreshed.userId);
     } catch {
       return setAuthCookies(

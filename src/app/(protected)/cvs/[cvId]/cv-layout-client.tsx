@@ -32,19 +32,17 @@ export function CvLayoutClient({
 
   return (
     <div className="flex w-full flex-col">
-      <div className="flex items-center gap-1 text-sm text-muted-foreground mb-2">
-        <Link href="/cvs" className="hover:text-primary">
+      <div className="flex items-center h-11 gap-2 mb-6">
+        <Link href="/cvs" className="text-base text-foreground/70 hover:text-primary transition-colors">
           CVs
         </Link>
-        <ChevronRight className="h-4 w-4" />
-        <span className="text-foreground">{cvName}</span>
-        <ChevronRight className="h-4 w-4" />
-        <span className="text-primary">
-          {TABS.find((t) => t.href === currentTab)?.label ?? currentTab}
-        </span>
+        <ChevronRight className="size-5" />
+        <span style={{ color: "#c63031" }}>{cvName}</span>
+        <ChevronRight className="size-5" />
+        <span className="text-base text-foreground/70">{TABS.find((t) => t.href === currentTab)?.label ?? currentTab}</span>
       </div>
 
-      <div className="flex border-b border-border mb-6">
+      <div className="flex mb-6 gap-0">
         {TABS.map((tab) => {
           const isActive = currentTab === tab.href;
           return (
@@ -52,10 +50,10 @@ export function CvLayoutClient({
               key={tab.href}
               href={`/cvs/${cvId}/${tab.href}`}
               className={
-                "px-4 py-3 text-sm font-medium transition-colors relative " +
+                "uppercase w-[150px] text-center text-sm font-medium py-3 relative transition-colors " +
                 (isActive
-                  ? "text-primary font-semibold after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-primary"
-                  : "text-muted-foreground hover:text-foreground")
+                  ? "text-primary after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-primary"
+                  : "text-foreground hover:text-primary")
               }
             >
               {tab.label}

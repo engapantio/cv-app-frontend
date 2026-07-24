@@ -1,6 +1,15 @@
 let accessToken: string | null = null;
 let refreshToken: string | null = null;
 
+let bootstrapResolve: (() => void) | null = null;
+export const onBootstrapComplete: Promise<void> = new Promise((resolve) => {
+  bootstrapResolve = resolve;
+});
+
+export function resolveBootstrap() {
+  bootstrapResolve?.();
+}
+
 export function getAccessToken(): string | null {
   return accessToken;
 }

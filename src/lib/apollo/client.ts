@@ -5,17 +5,36 @@ import { ApolloClient, InMemoryCache } from "@apollo/client-integration-nextjs";
 import { ErrorLink } from "@apollo/client/link/error";
 import { CombinedGraphQLErrors } from "@apollo/client/errors";
 import { typePolicies } from "@/lib/apollo/cache";
-import { getAccessToken, setTokens, isTokenExpired } from "@/lib/auth/token-store";
+import { getAccessToken, setTokens, isTokenExpired, clearTokens, onBootstrapComplete } from "@/lib/auth/token-store";
 
 let refreshPromise: Promise<void> | null = null;
+let refreshFailed = false;
+
+function isRefreshing(): boolean {
+  return refreshPromise !== null;
+}
+
+function waitForRefresh(): Promise<void> | null {
+  return refreshPromise;
+}
 
 async function refreshAuthSession(): Promise<void> {
+  if (refreshFailed) {
+    throw new Error("Session refresh previously failed");
+  }
+
   if (!refreshPromise) {
     refreshPromise = fetch("/api/auth/refresh", {
       method: "POST",
       credentials: "include",
     })
       .then(async (res) => {
+        if (res.status === 401) {
+          clearTokens();
+          refreshFailed = true;
+          window.location.href = "/auth/login";
+          throw new Error("Refresh token expired");
+        }
         if (!res.ok) throw new Error(`Refresh failed: ${res.status}`);
         const body = await res.json();
         if (body.accessToken) {
@@ -30,16 +49,29 @@ async function refreshAuthSession(): Promise<void> {
   return refreshPromise;
 }
 
+function resetFailedFlag() {
+  refreshFailed = false;
+}
+
 const authLink = new ApolloLink((operation, forward) => {
   return new Observable((observer) => {
     const execute = (retriesLeft: number) => {
       (async () => {
         try {
-          const token = getAccessToken();
+          let token = getAccessToken();
+
+          if (!token) {
+            await onBootstrapComplete;
+            token = getAccessToken();
+          }
 
           if (token && isTokenExpired(token)) {
             try {
-              await refreshAuthSession();
+              if (isRefreshing()) {
+                await waitForRefresh();
+              } else {
+                await refreshAuthSession();
+              }
             } catch {
               // pre-request refresh failed; continue with stale token or none
             }
@@ -56,6 +88,27 @@ const authLink = new ApolloLink((operation, forward) => {
 
           forward(operation).subscribe({
             next(value) {
+              const response = value as { data?: unknown; errors?: Array<{ message: string }> };
+              const isAuthError = response.errors?.some(({ message }) =>
+                /unauthorized|forbidden|expired/i.test(message),
+              );
+
+              if (isAuthError && retriesLeft > 0) {
+                const doRetry = () => {
+                  execute(retriesLeft - 1);
+                };
+                if (isRefreshing()) {
+                  waitForRefresh()?.then(doRetry).catch(() => observer.next(value));
+                } else {
+                  refreshAuthSession()
+                    .then(() => {
+                      resetFailedFlag();
+                      doRetry();
+                    })
+                    .catch(() => observer.next(value));
+                }
+                return;
+              }
               observer.next(value);
             },
             error(err) {
@@ -72,9 +125,21 @@ const authLink = new ApolloLink((operation, forward) => {
                   ) ?? /unauthorized|forbidden|expired/i.test(err?.message ?? "");
 
                 if (isAuthError) {
-                  refreshAuthSession()
-                    .then(() => execute(retriesLeft - 1))
-                    .catch(() => observer.error(err));
+                  if (isRefreshing()) {
+                    waitForRefresh()
+                      ?.then(() => {
+                        resetFailedFlag();
+                        execute(retriesLeft - 1);
+                      })
+                      .catch(() => observer.error(err));
+                  } else {
+                    refreshAuthSession()
+                      .then(() => {
+                        resetFailedFlag();
+                        execute(retriesLeft - 1);
+                      })
+                      .catch(() => observer.error(err));
+                  }
                   return;
                 }
               }
