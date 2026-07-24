@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createServerApolloClient } from "@/lib/apollo/server-client";
 import {
+  clearAuthCookies,
   getServerAccessToken,
   getServerRefreshToken,
   getServerUserId,
@@ -62,10 +63,8 @@ export async function GET() {
       });
       return setAuthCookies(res, refreshed, refreshed.userId);
     } catch {
-      return setAuthCookies(
+      return clearAuthCookies(
         NextResponse.json({ authenticated: false, user: null }),
-        refreshed,
-        refreshed.userId,
       );
     }
   }
