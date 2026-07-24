@@ -26,7 +26,10 @@ export async function POST() {
       return clearAuthCookies(NextResponse.json({ message: "Session expired" }, { status: 401 }));
     }
 
-    const response = NextResponse.json({ ok: true });
+    const response = NextResponse.json({
+      accessToken: data.updateToken.access_token,
+      refreshToken: data.updateToken.refresh_token,
+    });
     return setAuthCookies(
       response,
       {

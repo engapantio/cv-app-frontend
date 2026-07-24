@@ -1,7 +1,40 @@
 import { NextResponse } from "next/server";
 import { createServerApolloClient } from "@/lib/apollo/server-client";
-import { getServerAccessToken, getServerUserId } from "@/lib/auth/cookies";
-import { UserDocument } from "@/gql/generated/graphql";
+import {
+  clearAuthCookies,
+  getServerAccessToken,
+  getServerRefreshToken,
+  getServerUserId,
+  setAuthCookies,
+} from "@/lib/auth/cookies";
+import { UserDocument, UpdateTokenDocument } from "@/gql/generated/graphql";
+
+async function fetchUser(token: string, userId: string) {
+  const client = createServerApolloClient(token);
+  const result = await client.query({
+    query: UserDocument,
+    variables: { userId },
+    fetchPolicy: "no-cache",
+  });
+  return result.data?.user ?? null;
+}
+
+async function refreshTokens() {
+  const refreshToken = await getServerRefreshToken();
+  const userId = await getServerUserId();
+  if (!refreshToken || !userId) return null;
+  try {
+    const client = createServerApolloClient(refreshToken);
+    const { data } = await client.mutate({
+      mutation: UpdateTokenDocument,
+    });
+    return data?.updateToken
+      ? { accessToken: data.updateToken.access_token, refreshToken: data.updateToken.refresh_token, userId }
+      : null;
+  } catch {
+    return null;
+  }
+}
 
 export async function GET() {
   const accessToken = await getServerAccessToken();
@@ -12,21 +45,27 @@ export async function GET() {
   }
 
   try {
-    const client = createServerApolloClient(accessToken);
-
-    const result = await client.query({
-      query: UserDocument,
-      variables: { userId },
-      fetchPolicy: "no-cache",
-    });
-
-    const user = result.data?.user ?? null;
-
-    return NextResponse.json({
-      authenticated: !!user,
-      user,
-    });
+    const user = await fetchUser(accessToken, userId);
+    return NextResponse.json({ authenticated: !!user, user });
   } catch {
-    return NextResponse.json({ authenticated: false, user: null });
+    const refreshed = await refreshTokens();
+    if (!refreshed) {
+      return NextResponse.json({ authenticated: false, user: null });
+    }
+
+    try {
+      const user = await fetchUser(refreshed.accessToken, userId);
+      const res = NextResponse.json({
+        authenticated: !!user,
+        user,
+        accessToken: refreshed.accessToken,
+        refreshToken: refreshed.refreshToken,
+      });
+      return setAuthCookies(res, refreshed, refreshed.userId);
+    } catch {
+      return clearAuthCookies(
+        NextResponse.json({ authenticated: false, user: null }),
+      );
+    }
   }
 }

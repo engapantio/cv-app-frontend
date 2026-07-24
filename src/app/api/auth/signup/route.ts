@@ -24,7 +24,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: "Signup failed" }, { status: 400 });
     }
 
-    const response = NextResponse.json({ user: signup.user });
+    const response = NextResponse.json({
+      user: signup.user,
+      accessToken: signup.access_token,
+      refreshToken: signup.refresh_token,
+    });
 
     return setAuthCookies(
       response,

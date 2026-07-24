@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { setAuthenticatedSession } from "@/lib/auth/session";
+import { setTokens } from "@/lib/auth/token-store";
 import { PasswordField } from "@/components/auth/password-field";
 import { AuthFormHeader } from "@/components/auth/auth-form-header";
 import { AuthFormRootError } from "@/components/auth/auth-form-root-error";
@@ -51,6 +52,9 @@ export function LoginForm() {
         return;
       }
 
+      if (payload.accessToken) {
+        setTokens(payload.accessToken, payload.refreshToken ?? null);
+      }
       setAuthenticatedSession(payload.user);
       router.replace("/users");
       router.refresh();

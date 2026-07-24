@@ -3,6 +3,7 @@ import { makeVar } from "@apollo/client";
 import { useReactiveVar } from "@apollo/client/react";
 import { useEffect } from "react";
 import type { SessionUser } from "@/lib/auth/cookies";
+import { setTokens, clearTokens } from "@/lib/auth/token-store";
 
 export type SessionState = {
   status: "loading" | "authenticated" | "anonymous";
@@ -16,6 +17,38 @@ export const sessionStateVar = makeVar<SessionState>({
 
 let bootstrapped = false;
 let bootstrapAbortController: AbortController | null = null;
+let proactiveRefreshTimer: ReturnType<typeof setInterval> | null = null;
+
+const PROACTIVE_REFRESH_INTERVAL_MS = 8 * 60 * 1000;
+
+function startProactiveRefresh() {
+  stopProactiveRefresh();
+  proactiveRefreshTimer = setInterval(async () => {
+    try {
+      const res = await fetch("/api/auth/refresh", {
+        method: "POST",
+        credentials: "include",
+      });
+      if (!res.ok) {
+        clearSession();
+        return;
+      }
+      const body = await res.json();
+      if (body.accessToken) {
+        setTokens(body.accessToken, body.refreshToken ?? null);
+      }
+    } catch {
+      clearSession();
+    }
+  }, PROACTIVE_REFRESH_INTERVAL_MS);
+}
+
+function stopProactiveRefresh() {
+  if (proactiveRefreshTimer !== null) {
+    clearInterval(proactiveRefreshTimer);
+    proactiveRefreshTimer = null;
+  }
+}
 
 export function setAuthenticatedSession(user: SessionUser) {
   bootstrapAbortController?.abort();
@@ -29,6 +62,8 @@ export function setAuthenticatedSession(user: SessionUser) {
 export function clearSession() {
   bootstrapped = false;
   bootstrapAbortController = null;
+  stopProactiveRefresh();
+  clearTokens();
   sessionStateVar({
     status: "anonymous",
     user: null,
@@ -38,6 +73,8 @@ export function clearSession() {
 export function resetSessionToLoading() {
   bootstrapped = false;
   bootstrapAbortController = null;
+  stopProactiveRefresh();
+  clearTokens();
   sessionStateVar({
     status: "loading",
     user: null,
@@ -61,10 +98,16 @@ export async function bootstrapSession() {
       return res.json();
     })
     .then((data) => {
+      if (data.accessToken) {
+        setTokens(data.accessToken, data.refreshToken ?? null);
+      }
       sessionStateVar({
         status: data.authenticated ? "authenticated" : "anonymous",
         user: data.user ?? null,
       });
+      if (data.authenticated) {
+        startProactiveRefresh();
+      }
     })
     .catch((error) => {
       if (error.name !== "AbortError") {

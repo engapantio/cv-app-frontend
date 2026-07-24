@@ -1,14 +1,12 @@
 "use client";
 
-import { HttpLink, Observable } from "@apollo/client";
+import { ApolloLink, HttpLink, Observable } from "@apollo/client";
 import { ApolloClient, InMemoryCache } from "@apollo/client-integration-nextjs";
 import { ErrorLink } from "@apollo/client/link/error";
-import { SetContextLink } from "@apollo/client/link/context";
 import { CombinedGraphQLErrors } from "@apollo/client/errors";
 import { typePolicies } from "@/lib/apollo/cache";
-// import { clearSession } from "@/lib/auth/session";
+import { getAccessToken, setTokens, isTokenExpired } from "@/lib/auth/token-store";
 
-// let isLoggingOut = false;
 let refreshPromise: Promise<void> | null = null;
 
 async function refreshAuthSession(): Promise<void> {
@@ -17,8 +15,12 @@ async function refreshAuthSession(): Promise<void> {
       method: "POST",
       credentials: "include",
     })
-      .then((res) => {
+      .then(async (res) => {
         if (!res.ok) throw new Error(`Refresh failed: ${res.status}`);
+        const body = await res.json();
+        if (body.accessToken) {
+          setTokens(body.accessToken, body.refreshToken ?? null);
+        }
       })
       .finally(() => {
         refreshPromise = null;
@@ -28,53 +30,78 @@ async function refreshAuthSession(): Promise<void> {
   return refreshPromise;
 }
 
-const authLink = new SetContextLink((prevContext) => ({
-  ...prevContext,
-  fetchOptions: {
-    ...(prevContext.fetchOptions ?? {}),
-    cache: "no-store",
-  },
-}));
-
-const errorLink = new ErrorLink(({ error, operation, forward }) => {
-  if (!CombinedGraphQLErrors.is(error)) {
-    console.error(`[Network error] ${operation.operationName}:`, error);
-    return;
-  }
-  const unauthorized = error.errors.some(({ message }) =>
-    /unauthorized|forbidden|expired/i.test(message),
-  );
-
-  for (const { message } of error.errors) {
-    console.error(`[GraphQL error] ${operation.operationName}: ${message}`);
-  }
-
-  if (!unauthorized || !forward) return;
-
+const authLink = new ApolloLink((operation, forward) => {
   return new Observable((observer) => {
-    let sub: { unsubscribe(): void } | null = null;
-    let cancelled = false;
+    const execute = (retriesLeft: number) => {
+      (async () => {
+        try {
+          const token = getAccessToken();
 
-    (async () => {
-      try {
-        await refreshAuthSession();
-        if (cancelled) return;
+          if (token && isTokenExpired(token)) {
+            try {
+              await refreshAuthSession();
+            } catch {
+              // pre-request refresh failed; continue with stale token or none
+            }
+          }
 
-        sub = forward(operation).subscribe({
-          next: observer.next.bind(observer),
-          error: observer.error.bind(observer),
-          complete: observer.complete.bind(observer),
-        });
-      } catch (err) {
-        if (!cancelled) observer.error(err);
-      }
-    })();
+          const freshToken = getAccessToken();
+          operation.setContext(({ headers = {}, fetchOptions = {} }) => ({
+            fetchOptions: { ...fetchOptions, cache: "no-store" },
+            headers: {
+              ...headers,
+              ...(freshToken ? { Authorization: `Bearer ${freshToken}` } : {}),
+            },
+          }));
 
-    return () => {
-      cancelled = true;
-      sub?.unsubscribe();
+          forward(operation).subscribe({
+            next(value) {
+              observer.next(value);
+            },
+            error(err) {
+              if (retriesLeft > 0) {
+                const graphQLErrors =
+                  CombinedGraphQLErrors.is(err)
+                    ? err.errors
+                    : "graphQLErrors" in err
+                      ? (err as { graphQLErrors: Array<{ message: string }> }).graphQLErrors
+                      : null;
+                const isAuthError =
+                  graphQLErrors?.some(({ message }: { message: string }) =>
+                    /unauthorized|forbidden|expired/i.test(message),
+                  ) ?? /unauthorized|forbidden|expired/i.test(err?.message ?? "");
+
+                if (isAuthError) {
+                  refreshAuthSession()
+                    .then(() => execute(retriesLeft - 1))
+                    .catch(() => observer.error(err));
+                  return;
+                }
+              }
+              observer.error(err);
+            },
+            complete() {
+              observer.complete();
+            },
+          });
+        } catch (err) {
+          observer.error(err);
+        }
+      })();
     };
+
+    execute(1);
   });
+});
+
+const errorLink = new ErrorLink(({ error, operation }) => {
+  if (CombinedGraphQLErrors.is(error)) {
+    for (const { message } of error.errors) {
+      console.error(`[GraphQL error] ${operation.operationName}: ${message}`);
+    }
+  } else {
+    console.error(`[Network error] ${operation.operationName}:`, error);
+  }
 });
 
 function getGraphqlUri() {
@@ -92,6 +119,6 @@ export function createBrowserApolloClient() {
     cache: new InMemoryCache({
       typePolicies,
     }),
-    link: authLink.concat(errorLink, httpLink),
+    link: authLink.concat(errorLink.concat(httpLink)),
   });
 }
