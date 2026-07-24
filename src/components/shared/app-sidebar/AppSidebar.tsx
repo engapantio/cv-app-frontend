@@ -20,10 +20,21 @@ import {
   SidebarMenu,
   SidebarMenuButton,
 } from "@/components/ui";
-import { Users, Languages, TrendingUp, FileUser, Menu, Globe, ChevronLeft } from "lucide-react";
+import {
+  Users,
+  Languages,
+  TrendingUp,
+  FileUser,
+  Menu,
+  Globe,
+  ChevronLeft,
+  Sun,
+  Moon,
+} from "lucide-react";
 import { GET_ME, GetMeResponse } from "@/lib/graphql/queries/me.queries";
 import { Container } from "../container";
 import { useState } from "react";
+import { useTheme } from "next-themes";
 
 interface AppSidebarProps {
   isSidebarOpen: boolean;
@@ -39,6 +50,23 @@ const menuItems = [
 ];
 
 const LANGUAGES = ["EN", "PL", "RU"];
+
+function ThemeToggle() {
+  const { theme, setTheme } = useTheme();
+  const isDark = theme === "dark";
+
+  return (
+    <Button
+      variant="ghost"
+      size="icon"
+      onClick={() => setTheme(isDark ? "light" : "dark")}
+      aria-label="Toggle theme"
+      className="rounded-full"
+    >
+      {isDark ? <Sun className="h-5 w-5 text-icon" /> : <Moon className="h-5 w-5 text-icon" />}
+    </Button>
+  );
+}
 
 const getUserIdFromCookie = (): string | null => {
   if (typeof document === "undefined") return null;
@@ -75,17 +103,15 @@ function LanguageSwitcher() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>
-        <Button variant="ghost" size="icon">
-          <Globe />
-        </Button>
+      <DropdownMenuTrigger render={<Button variant="ghost" size="icon" />}>
+        <Globe className="text-icon" />
       </DropdownMenuTrigger>
       <DropdownMenuContent className={"flex justify-around"}>
         {LANGUAGES.map((lang) => (
           <DropdownMenuItem
             key={lang}
             onClick={() => setLanguage(lang)}
-            className={cn(language === lang && "bg-gray-200", "w-7")}
+            className={cn(language === lang && "bg-sidebar-accent", "w-7 hover:bg-sidebar-accent")}
           >
             {lang}
           </DropdownMenuItem>
@@ -103,6 +129,7 @@ function ProfileSection({
   initial,
   compact = false,
   showLanguageSwitcher = true,
+  userId,
 }: {
   loading: boolean;
   error?: Error | null;
@@ -111,6 +138,7 @@ function ProfileSection({
   initial: string;
   compact?: boolean;
   showLanguageSwitcher?: boolean;
+  userId?: string | null;
 }) {
   if (loading) {
     return (
@@ -127,18 +155,30 @@ function ProfileSection({
   }
 
   if (error) {
-    return <div className="text-sm text-red-500">Error loading profile</div>;
+    return <div className="text-sm text-destructive">Error loading profile</div>;
   }
 
-  return (
-    <div className="flex items-center gap-3">
-      {showLanguageSwitcher && <LanguageSwitcher />}
-      {compact && <h2>{fullName}</h2>}
+  const content = (
+    <>
+      {compact && fullName && <h2>{fullName}</h2>}
       <Avatar className="h-10 w-10">
         <AvatarFallback>{initial}</AvatarFallback>
         <AvatarImage src={avatar ?? undefined} />
       </Avatar>
       {!compact && <p className="text-sm font-medium truncate">{fullName}</p>}
+    </>
+  );
+
+  return (
+    <div className="flex items-center gap-3">
+      {showLanguageSwitcher && <LanguageSwitcher />}
+      {userId ? (
+        <Link href={`/users/${userId}/profile`} className="flex items-center gap-3">
+          {content}
+        </Link>
+      ) : (
+        content
+      )}
     </div>
   );
 }
@@ -155,10 +195,12 @@ function MenuItem({
   onClick: () => void;
 }) {
   const baseClasses = cn(
-    "w-full",
-    isMobile ? "py-5" : "py-8",
+    "w-full text-icon",
+    isMobile ? "p-5 w-auto" : "py-8",
     isActive &&
-      (isMobile ? "bg-gray-200 rounded-full" : "bg-gray-300 rounded-r-full rounded-l-none"),
+      (isMobile
+        ? "bg-sidebar-accent rounded-full text-foreground"
+        : "bg-sidebar-accent rounded-r-full rounded-l-none text-foreground"),
     !isMobile && "hover:rounded-r-full rounded-l-none",
   );
 
@@ -204,7 +246,7 @@ export function AppSidebar({ isSidebarOpen, setIsSidebarOpen, isTablet }: AppSid
   const renderDesktopHeader = () => {
     if (isTablet || isSidebarOpen) return null;
     return (
-      <header className="sticky top-0 z-40 px-4 py-3 border-b bg-white border-gray-100 shadow-sm">
+      <header className="sticky top-0 z-40 px-4 py-3 border-b bg-background border-border shadow-sm">
         <Container className="flex items-center justify-between">
           <Button
             variant="ghost"
@@ -212,9 +254,11 @@ export function AppSidebar({ isSidebarOpen, setIsSidebarOpen, isTablet }: AppSid
             onClick={() => setIsSidebarOpen(true)}
             className="hidden sm:flex"
           >
-            <Menu />
+            <Menu className="text-icon" />
           </Button>
           <div className="flex items-center gap-4">
+            <LanguageSwitcher />
+            <ThemeToggle />
             <ProfileSection
               loading={loading}
               error={error}
@@ -223,6 +267,7 @@ export function AppSidebar({ isSidebarOpen, setIsSidebarOpen, isTablet }: AppSid
               initial={initial}
               compact
               showLanguageSwitcher={false}
+              userId={userId}
             />
           </div>
         </Container>
@@ -235,7 +280,7 @@ export function AppSidebar({ isSidebarOpen, setIsSidebarOpen, isTablet }: AppSid
     return (
       <Sidebar
         collapsible="none"
-        className="fixed top-0 left-0 h-full bg-white transition-transform duration-300 ease-in-out z-50"
+        className="fixed top-0 left-0 h-full bg-background transition-transform duration-300 ease-in-out z-50"
         style={{
           borderRight: "none",
           width: "12rem",
@@ -254,9 +299,10 @@ export function AppSidebar({ isSidebarOpen, setIsSidebarOpen, isTablet }: AppSid
             initial={initial}
             compact={false}
             showLanguageSwitcher={false}
+            userId={userId}
           />
           <Button variant="ghost" size="icon" className="h-8 w-8 mt-2" onClick={closeSidebar}>
-            <ChevronLeft />
+            <ChevronLeft className="text-icon" />
           </Button>
         </SidebarFooter>
       </Sidebar>
@@ -266,7 +312,7 @@ export function AppSidebar({ isSidebarOpen, setIsSidebarOpen, isTablet }: AppSid
   const renderMobileFooter = () => {
     if (!isTablet) return null;
     return (
-      <footer className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 px-2 py-2 flex items-center justify-around">
+      <footer className="fixed bottom-0 left-0 right-0 z-40 bg-background border-t border-border px-2 py-2 flex items-center justify-around">
         {renderMenuItems(true)}
         <div className="flex items-center gap-1">
           <ProfileSection
@@ -277,6 +323,7 @@ export function AppSidebar({ isSidebarOpen, setIsSidebarOpen, isTablet }: AppSid
             initial={initial}
             compact
             showLanguageSwitcher={false}
+            userId={userId}
           />
         </div>
       </footer>

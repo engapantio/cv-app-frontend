@@ -35,7 +35,9 @@ export const usersColumns: ColumnDef<User, unknown>[] = [
       return (
         <Avatar className="size-10">
           <AvatarImage src={user.profile?.avatar ?? undefined} />
-          <AvatarFallback>{user.profile?.full_name?.[0].toUpperCase() || user.email[0].toUpperCase()}</AvatarFallback>
+          <AvatarFallback>
+            {user.profile?.full_name?.[0].toUpperCase() || user.email[0].toUpperCase()}
+          </AvatarFallback>
         </Avatar>
       );
     },

@@ -7,7 +7,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         <AuthTabsSwitcher />
       </div>
       <div className="flex flex-1 items-center justify-center px-4 pb-12">
-        <div className="w-full max-w-[560px]">{children}</div>
+        <div className="w-full max-w-140">{children}</div>
       </div>
     </>
   );

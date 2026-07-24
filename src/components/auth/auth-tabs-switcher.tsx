@@ -32,9 +32,7 @@ export function AuthTabsSwitcher() {
               )}
             >
               {label}
-              {active && (
-                <span className="absolute bottom-0 left-0 h-0.5 w-full bg-primary" />
-              )}
+              {active && <span className="absolute bottom-0 left-0 h-0.5 w-full bg-primary" />}
             </Link>
           );
         })}

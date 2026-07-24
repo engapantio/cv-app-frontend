@@ -6,7 +6,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation } from "@apollo/client/react";
 import { CreateCvDocument, type CreateCvMutation } from "@/gql/generated/graphql";
-import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, Input } from "@/components/ui";
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  Input,
+} from "@/components/ui";
 
 const createCvSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -57,8 +65,7 @@ export function CreateCvDialog({
         }
         onOpenChange(false);
         reset();
-      } catch {
-      }
+      } catch {}
     },
     [createCv, userId, onCreated, onOpenChange, reset],
   );
@@ -77,9 +84,7 @@ export function CreateCvDialog({
               disabled={isSubmitting}
               className="rounded-none placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-primary"
             />
-            {errors.name && (
-              <p className="text-sm text-destructive mt-1">{errors.name.message}</p>
-            )}
+            {errors.name && <p className="text-sm text-destructive mt-1">{errors.name.message}</p>}
           </div>
           <div className="relative mb-5">
             <Input

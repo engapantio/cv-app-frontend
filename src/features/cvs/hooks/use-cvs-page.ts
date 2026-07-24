@@ -51,10 +51,7 @@ export function useCvsPage({
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
 
-  const handleOpen = useCallback(
-    (cvId: string) => router.push(`/cvs/${cvId}/details`),
-    [router],
-  );
+  const handleOpen = useCallback((cvId: string) => router.push(`/cvs/${cvId}/details`), [router]);
 
   const handleDelete = useCallback((cv: CvItem) => {
     setDeleteTarget(cv);
