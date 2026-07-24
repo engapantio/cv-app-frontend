@@ -21,9 +21,8 @@ interface CvActions {
 export function createCvsColumns(
   currentUserId: string | undefined,
   isAdmin: boolean,
-  userEmail: string | null | undefined,
-  targetUserId: string,
   actions: CvActions,
+  userEmail?: string | null,
 ): ColumnDef<CvItem>[] {
   return [
     {
@@ -69,7 +68,7 @@ export function createCvsColumns(
           {column.getIsSorted() === "desc" && <ArrowDown className="size-4" />}
         </button>
       ),
-      accessorFn: () => userEmail ?? "",
+      accessorFn: (row) => row.user?.email ?? userEmail ?? "",
       enableGlobalFilter: true,
     },
     {
@@ -79,7 +78,7 @@ export function createCvsColumns(
       enableGlobalFilter: false,
       cell: ({ row }) => {
         const cv = row.original;
-        const isOwn = currentUserId === targetUserId;
+        const isOwn = currentUserId === cv.user?.id;
         const canMutate = isOwn || isAdmin;
 
         return (
@@ -87,7 +86,7 @@ export function createCvsColumns(
             <DropdownMenu>
               <DropdownMenuTrigger
                 render={
-                  <Button variant="ghost" size="icon" className="rounded-[20px]">
+                    <Button variant="ghost" size="icon" className="rounded-[20px] cursor-pointer">
                     <MoreVertical className="size-6" />
                   </Button>
                 }

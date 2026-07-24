@@ -8,11 +8,6 @@ query Cvs {
     user {
       id
       email
-      profile {
-        id
-        full_name
-        avatar
-      }
     }
     projects {
       __typename
