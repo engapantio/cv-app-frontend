@@ -5,7 +5,13 @@ import { ApolloClient, InMemoryCache } from "@apollo/client-integration-nextjs";
 import { ErrorLink } from "@apollo/client/link/error";
 import { CombinedGraphQLErrors } from "@apollo/client/errors";
 import { typePolicies } from "@/lib/apollo/cache";
-import { getAccessToken, setTokens, isTokenExpired, clearTokens, onBootstrapComplete } from "@/lib/auth/token-store";
+import {
+  getAccessToken,
+  setTokens,
+  isTokenExpired,
+  clearTokens,
+  onBootstrapComplete,
+} from "@/lib/auth/token-store";
 
 let refreshPromise: Promise<void> | null = null;
 let refreshFailed = false;
@@ -55,7 +61,11 @@ function resetFailedFlag() {
 
 const authLink = new ApolloLink((operation, forward) => {
   return new Observable((observer) => {
+    let innerSubscription: { unsubscribe: () => void } | null = null;
+
     const execute = (retriesLeft: number) => {
+      resetFailedFlag();
+
       (async () => {
         try {
           let token = getAccessToken();
@@ -86,7 +96,10 @@ const authLink = new ApolloLink((operation, forward) => {
             },
           }));
 
-          forward(operation).subscribe({
+          if (innerSubscription) {
+            innerSubscription.unsubscribe();
+          }
+          innerSubscription = forward(operation).subscribe({
             next(value) {
               const response = value as { data?: unknown; errors?: Array<{ message: string }> };
               const isAuthError = response.errors?.some(({ message }) =>
@@ -98,7 +111,9 @@ const authLink = new ApolloLink((operation, forward) => {
                   execute(retriesLeft - 1);
                 };
                 if (isRefreshing()) {
-                  waitForRefresh()?.then(doRetry).catch(() => observer.next(value));
+                  waitForRefresh()
+                    ?.then(doRetry)
+                    .catch(() => observer.next(value));
                 } else {
                   refreshAuthSession()
                     .then(() => {
@@ -113,12 +128,11 @@ const authLink = new ApolloLink((operation, forward) => {
             },
             error(err) {
               if (retriesLeft > 0) {
-                const graphQLErrors =
-                  CombinedGraphQLErrors.is(err)
-                    ? err.errors
-                    : "graphQLErrors" in err
-                      ? (err as { graphQLErrors: Array<{ message: string }> }).graphQLErrors
-                      : null;
+                const graphQLErrors = CombinedGraphQLErrors.is(err)
+                  ? err.errors
+                  : "graphQLErrors" in err
+                    ? (err as { graphQLErrors: Array<{ message: string }> }).graphQLErrors
+                    : null;
                 const isAuthError =
                   graphQLErrors?.some(({ message }: { message: string }) =>
                     /unauthorized|forbidden|expired/i.test(message),
@@ -152,10 +166,16 @@ const authLink = new ApolloLink((operation, forward) => {
         } catch (err) {
           observer.error(err);
         }
-      })();
+      })().catch(() => {
+        // async IIFE rejection already handled by catch block above
+      });
     };
 
     execute(1);
+
+    return () => {
+      innerSubscription?.unsubscribe();
+    };
   });
 });
 

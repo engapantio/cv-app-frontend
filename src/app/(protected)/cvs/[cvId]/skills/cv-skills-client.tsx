@@ -38,11 +38,9 @@ export function CvSkillsClient({ cvId }: { cvId: string }) {
   if (skillsByCategory.length === 0) {
     return (
       <div className="mx-auto w-full max-w-[900px]">
-        <div className="text-center text-muted-foreground py-8">
-          No skills assigned yet.
-        </div>
+        <div className="text-center text-muted-foreground py-8">No skills assigned yet.</div>
         {canMutate && (
-        <div className="flex justify-end items-center gap-6 pl-[40px] pr-6 py-4">
+          <div className="flex justify-end items-center gap-6 pl-[40px] pr-6 py-4">
             <button
               type="button"
               onClick={() => setAddDialogOpen(true)}
@@ -77,10 +75,7 @@ export function CvSkillsClient({ cvId }: { cvId: string }) {
                 const config = MASTERY_MAP[skill.mastery as Mastery] ?? MASTERY_MAP.Novice;
                 const isSelected = selectedSkills.has(skill.name);
                 return (
-                  <div
-                    key={skill.name}
-                    className="flex items-center gap-4 min-w-0"
-                  >
+                  <div key={skill.name} className="flex items-center gap-4 min-w-0">
                     <button
                       type="button"
                       onClick={() => {
@@ -93,13 +88,18 @@ export function CvSkillsClient({ cvId }: { cvId: string }) {
                     >
                       <div
                         className="w-full rounded-sm"
-                        style={{ height: 4, backgroundColor: removeMode && isSelected ? "rgb(59, 59, 59)" : config.track }}
+                        style={{
+                          height: 4,
+                          backgroundColor:
+                            removeMode && isSelected ? "rgb(59, 59, 59)" : config.track,
+                        }}
                       >
                         <div
                           className="h-full rounded-sm"
                           style={{
                             width: removeMode && isSelected ? "100%" : `${config.percent}%`,
-                            backgroundColor: removeMode && isSelected ? "rgb(59, 59, 59)" : config.fill,
+                            backgroundColor:
+                              removeMode && isSelected ? "rgb(59, 59, 59)" : config.fill,
                           }}
                         />
                       </div>

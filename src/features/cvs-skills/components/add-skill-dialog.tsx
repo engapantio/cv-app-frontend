@@ -20,7 +20,11 @@ import { MASTERY_OPTIONS } from "../utils/mastery-mapping";
 interface AddSkillDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  availableSkills: Array<{ name: string; category_name: string | null; category_parent_name: string | null }>;
+  availableSkills: Array<{
+    name: string;
+    category_name: string | null;
+    category_parent_name: string | null;
+  }>;
   onConfirm: (skillName: string, mastery: Mastery) => Promise<void>;
   loading: boolean;
 }
@@ -55,8 +59,15 @@ export function AddSkillDialog({
               Skill
             </span>
             <Select value={selectedSkill} onValueChange={(v) => setSelectedSkill(v)}>
-              <SelectTrigger className="w-full border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none h-12 py-1 text-lg" disabled={availableSkills.length === 0}>
-                <SelectValue placeholder={availableSkills.length === 0 ? "No available skills" : "Select skill"} />
+              <SelectTrigger
+                className="w-full border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none h-12 py-1 text-lg"
+                disabled={availableSkills.length === 0}
+              >
+                <SelectValue
+                  placeholder={
+                    availableSkills.length === 0 ? "No available skills" : "Select skill"
+                  }
+                />
               </SelectTrigger>
               <SelectContent>
                 {availableSkills.map((skill) => (

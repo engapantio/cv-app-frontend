@@ -47,13 +47,7 @@ export default function CvDetailsClient({
   return <CvDetailsForm cv={initialCv} cvId={cvId} />;
 }
 
-function CvDetailsForm({
-  cv,
-  cvId,
-}: {
-  cv: NonNullable<CvData>;
-  cvId: string;
-}) {
+function CvDetailsForm({ cv, cvId }: { cv: NonNullable<CvData>; cvId: string }) {
   const { canEdit } = usePermissions(cv.user?.id);
   const [updateCv, { loading: updating }] = useMutation(UpdateCvDocument);
 
@@ -104,9 +98,7 @@ function CvDetailsForm({
             className="border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none"
           />
         </div>
-        {errors.name && (
-          <p className="text-sm text-destructive mt-1">{errors.name.message}</p>
-        )}
+        {errors.name && <p className="text-sm text-destructive mt-1">{errors.name.message}</p>}
       </div>
 
       <div className="relative">

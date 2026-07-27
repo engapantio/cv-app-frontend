@@ -52,6 +52,7 @@ function stopProactiveRefresh() {
 
 export function setAuthenticatedSession(user: SessionUser) {
   bootstrapAbortController?.abort();
+  bootstrapped = false;
 
   sessionStateVar({
     status: "authenticated",

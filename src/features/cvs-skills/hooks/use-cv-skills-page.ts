@@ -25,7 +25,11 @@ export interface SkillsByCategory {
 export function useCvSkillsPage(cvId: string) {
   const { user: currentUser } = useSession();
 
-  const { data: cvData, loading: cvLoading, refetch: refetchCv } = useQuery(CvDocument, {
+  const {
+    data: cvData,
+    loading: cvLoading,
+    refetch: refetchCv,
+  } = useQuery(CvDocument, {
     variables: { cvId },
     fetchPolicy: "network-only",
     errorPolicy: "all",
@@ -52,7 +56,7 @@ export function useCvSkillsPage(cvId: string) {
   const { nameToCategory, idToCategory } = useMemo(() => {
     const nameMap = new Map<string, { categoryName: string; parentCategoryName: string | null }>();
     const idMap = new Map<string, string>();
-    for (const skill of (skillsData?.skills ?? [])) {
+    for (const skill of skillsData?.skills ?? []) {
       nameMap.set(skill.name, {
         categoryName: skill.category?.name ?? skill.category_name ?? "Unknown",
         parentCategoryName: skill.category?.parent?.name ?? skill.category_parent_name ?? null,
@@ -64,7 +68,7 @@ export function useCvSkillsPage(cvId: string) {
         idMap.set(skill.category.parent.id, skill.category.parent.name);
       }
     }
-    for (const cat of (categoriesData?.skillCategories ?? [])) {
+    for (const cat of categoriesData?.skillCategories ?? []) {
       if (!idMap.has(cat.id)) {
         idMap.set(cat.id, cat.name);
       }
@@ -84,11 +88,17 @@ export function useCvSkillsPage(cvId: string) {
         const info = nameToCategory.get(skill.name);
         return info?.parentCategoryName ?? info?.categoryName;
       })();
-      const byId = skill.categoryId != null ? idToCategory.get(String(skill.categoryId)) : undefined;
+      const byId =
+        skill.categoryId != null ? idToCategory.get(String(skill.categoryId)) : undefined;
       const directFromList = (() => {
         const match = allSkillsList.find((s) => s.name === skill.name);
         if (!match) return undefined;
-        return match.category_parent_name ?? match.category_name ?? match.category?.parent?.name ?? match.category?.name;
+        return (
+          match.category_parent_name ??
+          match.category_name ??
+          match.category?.parent?.name ??
+          match.category?.name
+        );
       })();
       const displayName = byName ?? byId ?? directFromList ?? "Skills";
       if (!groups.has(displayName)) groups.set(displayName, []);

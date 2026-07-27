@@ -68,7 +68,13 @@ function ThemeToggle() {
       aria-label="Toggle theme"
       className="rounded-full"
     >
-      {!mounted ? <span className="h-5 w-5" /> : isDark ? <Sun className="h-5 w-5 text-icon" /> : <Moon className="h-5 w-5 text-icon" />}
+      {!mounted ? (
+        <span className="h-5 w-5" />
+      ) : isDark ? (
+        <Sun className="h-5 w-5 text-icon" />
+      ) : (
+        <Moon className="h-5 w-5 text-icon" />
+      )}
     </Button>
   );
 }

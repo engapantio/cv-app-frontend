@@ -28,7 +28,11 @@ async function refreshTokens() {
       mutation: UpdateTokenDocument,
     });
     return data?.updateToken
-      ? { accessToken: data.updateToken.access_token, refreshToken: data.updateToken.refresh_token, userId }
+      ? {
+          accessToken: data.updateToken.access_token,
+          refreshToken: data.updateToken.refresh_token,
+          userId,
+        }
       : null;
   } catch {
     return null;
@@ -45,7 +49,12 @@ export async function GET() {
 
   try {
     const user = await fetchUser(accessToken, userId);
-    return NextResponse.json({ authenticated: !!user, user, accessToken, refreshToken: await getServerRefreshToken() });
+    return NextResponse.json({
+      authenticated: !!user,
+      user,
+      accessToken,
+      refreshToken: await getServerRefreshToken(),
+    });
   } catch {
     const refreshed = await refreshTokens();
     if (!refreshed) {
