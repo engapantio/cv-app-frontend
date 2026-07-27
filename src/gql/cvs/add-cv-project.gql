@@ -3,6 +3,36 @@ mutation AddCvProject($project: AddCvProjectInput!) {
     id
     created_at
     name
+    education
     description
+    user {
+      id
+      email
+    }
+    projects {
+      id
+      name
+      internal_name
+      description
+      domain
+      start_date
+      end_date
+      environment
+      roles
+      responsibilities
+      project {
+        id
+        name
+        internal_name
+      }
+    }
+    skills {
+      name
+      mastery
+      categoryId
+    }
+    languages {
+      __typename
+    }
   }
 }

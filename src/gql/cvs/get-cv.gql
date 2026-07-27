@@ -10,7 +10,21 @@ query Cv($cvId: ID!) {
       email
     }
     projects {
-      __typename
+      id
+      name
+      internal_name
+      description
+      domain
+      start_date
+      end_date
+      environment
+      roles
+      responsibilities
+      project {
+        id
+        name
+        internal_name
+      }
     }
     skills {
       name

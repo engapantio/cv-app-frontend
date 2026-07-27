@@ -41,10 +41,12 @@ export function AddSkillDialog({
 
   const handleConfirm = useCallback(async () => {
     if (!selectedSkill) return;
-    await onConfirm(selectedSkill, selectedMastery);
+    const skill = selectedSkill;
+    const mastery = selectedMastery;
     setSelectedSkill(null);
     setSelectedMastery("Novice");
     onOpenChange(false);
+    await onConfirm(skill, mastery);
   }, [selectedSkill, selectedMastery, onConfirm, onOpenChange]);
 
   return (
@@ -109,7 +111,7 @@ export function AddSkillDialog({
             CANCEL
           </Button>
           <Button
-            type="submit"
+            type="button"
             className="uppercase text-white min-w-30 py-1.5"
             style={{ backgroundColor: "#e53935" }}
             disabled={!selectedSkill || loading}
