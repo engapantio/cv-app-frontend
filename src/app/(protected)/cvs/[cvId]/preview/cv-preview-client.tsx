@@ -1,13 +1,20 @@
 "use client";
 
-import { useMemo, useCallback, Fragment } from "react";
+import { useMemo, useCallback } from "react";
 import { useMutation } from "@apollo/client/react";
+import { renderToString } from "react-dom/server";
 import {
   ExportPdfDocument,
   type CvQuery,
   type SkillCategoriesQuery,
-  type Proficiency,
 } from "@/gql/generated/graphql";
+import { THEMES } from "@/lib/constants/themes";
+import { CvSection } from "@/features/cvs/components/preview/CvSection";
+import { LanguageList } from "@/features/cvs/components/preview/LanguageList";
+import { DomainList } from "@/features/cvs/components/preview/DomainList";
+import { ProjectCard } from "@/features/cvs/components/preview/ProjectCard";
+import { SkillsTable } from "@/features/cvs/components/preview/SkillsTable";
+import { PrintableCv } from "@/features/cvs/components/preview/PrintableCv";
 import { toast } from "sonner";
 
 type CvData = CvQuery["cv"];
@@ -19,201 +26,6 @@ interface Props {
   serverError: string | null;
   years: number | null;
   lastUsed: number | null;
-}
-
-const PROFICIENCY_LABEL: Record<Proficiency, string> = {
-  A1: "A1",
-  A2: "A2",
-  B1: "B1",
-  B2: "B2",
-  C1: "C1",
-  C2: "C2",
-  Native: "Native",
-};
-
-const THEMES = {
-  light: {
-    background: "#ffffff",
-    foreground: "#2e2e2e",
-    primary: "#c63031",
-    muted: "#bdbdbd",
-    heading: "#2e2e2e",
-  },
-  dark: {
-    background: "#121212",
-    foreground: "#ffffff",
-    primary: "#c63031",
-    muted: "#757575",
-    heading: "#ffffff",
-  },
-} as const;
-
-function buildPrintHtml(
-  cv: NonNullable<CvData>,
-  years: number | null,
-  lastUsed: number | null,
-  categoryMap: Map<string, string>,
-  skillsByCategory: Map<string, NonNullable<CvData["skills"]>>,
-  uniqueDomains: string[],
-  theme: "light" | "dark",
-) {
-  const t = THEMES[theme];
-  const fullName = cv.user?.profile?.full_name ?? "Unknown";
-  const positionName = cv.user?.position_name ?? "";
-  const visibleYears = years ?? "—";
-  const visibleLastUsed = lastUsed ?? "—";
-
-  function esc(text: string) {
-    return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-  }
-
-  function section(label: string, contentHtml: string) {
-    return `<div style="margin-bottom:24px"><h2 style="font-size:16px;font-weight:700;margin:0 0 8px;color:${t.heading}">${esc(label)}</h2>${contentHtml}</div>`;
-  }
-
-  let languageHtml = "—";
-  if (cv.languages && cv.languages.length > 0) {
-    languageHtml = cv.languages
-      .map(
-        (l) =>
-          `<p style="font-size:16px;margin:0;color:${t.foreground}">${esc(l.name)} — ${PROFICIENCY_LABEL[l.proficiency]}</p>`,
-      )
-      .join("");
-  }
-
-  let domainsHtml = "—";
-  if (uniqueDomains.length > 0) {
-    domainsHtml = uniqueDomains
-      .map((d) => `<p style="font-size:16px;margin:0;color:${t.foreground}">${esc(d)}</p>`)
-      .join("");
-  }
-
-  let skillsByCategoryHtml = "";
-  if (skillsByCategory.size > 0) {
-    skillsByCategoryHtml = [...skillsByCategory.entries()]
-      .map(([catId, skills]) => {
-        const catName = categoryMap.get(catId) ?? catId;
-        return `<h4 style="font-size:16px;font-weight:700;margin:16px 0 4px;color:${t.foreground}">${esc(catName)}</h4>
-<p style="font-size:16px;margin:0;color:${t.foreground}">${skills.map((s) => esc(s.name)).join(", ")}.</p>`;
-      })
-      .join("");
-  }
-
-  let projectsHtml = "";
-  if (cv.projects && cv.projects.length > 0) {
-    projectsHtml = cv.projects
-      .map(
-        (p) => `
-      <div style="display:grid;grid-template-columns:260px 1fr;gap:0 32px;margin-bottom:32px">
-        <div>
-          <p style="font-size:16px;font-weight:700;margin:0;color:${t.primary}">${esc(p.name).toUpperCase()}</p>
-          ${p.description ? `<p style="font-size:16px;margin:8px 0 0;color:${t.foreground}">${esc(p.description)}</p>` : ""}
-        </div>
-        <div style="border-left:2px solid ${t.primary};padding-left:32px">
-          ${p.roles && p.roles.length > 0 ? `<div style="margin-bottom:12px"><span style="font-size:16px;font-weight:700;display:block;color:${t.foreground}">Project roles</span><p style="font-size:16px;margin:0;color:${t.foreground}">${esc(p.roles.join(", "))}</p></div>` : ""}
-          <div style="margin-bottom:12px"><span style="font-size:16px;font-weight:700;display:block;color:${t.foreground}">Period</span><p style="font-size:16px;margin:0;color:${t.foreground}">${p.start_date ? formatDate(p.start_date) : "—"} – ${p.end_date ? formatDate(p.end_date) : "Till now"}</p></div>
-          ${p.responsibilities && p.responsibilities.length > 0 ? `<div style="margin-bottom:12px"><span style="font-size:16px;font-weight:700;display:block;color:${t.foreground}">Responsibilities</span><ul style="margin:4px 0 0;padding-left:20px">${p.responsibilities.map((r) => `<li style="font-size:16px;color:${t.foreground}">${esc(r)}</li>`).join("")}</ul></div>` : ""}
-          ${p.environment && p.environment.length > 0 ? `<div style="margin-bottom:12px"><span style="font-size:16px;font-weight:700;display:block;color:${t.foreground}">Environment</span><p style="font-size:16px;margin:0;color:${t.foreground}">${esc(p.environment.join(", "))}.</p></div>` : ""}
-        </div>
-      </div>`,
-      )
-      .join("");
-  }
-
-  const leftColumn = section("Education", `<p style="font-size:16px;margin:0;color:${t.foreground}">${esc(cv.education || "—")}</p>`)
-    + section("Language proficiency", languageHtml)
-    + section("Domains", domainsHtml);
-
-  const rightColumn = section(
-    `${esc(positionName || "Professional")} with ${visibleYears} years of experience`,
-    `<p style="font-size:16px;line-height:1.5;margin:0;color:${t.foreground}">${esc(cv.description)}</p>`,
-  ) + skillsByCategoryHtml;
-
-  let skillsTableRows = "";
-  if (skillsByCategory.size > 0) {
-    skillsTableRows = [...skillsByCategory.entries()]
-      .map(([catId, skills]) => {
-        const catName = categoryMap.get(catId) ?? catId;
-        const skillsHtml = skills.map((s) => esc(s.name)).join("<br>");
-        return `<tr>
-          <td style="padding:8px 12px;font-size:14px;font-weight:700;border-bottom:1px solid ${t.muted};color:${t.primary}">${esc(catName)}</td>
-          <td style="padding:8px 12px;font-size:14px;font-weight:700;border-bottom:1px solid ${t.muted};color:${t.foreground}">${skillsHtml}</td>
-          <td style="padding:8px 12px;font-size:14px;text-align:center;border-bottom:1px solid ${t.muted};color:${t.foreground}">${visibleYears}</td>
-          <td style="padding:8px 12px;font-size:14px;text-align:center;border-bottom:1px solid ${t.muted};color:${t.foreground}">${visibleLastUsed}</td>
-        </tr>`;
-      })
-      .join("");
-  }
-
-  return `<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <style>
-    @page { margin: 0; size: A4; }
-    html, body { height: 100%; }
-    body {
-      font-family: Roboto, Arial, Helvetica, sans-serif;
-      font-size: 16px;
-      line-height: 1.5;
-      margin: 0;
-      padding: 20mm;
-      color: ${t.foreground};
-      background-color: ${t.background};
-      -webkit-print-color-adjust: exact;
-      print-color-adjust: exact;
-    }
-    h1 { font-size: 34px; font-weight: 400; margin: 0 0 4px; letter-spacing: 0.25px; color: ${t.foreground}; }
-    h3 { font-size: 34px; font-weight: 400; margin: 32px 0 16px; color: ${t.heading}; }
-    .grid-2col { display: grid; grid-template-columns: 260px 1fr; gap: 0 32px; }
-    .skills-table { width: 100%; border-collapse: collapse; }
-    .skills-table th {
-      padding: 8px 12px;
-      font-size: 14px;
-      font-weight: 500;
-      border-bottom: 1px solid ${t.primary};
-      color: ${t.foreground};
-    }
-    .skills-table th:nth-child(3),
-    .skills-table td:nth-child(3),
-    .skills-table th:nth-child(4),
-    .skills-table td:nth-child(4) { text-align: center; }
-    .skills-table th:nth-child(2),
-    .skills-table td:nth-child(2) { text-align: left; }
-    .skills-table th { border-left: none; border-right: none; }
-    .skills-table td { border-left: none; border-right: none; }
-  </style>
-</head>
-<body>
-  <h1>${esc(fullName)}</h1>
-  ${positionName ? `<p style="font-size:16px;margin:0 0 16px;color:${t.foreground}">${esc(positionName)}</p>` : ""}
-
-  <div class="grid-2col">
-    <div>${leftColumn}</div>
-    <div style="border-left:2px solid ${t.primary};padding-left:32px">${rightColumn}</div>
-  </div>
-
-  ${projectsHtml ? `<h3>Projects</h3>${projectsHtml}` : ""}
-
-  <h3>Professional skills</h3>
-  <table class="skills-table">
-    <thead>
-      <tr>
-        <th style="vertical-align:top">SKILLS</th>
-        <th></th>
-        <th style="padding:8px 12px;text-align:center;vertical-align:middle">
-          <span style="display:block">EXPERIENCE</span>
-          <span style="display:block">IN YEARS</span>
-        </th>
-        <th style="text-align:center;vertical-align:top">LAST USED</th>
-      </tr>
-    </thead>
-    <tbody>
-      ${skillsTableRows}
-    </tbody>
-  </table>
-</body>
-</html>`;
 }
 
 export function CvPreviewClient({
@@ -259,15 +71,80 @@ export function CvPreviewClient({
 
     const isDark = document.documentElement.classList.contains("dark");
     const resolvedTheme = isDark ? "dark" : "light";
-    const html = buildPrintHtml(
-      initialCv,
-      years,
-      lastUsed,
-      categoryMap,
-      skillsByCategory,
-      uniqueDomains,
-      resolvedTheme,
+    const colors = THEMES[resolvedTheme];
+
+    const bodyHtml = renderToString(
+      <PrintableCv
+        cv={initialCv}
+        years={years}
+        lastUsed={lastUsed}
+        categoryMap={categoryMap}
+        skillsByCategory={skillsByCategory}
+        uniqueDomains={uniqueDomains}
+        colors={colors}
+      />,
     );
+
+    const html = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    @page { margin: 0; size: A4; }
+    html, body { height: 100%; }
+    body {
+      font-family: Roboto, Arial, Helvetica, sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+      margin: 0;
+      padding: 20mm;
+      color: ${colors.foreground};
+      background-color: ${colors.background};
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    h1 { font-size: 34px; font-weight: 400; margin: 0 0 4px; letter-spacing: 0.25px; }
+    h3 { font-size: 34px; font-weight: 400; margin: 32px 0 16px; }
+    ul { margin: 4px 0 0; padding-left: 20px; }
+    li { font-size: 16px; }
+    .grid { display: grid; }
+    .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+    .md\:grid-cols-\[260px_1fr\] { grid-template-columns: 260px 1fr; }
+    .min-\[1440px\]\:grid-cols-\[260px_592px\] { grid-template-columns: 260px 592px; }
+    .gap-x-4 { column-gap: 1rem; }
+    .gap-y-0 { row-gap: 0; }
+    .gap-y-2 { row-gap: 0.5rem; }
+    .w-full { width: 100%; }
+    .overflow-x-auto { overflow-x: auto; }
+    .block { display: block; }
+    .space-y-1 > * + * { margin-top: 0.25rem; }
+    .mb-4 { margin-bottom: 1rem; }
+    .mb-3 { margin-bottom: 0.75rem; }
+    .mb-1 { margin-bottom: 0.25rem; }
+    .mt-1 { margin-top: 0.25rem; }
+    .mt-2 { margin-top: 0.5rem; }
+    .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+    .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
+    .md\:border-l-2 { border-left-width: 2px; }
+    .md\:pl-8 { padding-left: 2rem; }
+    .md\:pt-0 { padding-top: 0; }
+    .pl-0 { padding-left: 0; }
+    .pl-5 { padding-left: 1.25rem; }
+    .pt-4 { padding-top: 1rem; }
+    .text-base { font-size: 16px; }
+    .text-sm { font-size: 14px; }
+    .font-bold { font-weight: 700; }
+    .font-medium { font-weight: 500; }
+    .leading-tight { line-height: 1.25; }
+    .text-left { text-align: left; }
+    .text-center { text-align: center; }
+    .list-disc { list-style-type: disc; }
+    .align-top { vertical-align: top; }
+    .align-middle { vertical-align: middle; }
+  </style>
+</head>
+<body>${bodyHtml}</body>
+</html>`;
 
     try {
       const { data } = await exportPdf({
@@ -351,66 +228,44 @@ export function CvPreviewClient({
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-[260px_1fr] min-[1440px]:grid-cols-[260px_592px] gap-x-8 gap-y-0">
+      <div className="grid grid-cols-1 md:grid-cols-[260px_1fr] min-[1440px]:grid-cols-[260px_592px] gap-x-4 gap-y-0">
         <div className="space-y-6">
-          <Section label="Education">
+          <CvSection label="Education">
             <p className="text-base" style={{ color: "var(--foreground)" }}>
               {cv.education || "—"}
             </p>
-          </Section>
+          </CvSection>
 
-          <Section label="Language proficiency">
-            {cv.languages && cv.languages.length > 0 ? (
-              <div className="space-y-1">
-                {cv.languages.map((lang, i) => (
-                  <p key={i} className="text-base" style={{ color: "var(--foreground)" }}>
-                    {lang.name} &mdash; {PROFICIENCY_LABEL[lang.proficiency]}
-                  </p>
-                ))}
-              </div>
-            ) : (
-              <p className="text-base" style={{ color: "var(--foreground)" }}>
-                —
-              </p>
-            )}
-          </Section>
+          <CvSection label="Language proficiency">
+            <LanguageList languages={cv.languages ?? []} />
+          </CvSection>
 
-          <Section label="Domains">
-            {uniqueDomains.length > 0 ? (
-              <div className="space-y-1">
-                {uniqueDomains.map((domain, i) => (
-                  <p key={i} className="text-base" style={{ color: "var(--foreground)" }}>
-                    {domain}
-                  </p>
-                ))}
-              </div>
-            ) : (
-              <p className="text-base" style={{ color: "var(--foreground)" }}>
-                —
-              </p>
-            )}
-          </Section>
+          <CvSection label="Domains">
+            <DomainList domains={uniqueDomains} />
+          </CvSection>
         </div>
 
         <div
           className="md:border-l-2 pl-0 md:pl-8 pt-6 md:pt-0"
           style={{ borderColor: "#c63031" }}
         >
-          <Section label={`${positionName || "Professional"} with ${years ?? "N/A"} years of experience`}>
+          <CvSection
+            label={`${positionName || "Professional"} with ${years ?? "N/A"} years of experience`}
+          >
             <p className="text-base leading-relaxed" style={{ color: "var(--foreground)" }}>
               {cv.description}
             </p>
-          </Section>
+          </CvSection>
 
           {[...skillsByCategory.entries()].map(([catId, skills]) => {
             const catName = categoryMap.get(catId) ?? catId;
             return (
               <div key={catId} className="mt-4">
-                <Section label={catName}>
+                <CvSection label={catName}>
                   <p className="text-base" style={{ color: "var(--foreground)" }}>
                     {skills.map((s) => s.name).join(", ")}.
                   </p>
-                </Section>
+                </CvSection>
               </div>
             );
           })}
@@ -428,100 +283,7 @@ export function CvPreviewClient({
 
           <div className="space-y-8">
             {cv.projects.map((project) => (
-              <div
-                key={project.id}
-                className="grid grid-cols-1 md:grid-cols-[260px_1fr] min-[1440px]:grid-cols-[260px_592px] gap-x-8 gap-y-2"
-              >
-                <div>
-                  <p
-                    className="text-base font-bold"
-                    style={{ color: "#c63031" }}
-                  >
-                    {project.name.toUpperCase()}
-                  </p>
-                  {project.description && (
-                    <p
-                      className="text-base mt-2"
-                      style={{ color: "var(--foreground)" }}
-                    >
-                      {project.description}
-                    </p>
-                  )}
-                </div>
-
-                <div
-                  className="md:border-l-2 pl-0 md:pl-8 pt-4 md:pt-0"
-                  style={{ borderColor: "#c63031" }}
-                >
-                  {project.roles && project.roles.length > 0 && (
-                    <div className="mb-3">
-                      <span
-                        className="text-base font-bold block"
-                        style={{ color: "var(--foreground)" }}
-                      >
-                        Project roles
-                      </span>
-                      <p className="text-base" style={{ color: "var(--foreground)" }}>
-                        {project.roles.join(", ")}
-                      </p>
-                    </div>
-                  )}
-
-                  <div className="mb-3">
-                    <span
-                      className="text-base font-bold block"
-                      style={{ color: "var(--foreground)" }}
-                    >
-                      Period
-                    </span>
-                    <p className="text-base" style={{ color: "var(--foreground)" }}>
-                      {project.start_date
-                        ? formatDate(project.start_date)
-                        : "—"}{" "}
-                      &ndash;{" "}
-                      {project.end_date
-                        ? formatDate(project.end_date)
-                        : "Till now"}
-                    </p>
-                  </div>
-
-                  {project.responsibilities && project.responsibilities.length > 0 && (
-                    <div className="mb-3">
-                      <span
-                        className="text-base font-bold block"
-                        style={{ color: "var(--foreground)" }}
-                      >
-                        Responsibilities
-                      </span>
-                      <ul className="list-disc pl-5 mt-1 space-y-1">
-                        {project.responsibilities.map((resp, i) => (
-                          <li
-                            key={i}
-                            className="text-base"
-                            style={{ color: "var(--foreground)" }}
-                          >
-                            {resp}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  {project.environment && project.environment.length > 0 && (
-                    <div className="mb-3">
-                      <span
-                        className="text-base font-bold block"
-                        style={{ color: "var(--foreground)" }}
-                      >
-                        Environment
-                      </span>
-                      <p className="text-base" style={{ color: "var(--foreground)" }}>
-                        {project.environment.join(", ")}.
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
+              <ProjectCard key={project.id} project={project} />
             ))}
           </div>
         </>
@@ -534,98 +296,12 @@ export function CvPreviewClient({
         Professional skills
       </h3>
 
-      <div className="overflow-x-auto">
-        <table className="w-full" style={{ borderCollapse: "collapse" }}>
-          <thead>
-            <tr>
-              <th
-                className="text-left font-medium text-sm py-3 px-3 align-top"
-                style={{ color: "var(--foreground)", borderBottom: "1px solid #c63031" }}
-              >
-                SKILLS
-              </th>
-              <th
-                className="text-left font-medium text-sm py-3 px-3"
-                style={{ color: "var(--foreground)", borderBottom: "1px solid #c63031" }}
-              >
-              </th>
-              <th
-                className="text-center font-medium text-sm py-3 px-3 leading-tight"
-                style={{ color: "var(--foreground)", borderBottom: "1px solid #c63031", verticalAlign: "middle" }}
-              >
-                <span className="block">EXPERIENCE</span>
-                <span className="block">IN YEARS</span>
-              </th>
-              <th
-                className="text-center font-medium text-sm py-3 px-3 align-top"
-                style={{ color: "var(--foreground)", borderBottom: "1px solid #c63031" }}
-              >
-                LAST USED
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {[...skillsByCategory.entries()].map(([catId, skills]) => {
-              const catName = categoryMap.get(catId) ?? catId;
-              return (
-                <tr key={catId}>
-                  <td
-                    className="py-3 px-3 text-sm font-bold align-top"
-                    style={{ color: "#c63031", borderBottom: "1px solid #bdbdbd" }}
-                  >
-                    {catName}
-                  </td>
-                  <td
-                    className="py-3 px-3 text-sm font-bold align-top"
-                    style={{ color: "var(--foreground)", borderBottom: "1px solid #bdbdbd" }}
-                  >
-                    {skills.map((s, i) => (
-                      <Fragment key={i}>
-                        {i > 0 && <br />}{s.name}
-                      </Fragment>
-                    ))}
-                  </td>
-                  <td
-                    className="py-3 px-3 text-sm text-center align-middle"
-                    style={{ color: "var(--foreground)", borderBottom: "1px solid #bdbdbd" }}
-                  >
-                    {years ?? "—"}
-                  </td>
-                  <td
-                    className="py-3 px-3 text-sm text-center align-middle"
-                    style={{ color: "var(--foreground)", borderBottom: "1px solid #bdbdbd" }}
-                  >
-                    {lastUsed ?? "—"}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+      <SkillsTable
+        skillsByCategory={skillsByCategory}
+        categoryMap={categoryMap}
+        years={years}
+        lastUsed={lastUsed}
+      />
     </div>
   );
-}
-
-function Section({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className="mb-4">
-      <h2 className="text-base font-bold mb-1" style={{ color: "var(--foreground)" }}>
-        {label}
-      </h2>
-      {children}
-    </div>
-  );
-}
-
-function formatDate(dateStr: string): string {
-  try {
-    const d = new Date(dateStr);
-    if (isNaN(d.getTime())) return dateStr;
-    const mm = String(d.getMonth() + 1).padStart(2, "0");
-    const yyyy = d.getFullYear();
-    return `${mm}.${yyyy}`;
-  } catch {
-    return dateStr;
-  }
 }
