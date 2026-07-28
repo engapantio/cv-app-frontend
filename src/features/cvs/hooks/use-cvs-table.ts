@@ -25,9 +25,17 @@ interface UseCvsTableParams {
   dataPath: (data: unknown) => CvItem[] | null | undefined;
   initialCvs: CvItem[];
   userId?: string;
+  initialUserEmail?: string | null;
 }
 
-export function useCvsTable({ query, variables, dataPath, initialCvs, userId }: UseCvsTableParams) {
+export function useCvsTable({
+  query,
+  variables,
+  dataPath,
+  initialCvs,
+  userId,
+  initialUserEmail,
+}: UseCvsTableParams) {
   const router = useRouter();
 
   const { data, loading, refetch } = useQuery(query, {
@@ -73,13 +81,20 @@ export function useCvsTable({ query, variables, dataPath, initialCvs, userId }: 
 
   const canCreate = userId != null ? currentUserId === userId || isAdmin : !!currentUser;
 
+  const userEmail = initialUserEmail ?? cvsList[0]?.user?.email ?? undefined;
+
   const columns = useMemo(
     () =>
-      createCvsColumns(currentUserId, isAdmin, {
-        onOpen: handleOpen,
-        onDelete: handleDelete,
-      }),
-    [currentUserId, isAdmin, handleOpen, handleDelete],
+      createCvsColumns(
+        currentUserId,
+        isAdmin,
+        {
+          onOpen: handleOpen,
+          onDelete: handleDelete,
+        },
+        userEmail,
+      ),
+    [currentUserId, isAdmin, handleOpen, handleDelete, userEmail],
   );
 
   // eslint-disable-next-line react-hooks/incompatible-library
