@@ -27,13 +27,7 @@ interface UseCvsTableParams {
   userId?: string;
 }
 
-export function useCvsTable({
-  query,
-  variables,
-  dataPath,
-  initialCvs,
-  userId,
-}: UseCvsTableParams) {
+export function useCvsTable({ query, variables, dataPath, initialCvs, userId }: UseCvsTableParams) {
   const router = useRouter();
 
   const { data, loading, refetch } = useQuery(query, {
@@ -59,10 +53,7 @@ export function useCvsTable({
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
 
-  const handleOpen = useCallback(
-    (cvId: string) => router.push(`/cvs/${cvId}/details`),
-    [router],
-  );
+  const handleOpen = useCallback((cvId: string) => router.push(`/cvs/${cvId}/details`), [router]);
 
   const handleDelete = useCallback((cv: CvItem) => {
     setDeleteTarget(cv);
@@ -80,9 +71,7 @@ export function useCvsTable({
     refetch();
   }, [refetch]);
 
-  const canCreate = userId != null
-    ? currentUserId === userId || isAdmin
-    : !!currentUser;
+  const canCreate = userId != null ? currentUserId === userId || isAdmin : !!currentUser;
 
   const columns = useMemo(
     () =>

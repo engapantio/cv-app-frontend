@@ -8,17 +8,14 @@ query Cv($cvId: ID!) {
     user {
       id
       email
-      profile {
-        id
-        full_name
-        avatar
-      }
     }
     projects {
       __typename
     }
     skills {
-      __typename
+      name
+      mastery
+      categoryId
     }
     languages {
       __typename

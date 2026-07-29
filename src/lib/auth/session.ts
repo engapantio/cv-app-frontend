@@ -3,7 +3,7 @@ import { makeVar } from "@apollo/client";
 import { useReactiveVar } from "@apollo/client/react";
 import { useEffect } from "react";
 import type { SessionUser } from "@/lib/auth/cookies";
-import { setTokens, clearTokens } from "@/lib/auth/token-store";
+import { setTokens, clearTokens, resolveBootstrap } from "@/lib/auth/token-store";
 
 export type SessionState = {
   status: "loading" | "authenticated" | "anonymous";
@@ -52,6 +52,7 @@ function stopProactiveRefresh() {
 
 export function setAuthenticatedSession(user: SessionUser) {
   bootstrapAbortController?.abort();
+  bootstrapped = false;
 
   sessionStateVar({
     status: "authenticated",
@@ -82,7 +83,10 @@ export function resetSessionToLoading() {
 }
 
 export async function bootstrapSession() {
-  if (bootstrapped) return;
+  if (bootstrapped) {
+    resolveBootstrap();
+    return;
+  }
   bootstrapped = true;
 
   bootstrapAbortController = new AbortController();
@@ -108,11 +112,13 @@ export async function bootstrapSession() {
       if (data.authenticated) {
         startProactiveRefresh();
       }
+      resolveBootstrap();
     })
     .catch((error) => {
       if (error.name !== "AbortError") {
         clearSession();
       }
+      resolveBootstrap();
     });
 }
 

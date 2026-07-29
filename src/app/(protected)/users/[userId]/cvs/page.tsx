@@ -25,11 +25,5 @@ export default async function UserCvsPage({ params }: { params: Promise<{ userId
     serverError = e instanceof Error ? e.message : "Failed to load CVs";
   }
 
-  return (
-    <UserCvsClient
-      userId={userId}
-      initialCvs={initialCvs}
-      serverError={serverError}
-    />
-  );
+  return <UserCvsClient userId={userId} initialCvs={initialCvs} serverError={serverError} />;
 }

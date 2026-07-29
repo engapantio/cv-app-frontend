@@ -3,11 +3,7 @@ import { getServerAccessToken } from "@/lib/auth/cookies";
 import { CvDocument, type CvQuery } from "@/gql/generated/graphql";
 import CvDetailsClient from "./details-client";
 
-export default async function CvDetailsPage({
-  params,
-}: {
-  params: Promise<{ cvId: string }>;
-}) {
+export default async function CvDetailsPage({ params }: { params: Promise<{ cvId: string }> }) {
   const { cvId } = await params;
 
   let initialCv: CvQuery["cv"] | null = null;

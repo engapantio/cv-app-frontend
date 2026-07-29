@@ -106,7 +106,8 @@ export function CvsTable({
                     <TableHead
                       key={header.id}
                       className={
-                        (header.column.columnDef.meta as { className?: string } | undefined)?.className ?? ""
+                        (header.column.columnDef.meta as { className?: string } | undefined)
+                          ?.className ?? ""
                       }
                     >
                       {header.isPlaceholder
@@ -138,7 +139,9 @@ export function CvsTable({
                     <TableCell colSpan={columnCount}>
                       <div className="flex flex-col items-center max-md:py-8 md:max-[1439px]:py-12 min-[1440px]:py-16 text-muted-foreground">
                         <Inbox className="max-md:h-10 max-md:w-10 md:max-[1439px]:h-12 md:max-[1439px]:w-12 min-[1440px]:h-16 min-[1440px]:w-16 mb-2" />
-                        <p className="max-md:text-sm md:max-[1439px]:text-base min-[1440px]:text-lg">No CVs found.</p>
+                        <p className="max-md:text-sm md:max-[1439px]:text-base min-[1440px]:text-lg">
+                          No CVs found.
+                        </p>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -146,7 +149,10 @@ export function CvsTable({
               </TableBody>
             ) : (
               rows.map((row, idx) => (
-                <TableBody key={row.id} className={cn("group", idx < rows.length - 1 && "[&_tr:last-child]:border-b")}>
+                <TableBody
+                  key={row.id}
+                  className={cn("group", idx < rows.length - 1 && "[&_tr:last-child]:border-b")}
+                >
                   <TableRow
                     className="cursor-pointer border-b-0 group-hover:bg-muted/50"
                     onClick={() => handleOpen(row.original.id)}
@@ -156,7 +162,8 @@ export function CvsTable({
                         key={cell.id}
                         className={cn(
                           "max-md:py-2 md:max-[1439px]:py-3 min-[1440px]:py-4 font-semibold",
-                          (cell.column.columnDef.meta as { className?: string } | undefined)?.className ?? "",
+                          (cell.column.columnDef.meta as { className?: string } | undefined)
+                            ?.className ?? "",
                         )}
                       >
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
