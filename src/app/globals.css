@@ -39,12 +39,12 @@
 }
 
 .dark {
-  --background: #121212;
+  --background: #353535;
   --foreground: #ffffff;
   --icon: rgba(255, 255, 255, 0.7);
-  --card: #121212;
+  --card: #353535;
   --card-foreground: #ffffff;
-  --popover: #121212;
+  --popover: #353535;
   --popover-foreground: #ffffff;
   --primary: #c63031;
   --primary-foreground: #ffffff;

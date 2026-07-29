@@ -7,10 +7,7 @@ interface Props {
 export function CvSection({ label, children, color }: Props) {
   return (
     <div className="mb-4">
-      <h2
-        className="text-base font-bold mb-1"
-        style={{ color: color ?? "var(--foreground)" }}
-      >
+      <h2 className="text-base font-bold mb-1" style={{ color: color ?? "var(--foreground)" }}>
         {label}
       </h2>
       {children}

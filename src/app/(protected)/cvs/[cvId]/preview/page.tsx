@@ -32,9 +32,7 @@ function computeSkillTableData(projects: CvQuery["cv"]["projects"]) {
   }
 
   const earliestStart = new Date(Math.min(...validStarts.map((d) => d.getTime())));
-  const years = Math.round(
-    (Date.now() - earliestStart.getTime()) / (365.25 * 24 * 60 * 60 * 1000),
-  );
+  const years = Math.round((Date.now() - earliestStart.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
 
   let lastUsed: number | null = null;
   if (validEnds.length > 0) {
@@ -47,11 +45,7 @@ function computeSkillTableData(projects: CvQuery["cv"]["projects"]) {
   return { years, lastUsed };
 }
 
-export default async function CvPreviewPage({
-  params,
-}: {
-  params: Promise<{ cvId: string }>;
-}) {
+export default async function CvPreviewPage({ params }: { params: Promise<{ cvId: string }> }) {
   const { cvId } = await params;
 
   let initialCv: CvQuery["cv"] | null = null;

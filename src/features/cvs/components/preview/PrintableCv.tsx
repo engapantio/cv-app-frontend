@@ -45,9 +45,7 @@ export function PrintableCv({
         {fullName}
       </h1>
       {positionName && (
-        <p style={{ fontSize: 16, margin: "0 0 16px", color: c.foreground }}>
-          {positionName}
-        </p>
+        <p style={{ fontSize: 16, margin: "0 0 16px", color: c.foreground }}>{positionName}</p>
       )}
 
       <div
@@ -59,9 +57,7 @@ export function PrintableCv({
       >
         <div>
           <CvSection label="Education" color={c.foreground}>
-            <p style={{ fontSize: 16, margin: 0, color: c.foreground }}>
-              {cv.education || "—"}
-            </p>
+            <p style={{ fontSize: 16, margin: 0, color: c.foreground }}>{cv.education || "—"}</p>
           </CvSection>
 
           <CvSection label="Language proficiency" color={c.foreground}>

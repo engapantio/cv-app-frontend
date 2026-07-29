@@ -245,10 +245,7 @@ export function CvPreviewClient({
           </CvSection>
         </div>
 
-        <div
-          className="md:border-l-2 pl-0 md:pl-8 pt-6 md:pt-0"
-          style={{ borderColor: "#c63031" }}
-        >
+        <div className="md:border-l-2 pl-0 md:pl-8 pt-6 md:pt-0" style={{ borderColor: "#c63031" }}>
           <CvSection
             label={`${positionName || "Professional"} with ${years ?? "N/A"} years of experience`}
           >

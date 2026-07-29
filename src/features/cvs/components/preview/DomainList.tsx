@@ -1,10 +1,4 @@
-export function DomainList({
-  domains,
-  color,
-}: {
-  domains: string[];
-  color?: string;
-}) {
+export function DomainList({ domains, color }: { domains: string[]; color?: string }) {
   if (domains.length === 0) {
     return (
       <p className="text-base" style={{ color: color ?? "var(--foreground)" }}>

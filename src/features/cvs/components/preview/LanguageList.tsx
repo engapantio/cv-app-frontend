@@ -3,13 +3,7 @@ import { PROFICIENCY_LABEL } from "@/lib/constants/proficiency";
 
 type Languages = NonNullable<NonNullable<CvQuery["cv"]>["languages"]>;
 
-export function LanguageList({
-  languages,
-  color,
-}: {
-  languages: Languages;
-  color?: string;
-}) {
+export function LanguageList({ languages, color }: { languages: Languages; color?: string }) {
   if (!languages || languages.length === 0) {
     return (
       <p className="text-base" style={{ color: color ?? "var(--foreground)" }}>

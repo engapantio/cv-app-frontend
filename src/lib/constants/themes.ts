@@ -17,7 +17,7 @@ export const THEMES: Record<ThemeColor, ThemeColors> = {
     heading: "#2e2e2e",
   },
   dark: {
-    background: "#121212",
+    background: "#353535",
     foreground: "#ffffff",
     primary: "#c63031",
     muted: "#757575",
