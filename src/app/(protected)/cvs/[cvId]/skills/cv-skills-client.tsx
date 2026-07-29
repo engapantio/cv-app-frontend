@@ -83,7 +83,7 @@ export function CvSkillsClient({ cvId }: { cvId: string }) {
                           setUpdateSkillTarget(skill);
                         }
                       }}
-                      className="w-[113px] md:w-24 min-[1440px]:w-[79px] p-0 bg-transparent border-none cursor-pointer shrink-0"
+                      className={"w-[113px] md:w-24 min-[1440px]:w-[79px] p-0 bg-transparent border-none shrink-0 " + (!canMutate || removeMode ? "cursor-default " : "cursor-pointer ")}
                       disabled={!canMutate || removeMode}
                     >
                       <div

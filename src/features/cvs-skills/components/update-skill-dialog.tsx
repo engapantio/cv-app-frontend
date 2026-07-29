@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { toast } from "sonner";
 import { ChevronDown } from "lucide-react";
 import {
   Button,
@@ -39,8 +40,12 @@ export function UpdateSkillDialog({
   const [selectedMastery, setSelectedMastery] = useState<Mastery>(currentMastery);
 
   const handleConfirm = useCallback(async () => {
-    onOpenChange(false);
-    await onConfirm(skillName, selectedMastery);
+    try {
+      await onConfirm(skillName, selectedMastery);
+      onOpenChange(false);
+    } catch {
+      toast.error("Failed to update skill");
+    }
   }, [skillName, selectedMastery, onConfirm, onOpenChange]);
 
   return (

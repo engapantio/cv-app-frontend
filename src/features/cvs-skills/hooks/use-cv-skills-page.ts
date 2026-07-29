@@ -12,6 +12,7 @@ import {
   type Mastery,
   type CvQuery,
 } from "@/gql/generated/graphql";
+import { toast } from "sonner";
 import { useSession } from "@/lib/auth/session";
 
 type CvSkill = NonNullable<CvQuery["cv"]["skills"]>[number];
@@ -155,17 +156,13 @@ export function useCvSkillsPage(cvId: string) {
 
   const handleAddSkill = useCallback(
     async (skillName: string, mastery: Mastery) => {
-      try {
-        const categoryId = skillCategoryMap.get(skillName) ?? null;
-        await addCvSkill({
-          variables: {
-            skill: { cvId, name: skillName, mastery, categoryId },
-          },
-        });
-        await refetchCv();
-      } catch (e) {
-        console.error("add skill mutation error", e);
-      }
+      const categoryId = skillCategoryMap.get(skillName) ?? null;
+      await addCvSkill({
+        variables: {
+          skill: { cvId, name: skillName, mastery, categoryId },
+        },
+      });
+      await refetchCv();
     },
     [addCvSkill, cvId, refetchCv, skillCategoryMap],
   );
@@ -174,17 +171,13 @@ export function useCvSkillsPage(cvId: string) {
 
   const handleUpdateSkill = useCallback(
     async (skillName: string, mastery: Mastery) => {
-      try {
-        const categoryId = skillCategoryMap.get(skillName) ?? null;
-        await updateCvSkill({
-          variables: {
-            skill: { cvId, name: skillName, mastery, categoryId },
-          },
-        });
-        await refetchCv();
-      } catch (e) {
-        console.error("update skill mutation error", e);
-      }
+      const categoryId = skillCategoryMap.get(skillName) ?? null;
+      await updateCvSkill({
+        variables: {
+          skill: { cvId, name: skillName, mastery, categoryId },
+        },
+      });
+      await refetchCv();
     },
     [updateCvSkill, cvId, refetchCv, skillCategoryMap],
   );
@@ -201,8 +194,8 @@ export function useCvSkillsPage(cvId: string) {
       setSelectedSkills(new Set());
       setRemoveMode(false);
       await refetchCv();
-    } catch (e) {
-      console.error("delete skill mutation error", e);
+    } catch {
+      toast.error("Failed to delete skills");
     }
   }, [deleteCvSkill, cvId, selectedSkills, refetchCv]);
 

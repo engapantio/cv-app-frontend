@@ -175,7 +175,7 @@ function UpdateProjectForm({
           <Textarea
             value={project.description}
             readOnly
-            className="border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none min-h-[80px] resize-none opacity-60"
+            className="border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none min-h-20 resize-none opacity-60"
           />
         </div>
         <div className="group relative rounded-none border border-border">
@@ -205,7 +205,7 @@ function UpdateProjectForm({
             value={rolesInput}
             onChange={(e) => setRolesInput(e.target.value)}
             placeholder="Enter roles and responsibilities (one per line)"
-            className="border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none min-h-[100px] resize-none pt-6"
+            className="border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none min-h-25 resize-none pt-6"
           />
         </div>
       </div>
