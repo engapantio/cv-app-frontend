@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useSyncExternalStore } from "react";
-import { useQuery } from "@apollo/client/react";
 import { cn } from "@/lib/utils";
 import {
   Button,
@@ -26,15 +25,17 @@ import {
   Languages,
   TrendingUp,
   FileUser,
+  FolderKanban,
   Menu,
   Globe,
   ChevronLeft,
   Sun,
   Moon,
 } from "lucide-react";
-import { GET_ME, GetMeResponse } from "@/lib/graphql/queries/me.queries";
 import { Container } from "../container";
 import { useTheme } from "next-themes";
+import { useSession } from "@/lib/auth/session";
+import { usePermissions } from "@/lib/auth/permissions";
 
 interface AppSidebarProps {
   isSidebarOpen: boolean;
@@ -44,6 +45,7 @@ interface AppSidebarProps {
 
 const menuItems = [
   { href: "/users", label: "Employees", icon: Users },
+  { href: "/projects", label: "Projects", icon: FolderKanban, adminOnly: true as const },
   { href: "/skills", label: "Skills", icon: TrendingUp },
   { href: "/languages", label: "Languages", icon: Languages },
   { href: "/cvs", label: "CVs", icon: FileUser },
@@ -78,32 +80,6 @@ function ThemeToggle() {
     </Button>
   );
 }
-
-const getUserIdFromCookie = (): string | null => {
-  if (typeof document === "undefined") return null;
-  const cookie = document.cookie.split("; ").find((row) => row.startsWith("cv_session_user="));
-  if (!cookie) return null;
-  try {
-    let value = cookie.split("=")[1];
-    while (value.includes("%")) {
-      try {
-        const decoded = decodeURIComponent(value);
-        if (decoded === value) break;
-        value = decoded;
-      } catch {
-        break;
-      }
-    }
-    if (value.startsWith("{") && value.endsWith("}")) {
-      const parsed = JSON.parse(value);
-      return parsed?.id || null;
-    }
-    return null;
-  } catch (e) {
-    console.error("[AppSidebar] Error parsing cookie:", e);
-    return null;
-  }
-};
 
 const isActivePath = (pathname: string, href: string): boolean => {
   if (pathname === href || pathname === href + "/") {
@@ -239,24 +215,22 @@ function MenuItem({
 
 export function AppSidebar({ isSidebarOpen, setIsSidebarOpen, isTablet }: AppSidebarProps) {
   const pathname = usePathname();
-  const userId = getUserIdFromCookie();
-  const { data, loading, error } = useQuery<GetMeResponse>(GET_ME, {
-    variables: { userId },
-    skip: !userId,
-  });
+  const { user, loading } = useSession();
+  const { isAdmin } = usePermissions();
 
-  const user = data?.user;
+  const userId = user?.id ?? null;
   const fullName =
     user?.profile?.full_name ||
     `${user?.profile?.first_name || ""} ${user?.profile?.last_name || ""}`.trim() ||
     "";
   const avatar = user?.profile?.avatar;
   const initial = fullName ? fullName[0].toUpperCase() : "";
-
   const closeSidebar = () => setIsSidebarOpen(false);
 
+  const visibleMenuItems = menuItems.filter((item) => !item.adminOnly || isAdmin);
+
   const renderMenuItems = (isMobile: boolean) =>
-    menuItems.map((item) => (
+    visibleMenuItems.map((item) => (
       <MenuItem
         key={item.href}
         item={item}
@@ -284,7 +258,6 @@ export function AppSidebar({ isSidebarOpen, setIsSidebarOpen, isTablet }: AppSid
             <ThemeToggle />
             <ProfileSection
               loading={loading}
-              error={error}
               fullName={fullName}
               avatar={avatar}
               initial={initial}
@@ -316,7 +289,6 @@ export function AppSidebar({ isSidebarOpen, setIsSidebarOpen, isTablet }: AppSid
         <SidebarFooter>
           <ProfileSection
             loading={loading}
-            error={error}
             fullName={fullName}
             avatar={avatar}
             initial={initial}
@@ -340,7 +312,6 @@ export function AppSidebar({ isSidebarOpen, setIsSidebarOpen, isTablet }: AppSid
         <div className="flex items-center gap-1">
           <ProfileSection
             loading={loading}
-            error={error}
             fullName={fullName}
             avatar={avatar}
             initial={initial}

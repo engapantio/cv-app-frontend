@@ -11,16 +11,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui";
-import type { CvProjectItem } from "../hooks/use-cv-projects-page";
+import type { ProjectItem } from "../hooks/use-projects-page";
 
 interface ProjectRowProps {
-  project: CvProjectItem;
+  project: ProjectItem;
   columnCount: number;
   canMutate: boolean;
   isLast: boolean;
-  onOpen: (project: CvProjectItem) => void;
-  onUpdate: (project: CvProjectItem) => void;
-  onRemove: (project: CvProjectItem) => void;
+  onOpen: (project: ProjectItem) => void;
+  onUpdate: (project: ProjectItem) => void;
+  onDelete: (project: ProjectItem) => void;
 }
 
 export function ProjectRow({
@@ -30,12 +30,8 @@ export function ProjectRow({
   isLast,
   onOpen,
   onUpdate,
-  onRemove,
+  onDelete,
 }: ProjectRowProps) {
-  const pills = [...project.roles, ...project.responsibilities];
-  const minPills = 4;
-  const displayPills = pills.length >= minPills ? pills : pills;
-
   return (
     <tbody className={cn("group", !isLast && "border-b border-border")}>
       <tr
@@ -50,7 +46,7 @@ export function ProjectRow({
           {formatDate(project.start_date)}
         </td>
         <td className="py-3 px-4 text-sm font-medium hidden xl:table-cell align-middle">
-          {project.end_date ? formatDate(project.end_date) : "Till now"}
+          {formatDate(project.end_date, "Till now")}
         </td>
         <td className="py-3 px-4 w-12 align-middle">
           <div className="flex justify-end" onClick={(e) => e.stopPropagation()}>
@@ -77,12 +73,12 @@ export function ProjectRow({
                   Update
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  onClick={() => onRemove(project)}
+                  onClick={() => onDelete(project)}
                   disabled={!canMutate}
                   variant="destructive"
                   className="justify-center cursor-pointer"
                 >
-                  Remove
+                  Delete
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -105,9 +101,9 @@ export function ProjectRow({
         onClick={() => onOpen(project)}
       >
         <td colSpan={columnCount} className="px-4 pb-3 pt-0">
-          <div className="flex flex-wrap gap-2">
-            {displayPills.map((pill, index) => (
-              <Pill key={index} text={pill} />
+          <div className="flex flex-wrap gap-1">
+            {project.environment.map((env, index) => (
+              <Pill key={index} text={env} variant="transparent" />
             ))}
           </div>
         </td>
