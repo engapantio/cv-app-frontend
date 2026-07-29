@@ -5,7 +5,15 @@ import { useCvsTable } from "./use-cvs-table";
 
 type CvItem = NonNullable<UserQuery["user"]["cvs"]>[number];
 
-export function useCvsPage({ userId, initialCvs }: { userId: string; initialCvs: CvItem[] }) {
+export function useCvsPage({
+  userId,
+  initialCvs,
+  initialUserEmail,
+}: {
+  userId: string;
+  initialCvs: CvItem[];
+  initialUserEmail?: string | null;
+}) {
   return useCvsTable({
     query: UserDocument,
     variables: { userId },
@@ -15,5 +23,6 @@ export function useCvsPage({ userId, initialCvs }: { userId: string; initialCvs:
     },
     initialCvs,
     userId,
+    initialUserEmail,
   });
 }

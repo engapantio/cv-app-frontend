@@ -11,6 +11,7 @@ export default async function UserCvsPage({ params }: { params: Promise<{ userId
   const client = createServerApolloClient(token ?? undefined);
 
   let initialCvs: CvItem[] = [];
+  let initialUserEmail: string | null | undefined;
   let serverError: string | null = null;
 
   try {
@@ -21,9 +22,17 @@ export default async function UserCvsPage({ params }: { params: Promise<{ userId
       fetchPolicy: "no-cache",
     });
     initialCvs = data?.user?.cvs ?? [];
+    initialUserEmail = data?.user?.email;
   } catch (e) {
     serverError = e instanceof Error ? e.message : "Failed to load CVs";
   }
 
-  return <UserCvsClient userId={userId} initialCvs={initialCvs} serverError={serverError} />;
+  return (
+    <UserCvsClient
+      userId={userId}
+      initialCvs={initialCvs}
+      initialUserEmail={initialUserEmail}
+      serverError={serverError}
+    />
+  );
 }

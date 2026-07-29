@@ -355,7 +355,29 @@ export type AddCvProjectMutationVariables = Exact<{
 }>;
 
 export type AddCvProjectMutation = {
-  addCvProject: { id: string; created_at: string; name: string; description: string };
+  addCvProject: {
+    id: string;
+    created_at: string;
+    name: string;
+    education: string | null;
+    description: string;
+    user: { id: string; email: string } | null;
+    projects: Array<{
+      id: string;
+      name: string;
+      internal_name: string;
+      description: string;
+      domain: string;
+      start_date: string;
+      end_date: string | null;
+      environment: Array<string>;
+      roles: Array<string>;
+      responsibilities: Array<string>;
+      project: { id: string; name: string; internal_name: string };
+    }> | null;
+    skills: Array<{ name: string; mastery: Mastery; categoryId: string | null }>;
+    languages: Array<{ __typename: "LanguageProficiency" }>;
+  };
 };
 
 export type AddCvSkillMutationVariables = Exact<{
@@ -406,7 +428,19 @@ export type CvQuery = {
     education: string | null;
     description: string;
     user: { id: string; email: string } | null;
-    projects: Array<{ __typename: "CvProject" }> | null;
+    projects: Array<{
+      id: string;
+      name: string;
+      internal_name: string;
+      description: string;
+      domain: string;
+      start_date: string;
+      end_date: string | null;
+      environment: Array<string>;
+      roles: Array<string>;
+      responsibilities: Array<string>;
+      project: { id: string; name: string; internal_name: string };
+    }> | null;
     skills: Array<{ name: string; mastery: Mastery; categoryId: string | null }>;
     languages: Array<{ __typename: "LanguageProficiency" }>;
   };
@@ -433,7 +467,29 @@ export type RemoveCvProjectMutationVariables = Exact<{
 }>;
 
 export type RemoveCvProjectMutation = {
-  removeCvProject: { id: string; created_at: string; name: string; description: string };
+  removeCvProject: {
+    id: string;
+    created_at: string;
+    name: string;
+    education: string | null;
+    description: string;
+    user: { id: string; email: string } | null;
+    projects: Array<{
+      id: string;
+      name: string;
+      internal_name: string;
+      description: string;
+      domain: string;
+      start_date: string;
+      end_date: string | null;
+      environment: Array<string>;
+      roles: Array<string>;
+      responsibilities: Array<string>;
+      project: { id: string; name: string; internal_name: string };
+    }> | null;
+    skills: Array<{ name: string; mastery: Mastery; categoryId: string | null }>;
+    languages: Array<{ __typename: "LanguageProficiency" }>;
+  };
 };
 
 export type UpdateCvProjectMutationVariables = Exact<{
@@ -441,7 +497,29 @@ export type UpdateCvProjectMutationVariables = Exact<{
 }>;
 
 export type UpdateCvProjectMutation = {
-  updateCvProject: { id: string; created_at: string; name: string; description: string };
+  updateCvProject: {
+    id: string;
+    created_at: string;
+    name: string;
+    education: string | null;
+    description: string;
+    user: { id: string; email: string } | null;
+    projects: Array<{
+      id: string;
+      name: string;
+      internal_name: string;
+      description: string;
+      domain: string;
+      start_date: string;
+      end_date: string | null;
+      environment: Array<string>;
+      roles: Array<string>;
+      responsibilities: Array<string>;
+      project: { id: string; name: string; internal_name: string };
+    }> | null;
+    skills: Array<{ name: string; mastery: Mastery; categoryId: string | null }>;
+    languages: Array<{ __typename: "LanguageProficiency" }>;
+  };
 };
 
 export type UpdateCvSkillMutationVariables = Exact<{
@@ -1348,7 +1426,70 @@ export const AddCvProjectDocument = {
                 { kind: "Field", name: { kind: "Name", value: "id" } },
                 { kind: "Field", name: { kind: "Name", value: "created_at" } },
                 { kind: "Field", name: { kind: "Name", value: "name" } },
+                { kind: "Field", name: { kind: "Name", value: "education" } },
                 { kind: "Field", name: { kind: "Name", value: "description" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "user" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "email" } },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "projects" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "name" } },
+                      { kind: "Field", name: { kind: "Name", value: "internal_name" } },
+                      { kind: "Field", name: { kind: "Name", value: "description" } },
+                      { kind: "Field", name: { kind: "Name", value: "domain" } },
+                      { kind: "Field", name: { kind: "Name", value: "start_date" } },
+                      { kind: "Field", name: { kind: "Name", value: "end_date" } },
+                      { kind: "Field", name: { kind: "Name", value: "environment" } },
+                      { kind: "Field", name: { kind: "Name", value: "roles" } },
+                      { kind: "Field", name: { kind: "Name", value: "responsibilities" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "project" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "name" } },
+                            { kind: "Field", name: { kind: "Name", value: "internal_name" } },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "skills" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "name" } },
+                      { kind: "Field", name: { kind: "Name", value: "mastery" } },
+                      { kind: "Field", name: { kind: "Name", value: "categoryId" } },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "languages" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [{ kind: "Field", name: { kind: "Name", value: "__typename" } }],
+                  },
+                },
               ],
             },
           },
@@ -1587,7 +1728,30 @@ export const CvDocument = {
                   name: { kind: "Name", value: "projects" },
                   selectionSet: {
                     kind: "SelectionSet",
-                    selections: [{ kind: "Field", name: { kind: "Name", value: "__typename" } }],
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "name" } },
+                      { kind: "Field", name: { kind: "Name", value: "internal_name" } },
+                      { kind: "Field", name: { kind: "Name", value: "description" } },
+                      { kind: "Field", name: { kind: "Name", value: "domain" } },
+                      { kind: "Field", name: { kind: "Name", value: "start_date" } },
+                      { kind: "Field", name: { kind: "Name", value: "end_date" } },
+                      { kind: "Field", name: { kind: "Name", value: "environment" } },
+                      { kind: "Field", name: { kind: "Name", value: "roles" } },
+                      { kind: "Field", name: { kind: "Name", value: "responsibilities" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "project" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "name" } },
+                            { kind: "Field", name: { kind: "Name", value: "internal_name" } },
+                          ],
+                        },
+                      },
+                    ],
                   },
                 },
                 {
@@ -1718,7 +1882,70 @@ export const RemoveCvProjectDocument = {
                 { kind: "Field", name: { kind: "Name", value: "id" } },
                 { kind: "Field", name: { kind: "Name", value: "created_at" } },
                 { kind: "Field", name: { kind: "Name", value: "name" } },
+                { kind: "Field", name: { kind: "Name", value: "education" } },
                 { kind: "Field", name: { kind: "Name", value: "description" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "user" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "email" } },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "projects" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "name" } },
+                      { kind: "Field", name: { kind: "Name", value: "internal_name" } },
+                      { kind: "Field", name: { kind: "Name", value: "description" } },
+                      { kind: "Field", name: { kind: "Name", value: "domain" } },
+                      { kind: "Field", name: { kind: "Name", value: "start_date" } },
+                      { kind: "Field", name: { kind: "Name", value: "end_date" } },
+                      { kind: "Field", name: { kind: "Name", value: "environment" } },
+                      { kind: "Field", name: { kind: "Name", value: "roles" } },
+                      { kind: "Field", name: { kind: "Name", value: "responsibilities" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "project" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "name" } },
+                            { kind: "Field", name: { kind: "Name", value: "internal_name" } },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "skills" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "name" } },
+                      { kind: "Field", name: { kind: "Name", value: "mastery" } },
+                      { kind: "Field", name: { kind: "Name", value: "categoryId" } },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "languages" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [{ kind: "Field", name: { kind: "Name", value: "__typename" } }],
+                  },
+                },
               ],
             },
           },
@@ -1763,7 +1990,70 @@ export const UpdateCvProjectDocument = {
                 { kind: "Field", name: { kind: "Name", value: "id" } },
                 { kind: "Field", name: { kind: "Name", value: "created_at" } },
                 { kind: "Field", name: { kind: "Name", value: "name" } },
+                { kind: "Field", name: { kind: "Name", value: "education" } },
                 { kind: "Field", name: { kind: "Name", value: "description" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "user" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "email" } },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "projects" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "name" } },
+                      { kind: "Field", name: { kind: "Name", value: "internal_name" } },
+                      { kind: "Field", name: { kind: "Name", value: "description" } },
+                      { kind: "Field", name: { kind: "Name", value: "domain" } },
+                      { kind: "Field", name: { kind: "Name", value: "start_date" } },
+                      { kind: "Field", name: { kind: "Name", value: "end_date" } },
+                      { kind: "Field", name: { kind: "Name", value: "environment" } },
+                      { kind: "Field", name: { kind: "Name", value: "roles" } },
+                      { kind: "Field", name: { kind: "Name", value: "responsibilities" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "project" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "name" } },
+                            { kind: "Field", name: { kind: "Name", value: "internal_name" } },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "skills" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "name" } },
+                      { kind: "Field", name: { kind: "Name", value: "mastery" } },
+                      { kind: "Field", name: { kind: "Name", value: "categoryId" } },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "languages" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [{ kind: "Field", name: { kind: "Name", value: "__typename" } }],
+                  },
+                },
               ],
             },
           },

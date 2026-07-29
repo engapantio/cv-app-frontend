@@ -39,8 +39,8 @@ export function UpdateSkillDialog({
   const [selectedMastery, setSelectedMastery] = useState<Mastery>(currentMastery);
 
   const handleConfirm = useCallback(async () => {
-    await onConfirm(skillName, selectedMastery);
     onOpenChange(false);
+    await onConfirm(skillName, selectedMastery);
   }, [skillName, selectedMastery, onConfirm, onOpenChange]);
 
   return (
@@ -92,7 +92,7 @@ export function UpdateSkillDialog({
             CANCEL
           </Button>
           <Button
-            type="submit"
+            type="button"
             className="uppercase text-white min-w-30 py-1.5"
             style={{ backgroundColor: "#e53935" }}
             disabled={loading}

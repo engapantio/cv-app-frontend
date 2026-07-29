@@ -155,13 +155,17 @@ export function useCvSkillsPage(cvId: string) {
 
   const handleAddSkill = useCallback(
     async (skillName: string, mastery: Mastery) => {
-      const categoryId = skillCategoryMap.get(skillName) ?? null;
-      await addCvSkill({
-        variables: {
-          skill: { cvId, name: skillName, mastery, categoryId },
-        },
-      });
-      await refetchCv();
+      try {
+        const categoryId = skillCategoryMap.get(skillName) ?? null;
+        await addCvSkill({
+          variables: {
+            skill: { cvId, name: skillName, mastery, categoryId },
+          },
+        });
+        await refetchCv();
+      } catch (e) {
+        console.error("add skill mutation error", e);
+      }
     },
     [addCvSkill, cvId, refetchCv, skillCategoryMap],
   );
@@ -170,13 +174,17 @@ export function useCvSkillsPage(cvId: string) {
 
   const handleUpdateSkill = useCallback(
     async (skillName: string, mastery: Mastery) => {
-      const categoryId = skillCategoryMap.get(skillName) ?? null;
-      await updateCvSkill({
-        variables: {
-          skill: { cvId, name: skillName, mastery, categoryId },
-        },
-      });
-      await refetchCv();
+      try {
+        const categoryId = skillCategoryMap.get(skillName) ?? null;
+        await updateCvSkill({
+          variables: {
+            skill: { cvId, name: skillName, mastery, categoryId },
+          },
+        });
+        await refetchCv();
+      } catch (e) {
+        console.error("update skill mutation error", e);
+      }
     },
     [updateCvSkill, cvId, refetchCv, skillCategoryMap],
   );
@@ -184,14 +192,18 @@ export function useCvSkillsPage(cvId: string) {
   const [deleteCvSkill, { loading: deletingSkill }] = useMutation(DeleteCvSkillDocument);
 
   const handleDeleteSkills = useCallback(async () => {
-    const names = Array.from(selectedSkills);
-    if (names.length === 0) return;
-    await deleteCvSkill({
-      variables: { skill: { cvId, name: names } },
-    });
-    setSelectedSkills(new Set());
-    setRemoveMode(false);
-    await refetchCv();
+    try {
+      const names = Array.from(selectedSkills);
+      if (names.length === 0) return;
+      await deleteCvSkill({
+        variables: { skill: { cvId, name: names } },
+      });
+      setSelectedSkills(new Set());
+      setRemoveMode(false);
+      await refetchCv();
+    } catch (e) {
+      console.error("delete skill mutation error", e);
+    }
   }, [deleteCvSkill, cvId, selectedSkills, refetchCv]);
 
   return {

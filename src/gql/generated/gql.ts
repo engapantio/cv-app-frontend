@@ -21,15 +21,15 @@ type Documents = {
   "mutation UpdateToken {\n  updateToken {\n    access_token\n    refresh_token\n  }\n}": typeof types.UpdateTokenDocument;
   "mutation DeleteAvatar($avatar: DeleteAvatarInput!) {\n  deleteAvatar(avatar: $avatar)\n}": typeof types.DeleteAvatarDocument;
   "mutation UploadAvatar($avatar: UploadAvatarInput!) {\n  uploadAvatar(avatar: $avatar)\n}": typeof types.UploadAvatarDocument;
-  "mutation AddCvProject($project: AddCvProjectInput!) {\n  addCvProject(project: $project) {\n    id\n    created_at\n    name\n    description\n  }\n}": typeof types.AddCvProjectDocument;
+  "mutation AddCvProject($project: AddCvProjectInput!) {\n  addCvProject(project: $project) {\n    id\n    created_at\n    name\n    education\n    description\n    user {\n      id\n      email\n    }\n    projects {\n      id\n      name\n      internal_name\n      description\n      domain\n      start_date\n      end_date\n      environment\n      roles\n      responsibilities\n      project {\n        id\n        name\n        internal_name\n      }\n    }\n    skills {\n      name\n      mastery\n      categoryId\n    }\n    languages {\n      __typename\n    }\n  }\n}": typeof types.AddCvProjectDocument;
   "mutation AddCvSkill($skill: AddCvSkillInput!) {\n  addCvSkill(skill: $skill) {\n    id\n    created_at\n    name\n    description\n  }\n}": typeof types.AddCvSkillDocument;
   "mutation CreateCv($cv: CreateCvInput!) {\n  createCv(cv: $cv) {\n    id\n    created_at\n    name\n    education\n    description\n  }\n}": typeof types.CreateCvDocument;
   "mutation DeleteCvSkill($skill: DeleteCvSkillInput!) {\n  deleteCvSkill(skill: $skill) {\n    id\n    created_at\n    name\n    description\n  }\n}": typeof types.DeleteCvSkillDocument;
   "mutation DeleteCv($cv: DeleteCvInput!) {\n  deleteCv(cv: $cv) {\n    affected\n  }\n}": typeof types.DeleteCvDocument;
-  "query Cv($cvId: ID!) {\n  cv(cvId: $cvId) {\n    id\n    created_at\n    name\n    education\n    description\n    user {\n      id\n      email\n    }\n    projects {\n      __typename\n    }\n    skills {\n      name\n      mastery\n      categoryId\n    }\n    languages {\n      __typename\n    }\n  }\n}": typeof types.CvDocument;
+  "query Cv($cvId: ID!) {\n  cv(cvId: $cvId) {\n    id\n    created_at\n    name\n    education\n    description\n    user {\n      id\n      email\n    }\n    projects {\n      id\n      name\n      internal_name\n      description\n      domain\n      start_date\n      end_date\n      environment\n      roles\n      responsibilities\n      project {\n        id\n        name\n        internal_name\n      }\n    }\n    skills {\n      name\n      mastery\n      categoryId\n    }\n    languages {\n      __typename\n    }\n  }\n}": typeof types.CvDocument;
   "query Cvs {\n  cvs {\n    id\n    created_at\n    name\n    education\n    description\n    user {\n      id\n      email\n    }\n    projects {\n      __typename\n    }\n    skills {\n      __typename\n    }\n    languages {\n      __typename\n    }\n  }\n}": typeof types.CvsDocument;
-  "mutation RemoveCvProject($project: RemoveCvProjectInput!) {\n  removeCvProject(project: $project) {\n    id\n    created_at\n    name\n    description\n  }\n}": typeof types.RemoveCvProjectDocument;
-  "mutation UpdateCvProject($project: UpdateCvProjectInput!) {\n  updateCvProject(project: $project) {\n    id\n    created_at\n    name\n    description\n  }\n}": typeof types.UpdateCvProjectDocument;
+  "mutation RemoveCvProject($project: RemoveCvProjectInput!) {\n  removeCvProject(project: $project) {\n    id\n    created_at\n    name\n    education\n    description\n    user {\n      id\n      email\n    }\n    projects {\n      id\n      name\n      internal_name\n      description\n      domain\n      start_date\n      end_date\n      environment\n      roles\n      responsibilities\n      project {\n        id\n        name\n        internal_name\n      }\n    }\n    skills {\n      name\n      mastery\n      categoryId\n    }\n    languages {\n      __typename\n    }\n  }\n}": typeof types.RemoveCvProjectDocument;
+  "mutation UpdateCvProject($project: UpdateCvProjectInput!) {\n  updateCvProject(project: $project) {\n    id\n    created_at\n    name\n    education\n    description\n    user {\n      id\n      email\n    }\n    projects {\n      id\n      name\n      internal_name\n      description\n      domain\n      start_date\n      end_date\n      environment\n      roles\n      responsibilities\n      project {\n        id\n        name\n        internal_name\n      }\n    }\n    skills {\n      name\n      mastery\n      categoryId\n    }\n    languages {\n      __typename\n    }\n  }\n}": typeof types.UpdateCvProjectDocument;
   "mutation UpdateCvSkill($skill: UpdateCvSkillInput!) {\n  updateCvSkill(skill: $skill) {\n    id\n    created_at\n    name\n    description\n  }\n}": typeof types.UpdateCvSkillDocument;
   "mutation UpdateCv($cv: UpdateCvInput!) {\n  updateCv(cv: $cv) {\n    id\n    created_at\n    name\n    education\n    description\n  }\n}": typeof types.UpdateCvDocument;
   "mutation CreateDepartment($department: CreateDepartmentInput!) {\n  createDepartment(department: $department) {\n    id\n    created_at\n    name\n  }\n}": typeof types.CreateDepartmentDocument;
@@ -85,7 +85,7 @@ const documents: Documents = {
     types.DeleteAvatarDocument,
   "mutation UploadAvatar($avatar: UploadAvatarInput!) {\n  uploadAvatar(avatar: $avatar)\n}":
     types.UploadAvatarDocument,
-  "mutation AddCvProject($project: AddCvProjectInput!) {\n  addCvProject(project: $project) {\n    id\n    created_at\n    name\n    description\n  }\n}":
+  "mutation AddCvProject($project: AddCvProjectInput!) {\n  addCvProject(project: $project) {\n    id\n    created_at\n    name\n    education\n    description\n    user {\n      id\n      email\n    }\n    projects {\n      id\n      name\n      internal_name\n      description\n      domain\n      start_date\n      end_date\n      environment\n      roles\n      responsibilities\n      project {\n        id\n        name\n        internal_name\n      }\n    }\n    skills {\n      name\n      mastery\n      categoryId\n    }\n    languages {\n      __typename\n    }\n  }\n}":
     types.AddCvProjectDocument,
   "mutation AddCvSkill($skill: AddCvSkillInput!) {\n  addCvSkill(skill: $skill) {\n    id\n    created_at\n    name\n    description\n  }\n}":
     types.AddCvSkillDocument,
@@ -95,13 +95,13 @@ const documents: Documents = {
     types.DeleteCvSkillDocument,
   "mutation DeleteCv($cv: DeleteCvInput!) {\n  deleteCv(cv: $cv) {\n    affected\n  }\n}":
     types.DeleteCvDocument,
-  "query Cv($cvId: ID!) {\n  cv(cvId: $cvId) {\n    id\n    created_at\n    name\n    education\n    description\n    user {\n      id\n      email\n    }\n    projects {\n      __typename\n    }\n    skills {\n      name\n      mastery\n      categoryId\n    }\n    languages {\n      __typename\n    }\n  }\n}":
+  "query Cv($cvId: ID!) {\n  cv(cvId: $cvId) {\n    id\n    created_at\n    name\n    education\n    description\n    user {\n      id\n      email\n    }\n    projects {\n      id\n      name\n      internal_name\n      description\n      domain\n      start_date\n      end_date\n      environment\n      roles\n      responsibilities\n      project {\n        id\n        name\n        internal_name\n      }\n    }\n    skills {\n      name\n      mastery\n      categoryId\n    }\n    languages {\n      __typename\n    }\n  }\n}":
     types.CvDocument,
   "query Cvs {\n  cvs {\n    id\n    created_at\n    name\n    education\n    description\n    user {\n      id\n      email\n    }\n    projects {\n      __typename\n    }\n    skills {\n      __typename\n    }\n    languages {\n      __typename\n    }\n  }\n}":
     types.CvsDocument,
-  "mutation RemoveCvProject($project: RemoveCvProjectInput!) {\n  removeCvProject(project: $project) {\n    id\n    created_at\n    name\n    description\n  }\n}":
+  "mutation RemoveCvProject($project: RemoveCvProjectInput!) {\n  removeCvProject(project: $project) {\n    id\n    created_at\n    name\n    education\n    description\n    user {\n      id\n      email\n    }\n    projects {\n      id\n      name\n      internal_name\n      description\n      domain\n      start_date\n      end_date\n      environment\n      roles\n      responsibilities\n      project {\n        id\n        name\n        internal_name\n      }\n    }\n    skills {\n      name\n      mastery\n      categoryId\n    }\n    languages {\n      __typename\n    }\n  }\n}":
     types.RemoveCvProjectDocument,
-  "mutation UpdateCvProject($project: UpdateCvProjectInput!) {\n  updateCvProject(project: $project) {\n    id\n    created_at\n    name\n    description\n  }\n}":
+  "mutation UpdateCvProject($project: UpdateCvProjectInput!) {\n  updateCvProject(project: $project) {\n    id\n    created_at\n    name\n    education\n    description\n    user {\n      id\n      email\n    }\n    projects {\n      id\n      name\n      internal_name\n      description\n      domain\n      start_date\n      end_date\n      environment\n      roles\n      responsibilities\n      project {\n        id\n        name\n        internal_name\n      }\n    }\n    skills {\n      name\n      mastery\n      categoryId\n    }\n    languages {\n      __typename\n    }\n  }\n}":
     types.UpdateCvProjectDocument,
   "mutation UpdateCvSkill($skill: UpdateCvSkillInput!) {\n  updateCvSkill(skill: $skill) {\n    id\n    created_at\n    name\n    description\n  }\n}":
     types.UpdateCvSkillDocument,
@@ -242,8 +242,8 @@ export function graphql(
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(
-  source: "mutation AddCvProject($project: AddCvProjectInput!) {\n  addCvProject(project: $project) {\n    id\n    created_at\n    name\n    description\n  }\n}",
-): (typeof documents)["mutation AddCvProject($project: AddCvProjectInput!) {\n  addCvProject(project: $project) {\n    id\n    created_at\n    name\n    description\n  }\n}"];
+  source: "mutation AddCvProject($project: AddCvProjectInput!) {\n  addCvProject(project: $project) {\n    id\n    created_at\n    name\n    education\n    description\n    user {\n      id\n      email\n    }\n    projects {\n      id\n      name\n      internal_name\n      description\n      domain\n      start_date\n      end_date\n      environment\n      roles\n      responsibilities\n      project {\n        id\n        name\n        internal_name\n      }\n    }\n    skills {\n      name\n      mastery\n      categoryId\n    }\n    languages {\n      __typename\n    }\n  }\n}",
+): (typeof documents)["mutation AddCvProject($project: AddCvProjectInput!) {\n  addCvProject(project: $project) {\n    id\n    created_at\n    name\n    education\n    description\n    user {\n      id\n      email\n    }\n    projects {\n      id\n      name\n      internal_name\n      description\n      domain\n      start_date\n      end_date\n      environment\n      roles\n      responsibilities\n      project {\n        id\n        name\n        internal_name\n      }\n    }\n    skills {\n      name\n      mastery\n      categoryId\n    }\n    languages {\n      __typename\n    }\n  }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -272,8 +272,8 @@ export function graphql(
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(
-  source: "query Cv($cvId: ID!) {\n  cv(cvId: $cvId) {\n    id\n    created_at\n    name\n    education\n    description\n    user {\n      id\n      email\n    }\n    projects {\n      __typename\n    }\n    skills {\n      name\n      mastery\n      categoryId\n    }\n    languages {\n      __typename\n    }\n  }\n}",
-): (typeof documents)["query Cv($cvId: ID!) {\n  cv(cvId: $cvId) {\n    id\n    created_at\n    name\n    education\n    description\n    user {\n      id\n      email\n    }\n    projects {\n      __typename\n    }\n    skills {\n      name\n      mastery\n      categoryId\n    }\n    languages {\n      __typename\n    }\n  }\n}"];
+  source: "query Cv($cvId: ID!) {\n  cv(cvId: $cvId) {\n    id\n    created_at\n    name\n    education\n    description\n    user {\n      id\n      email\n    }\n    projects {\n      id\n      name\n      internal_name\n      description\n      domain\n      start_date\n      end_date\n      environment\n      roles\n      responsibilities\n      project {\n        id\n        name\n        internal_name\n      }\n    }\n    skills {\n      name\n      mastery\n      categoryId\n    }\n    languages {\n      __typename\n    }\n  }\n}",
+): (typeof documents)["query Cv($cvId: ID!) {\n  cv(cvId: $cvId) {\n    id\n    created_at\n    name\n    education\n    description\n    user {\n      id\n      email\n    }\n    projects {\n      id\n      name\n      internal_name\n      description\n      domain\n      start_date\n      end_date\n      environment\n      roles\n      responsibilities\n      project {\n        id\n        name\n        internal_name\n      }\n    }\n    skills {\n      name\n      mastery\n      categoryId\n    }\n    languages {\n      __typename\n    }\n  }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -284,14 +284,14 @@ export function graphql(
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(
-  source: "mutation RemoveCvProject($project: RemoveCvProjectInput!) {\n  removeCvProject(project: $project) {\n    id\n    created_at\n    name\n    description\n  }\n}",
-): (typeof documents)["mutation RemoveCvProject($project: RemoveCvProjectInput!) {\n  removeCvProject(project: $project) {\n    id\n    created_at\n    name\n    description\n  }\n}"];
+  source: "mutation RemoveCvProject($project: RemoveCvProjectInput!) {\n  removeCvProject(project: $project) {\n    id\n    created_at\n    name\n    education\n    description\n    user {\n      id\n      email\n    }\n    projects {\n      id\n      name\n      internal_name\n      description\n      domain\n      start_date\n      end_date\n      environment\n      roles\n      responsibilities\n      project {\n        id\n        name\n        internal_name\n      }\n    }\n    skills {\n      name\n      mastery\n      categoryId\n    }\n    languages {\n      __typename\n    }\n  }\n}",
+): (typeof documents)["mutation RemoveCvProject($project: RemoveCvProjectInput!) {\n  removeCvProject(project: $project) {\n    id\n    created_at\n    name\n    education\n    description\n    user {\n      id\n      email\n    }\n    projects {\n      id\n      name\n      internal_name\n      description\n      domain\n      start_date\n      end_date\n      environment\n      roles\n      responsibilities\n      project {\n        id\n        name\n        internal_name\n      }\n    }\n    skills {\n      name\n      mastery\n      categoryId\n    }\n    languages {\n      __typename\n    }\n  }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(
-  source: "mutation UpdateCvProject($project: UpdateCvProjectInput!) {\n  updateCvProject(project: $project) {\n    id\n    created_at\n    name\n    description\n  }\n}",
-): (typeof documents)["mutation UpdateCvProject($project: UpdateCvProjectInput!) {\n  updateCvProject(project: $project) {\n    id\n    created_at\n    name\n    description\n  }\n}"];
+  source: "mutation UpdateCvProject($project: UpdateCvProjectInput!) {\n  updateCvProject(project: $project) {\n    id\n    created_at\n    name\n    education\n    description\n    user {\n      id\n      email\n    }\n    projects {\n      id\n      name\n      internal_name\n      description\n      domain\n      start_date\n      end_date\n      environment\n      roles\n      responsibilities\n      project {\n        id\n        name\n        internal_name\n      }\n    }\n    skills {\n      name\n      mastery\n      categoryId\n    }\n    languages {\n      __typename\n    }\n  }\n}",
+): (typeof documents)["mutation UpdateCvProject($project: UpdateCvProjectInput!) {\n  updateCvProject(project: $project) {\n    id\n    created_at\n    name\n    education\n    description\n    user {\n      id\n      email\n    }\n    projects {\n      id\n      name\n      internal_name\n      description\n      domain\n      start_date\n      end_date\n      environment\n      roles\n      responsibilities\n      project {\n        id\n        name\n        internal_name\n      }\n    }\n    skills {\n      name\n      mastery\n      categoryId\n    }\n    languages {\n      __typename\n    }\n  }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

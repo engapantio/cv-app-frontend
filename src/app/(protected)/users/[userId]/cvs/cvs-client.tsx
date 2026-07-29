@@ -9,13 +9,15 @@ type CvItem = NonNullable<UserQuery["user"]["cvs"]>[number];
 export default function UserCvsClient({
   userId,
   initialCvs,
+  initialUserEmail,
   serverError,
 }: {
   userId: string;
   initialCvs: CvItem[];
+  initialUserEmail?: string | null;
   serverError?: string | null;
 }) {
-  const tableData = useCvsPage({ userId, initialCvs });
+  const tableData = useCvsPage({ userId, initialCvs, initialUserEmail });
 
   return (
     <div className="flex w-full">
