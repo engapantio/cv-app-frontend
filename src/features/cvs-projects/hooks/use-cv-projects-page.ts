@@ -78,28 +78,24 @@ export function useCvProjectsPage(cvId: string, initialCv?: CvQuery["cv"] | null
       roles: string[];
       responsibilities: string[];
     }) => {
-      try {
-        const result = await addCvProject({
-          variables: {
-            project: {
-              cvId,
-              projectId: data.projectId,
-              start_date: data.start_date,
-              end_date: data.end_date,
-              roles: data.roles,
-              responsibilities: data.responsibilities,
-            },
+      const result = await addCvProject({
+        variables: {
+          project: {
+            cvId,
+            projectId: data.projectId,
+            start_date: data.start_date,
+            end_date: data.end_date,
+            roles: data.roles,
+            responsibilities: data.responsibilities,
           },
-        });
-        const updatedCv = result.data?.addCvProject;
-        if (updatedCv?.projects) {
-          setLocalProjects(updatedCv.projects as CvProjectItem[]);
-        }
-        refetchCv();
-        setAddOpen(false);
-      } catch (error) {
-        throw error;
+        },
+      });
+      const updatedCv = result.data?.addCvProject;
+      if (updatedCv?.projects) {
+        setLocalProjects(updatedCv.projects as CvProjectItem[]);
       }
+      refetchCv();
+      setAddOpen(false);
     },
     [addCvProject, cvId, refetchCv],
   );
@@ -112,48 +108,40 @@ export function useCvProjectsPage(cvId: string, initialCv?: CvQuery["cv"] | null
       roles: string[];
       responsibilities: string[];
     }) => {
-      try {
-        const result = await updateCvProject({
-          variables: {
-            project: {
-              cvId,
-              projectId: data.projectId,
-              start_date: data.start_date,
-              end_date: data.end_date,
-              roles: data.roles,
-              responsibilities: data.responsibilities,
-            },
+      const result = await updateCvProject({
+        variables: {
+          project: {
+            cvId,
+            projectId: data.projectId,
+            start_date: data.start_date,
+            end_date: data.end_date,
+            roles: data.roles,
+            responsibilities: data.responsibilities,
           },
-        });
-        const updatedCv = result.data?.updateCvProject;
-        if (updatedCv?.projects) {
-          setLocalProjects(updatedCv.projects as CvProjectItem[]);
-        }
-        refetchCv();
-        setUpdateTarget(null);
-      } catch (error) {
-        throw error;
+        },
+      });
+      const updatedCv = result.data?.updateCvProject;
+      if (updatedCv?.projects) {
+        setLocalProjects(updatedCv.projects as CvProjectItem[]);
       }
+      refetchCv();
+      setUpdateTarget(null);
     },
     [updateCvProject, cvId, refetchCv],
   );
 
   const handleRemove = useCallback(
     async (projectId: string) => {
-      try {
-        const result = await removeCvProject({
-          variables: {
-            project: { cvId, projectId },
-          },
-        });
-        const updatedCv = result.data?.removeCvProject;
-        if (updatedCv?.projects) {
-          setLocalProjects(updatedCv.projects as CvProjectItem[]);
-        }
-        refetchCv();
-      } catch (error) {
-        throw error;
+      const result = await removeCvProject({
+        variables: {
+          project: { cvId, projectId },
+        },
+      });
+      const updatedCv = result.data?.removeCvProject;
+      if (updatedCv?.projects) {
+        setLocalProjects(updatedCv.projects as CvProjectItem[]);
       }
+      refetchCv();
     },
     [removeCvProject, cvId, refetchCv],
   );

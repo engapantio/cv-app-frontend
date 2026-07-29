@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { toast } from "sonner";
 import {
   Button,
   Dialog,
@@ -43,10 +44,14 @@ export function AddSkillDialog({
     if (!selectedSkill) return;
     const skill = selectedSkill;
     const mastery = selectedMastery;
-    setSelectedSkill(null);
-    setSelectedMastery("Novice");
-    onOpenChange(false);
-    await onConfirm(skill, mastery);
+    try {
+      await onConfirm(skill, mastery);
+      setSelectedSkill(null);
+      setSelectedMastery("Novice");
+      onOpenChange(false);
+    } catch {
+      toast.error("Failed to add skill");
+    }
   }, [selectedSkill, selectedMastery, onConfirm, onOpenChange]);
 
   return (
