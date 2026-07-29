@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback } from "react";
+import { toast } from "sonner";
 import { Button, Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui";
 import type { CvProjectItem } from "../hooks/use-cv-projects-page";
 
@@ -19,8 +20,12 @@ export function RemoveProjectDialog({
 }: RemoveProjectDialogProps) {
   const handleConfirm = useCallback(async () => {
     if (!target) return;
-    await onConfirm(target.project.id);
-    onClose();
+    try {
+      await onConfirm(target.project.id);
+      onClose();
+    } catch {
+      toast.error("Failed to remove project");
+    }
   }, [target, onConfirm, onClose]);
 
   return (

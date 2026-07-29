@@ -97,8 +97,8 @@ export function useCvProjectsPage(cvId: string, initialCv?: CvQuery["cv"] | null
         }
         refetchCv();
         setAddOpen(false);
-      } catch {
-        // error already logged by Apollo; user stays on modal to retry
+      } catch (error) {
+        throw error;
       }
     },
     [addCvProject, cvId, refetchCv],
@@ -131,8 +131,8 @@ export function useCvProjectsPage(cvId: string, initialCv?: CvQuery["cv"] | null
         }
         refetchCv();
         setUpdateTarget(null);
-      } catch {
-        // error already logged by Apollo; user stays on modal to retry
+      } catch (error) {
+        throw error;
       }
     },
     [updateCvProject, cvId, refetchCv],
@@ -151,8 +151,8 @@ export function useCvProjectsPage(cvId: string, initialCv?: CvQuery["cv"] | null
           setLocalProjects(updatedCv.projects as CvProjectItem[]);
         }
         refetchCv();
-      } catch {
-        // error already logged by Apollo; user stays on modal to retry
+      } catch (error) {
+        throw error;
       }
     },
     [removeCvProject, cvId, refetchCv],

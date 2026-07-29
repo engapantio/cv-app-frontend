@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
+import { toast } from "sonner";
 import {
   Button,
   Dialog,
@@ -90,15 +91,19 @@ export function AddProjectDialog({
 
   const handleConfirm = useCallback(async () => {
     if (!selectedProject) return;
-    const { roles, responsibilities } = parseRoles(rolesInput);
-    await onConfirm({
-      projectId: selectedProject.id,
-      start_date: startDate ? startDate.toISOString() : "",
-      end_date: endDate ? endDate.toISOString() : null,
-      roles,
-      responsibilities,
-    });
-    reset();
+    try {
+      const { roles, responsibilities } = parseRoles(rolesInput);
+      await onConfirm({
+        projectId: selectedProject.id,
+        start_date: startDate ? startDate.toISOString() : "",
+        end_date: endDate ? endDate.toISOString() : null,
+        roles,
+        responsibilities,
+      });
+      reset();
+    } catch {
+      toast.error("Failed to add project");
+    }
   }, [selectedProject, startDate, endDate, rolesInput, onConfirm, reset]);
 
   return (

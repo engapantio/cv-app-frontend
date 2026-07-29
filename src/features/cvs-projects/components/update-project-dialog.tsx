@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
+import { toast } from "sonner";
 import {
   Button,
   Dialog,
@@ -59,14 +60,18 @@ function UpdateProjectForm({
   const [endDateOpen, setEndDateOpen] = useState(false);
 
   const handleConfirm = useCallback(async () => {
-    const { roles, responsibilities } = parseRoles(rolesInput);
-    await onConfirm({
-      projectId: project.project.id,
-      start_date: startDate ? startDate.toISOString() : project.start_date,
-      end_date: endDate ? endDate.toISOString() : project.end_date,
-      roles,
-      responsibilities,
-    });
+    try {
+      const { roles, responsibilities } = parseRoles(rolesInput);
+      await onConfirm({
+        projectId: project.project.id,
+        start_date: startDate ? startDate.toISOString() : project.start_date,
+        end_date: endDate ? endDate.toISOString() : project.end_date,
+        roles,
+        responsibilities,
+      });
+    } catch {
+      toast.error("Failed to update project");
+    }
   }, [
     project.project.id,
     startDate,
