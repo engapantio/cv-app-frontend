@@ -1,10 +1,12 @@
-import { format } from "date-fns";
 
-export function formatDate(dateStr: string | null, fallback = "—"): string {
-  if (!dateStr) return fallback;
+export function formatDate(dateStr: string): string {
   try {
-    return format(new Date(dateStr), "dd/MM/yyyy");
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return dateStr;
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const yyyy = d.getFullYear();
+    return `${mm}.${yyyy}`;
   } catch {
-    return fallback;
+    return dateStr;
   }
 }

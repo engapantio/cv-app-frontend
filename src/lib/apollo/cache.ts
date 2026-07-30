@@ -81,6 +81,9 @@ export const typePolicies: TypePolicies = {
   Skill: { keyFields: ["id"] },
   Language: { keyFields: ["id"] },
   SkillCategory: { keyFields: ["id"] },
+  CvProject: { keyFields: ["id"] },
+  SkillMastery: { keyFields: false },
+  LanguageProficiency: { keyFields: false },
   Query: {
     fields: {
       user: { keyArgs: ["userId"] },
@@ -95,7 +98,7 @@ export const typePolicies: TypePolicies = {
       projects: paginatedFieldPolicy("items"),
       skills: paginatedFieldPolicy("items"),
       languages: paginatedFieldPolicy("items"),
-      skillCategories: { merge: true },
+      skillCategories: { merge: false },
     },
   },
 };
