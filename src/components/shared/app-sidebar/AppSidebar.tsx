@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState, useSyncExternalStore } from "react";
 import { cn } from "@/lib/utils";
 import {
@@ -14,6 +14,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   Sidebar,
   SidebarContent,
   SidebarFooter,
@@ -36,7 +37,7 @@ import {
 } from "lucide-react";
 import { Container } from "../container";
 import { useTheme } from "next-themes";
-import { useSession } from "@/lib/auth/session";
+import { useSession, logout } from "@/lib/auth/session";
 import { usePermissions } from "@/lib/auth/permissions";
 
 interface AppSidebarProps {
@@ -140,6 +141,7 @@ function ProfileSection({
   compact = false,
   showLanguageSwitcher = true,
   userId,
+  menuSide = "bottom",
 }: {
   loading: boolean;
   error?: Error | null;
@@ -149,7 +151,10 @@ function ProfileSection({
   compact?: boolean;
   showLanguageSwitcher?: boolean;
   userId?: string | null;
+  menuSide?: "top" | "bottom";
 }) {
+  const router = useRouter();
+
   if (loading) {
     return (
       <div className="flex items-center gap-3">
@@ -179,13 +184,40 @@ function ProfileSection({
     </>
   );
 
+  const handleLogout = async () => {
+    await logout();
+    router.push("/auth/login");
+  };
+
   return (
     <div className="flex items-center gap-3">
       {showLanguageSwitcher && <LanguageSwitcher />}
       {userId ? (
-        <Link href={`/users/${userId}/profile`} className="flex items-center gap-3">
-          {content}
-        </Link>
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            render={
+              <button
+                type="button"
+                className="flex items-center gap-3 cursor-pointer outline-none"
+              />
+            }
+          >
+            {content}
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" side={menuSide} className="min-w-36">
+            <DropdownMenuItem
+              onClick={() => router.push(`/users/${userId}/profile`)}
+              className="cursor-pointer"
+            >
+              Profile
+            </DropdownMenuItem>
+            <DropdownMenuItem disabled>Settings</DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
+              Logout
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       ) : (
         content
       )}
@@ -222,7 +254,7 @@ function MenuItem({
 
   return (
     <SidebarMenuButton className={baseClasses}>
-      <Link href={item.href} onClick={onClick} className="flex items-center gap-4">
+      <Link href={item.href} onClick={onClick} className="flex items-center gap-4 w-full h-full">
         <item.icon className="h-4 w-4" />
         <span>{item.label}</span>
       </Link>
@@ -269,7 +301,7 @@ export function AppSidebar({ isSidebarOpen, setIsSidebarOpen, isTablet }: AppSid
       return (
         <>
           {beforeDepartments}
-          <div className="border-b border-border my-2" />
+          <div className="border-b border-border my-0" />
           {afterDepartments}
         </>
       );
@@ -333,6 +365,7 @@ export function AppSidebar({ isSidebarOpen, setIsSidebarOpen, isTablet }: AppSid
             compact={false}
             showLanguageSwitcher={false}
             userId={userId}
+            menuSide="top"
           />
           <Button variant="ghost" size="icon" className="h-8 w-8 mt-2" onClick={closeSidebar}>
             <ChevronLeft className="text-icon" />
@@ -345,19 +378,20 @@ export function AppSidebar({ isSidebarOpen, setIsSidebarOpen, isTablet }: AppSid
   const renderMobileFooter = () => {
     if (!isTablet) return null;
     return (
-      <footer className="fixed bottom-0 left-0 right-0 z-40 bg-background border-t border-border px-2 py-2 flex items-center justify-around">
-        {renderMenuItems(true)}
-        <div className="flex items-center gap-1">
-          <ProfileSection
-            loading={loading}
-            fullName={fullName}
-            avatar={avatar}
-            initial={initial}
-            compact
-            showLanguageSwitcher={false}
-            userId={userId}
-          />
+      <footer className="fixed bottom-0 left-0 right-0 z-40 bg-background border-t border-border px-2 py-2 flex flex-col items-center gap-1">
+        <div className="flex flex-wrap justify-center items-center gap-1">
+          {renderMenuItems(true)}
         </div>
+        <ProfileSection
+          loading={loading}
+          fullName={fullName}
+          avatar={avatar}
+          initial={initial}
+          compact
+          showLanguageSwitcher={false}
+          userId={userId}
+          menuSide="top"
+        />
       </footer>
     );
   };
