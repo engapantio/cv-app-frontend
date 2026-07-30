@@ -37,10 +37,10 @@ export function CvSkillsClient({ cvId }: { cvId: string }) {
 
   if (skillsByCategory.length === 0) {
     return (
-      <div className="mx-auto w-full max-w-[900px]">
+      <div className="mx-auto w-full max-w-225">
         <div className="text-center text-muted-foreground py-8">No skills assigned yet.</div>
         {canMutate && (
-          <div className="flex justify-end items-center gap-6 pl-[40px] pr-6 py-4">
+          <div className="flex justify-end items-center gap-6 pl-10 pr-6 py-4">
             <button
               type="button"
               onClick={() => setAddDialogOpen(true)}
@@ -63,14 +63,14 @@ export function CvSkillsClient({ cvId }: { cvId: string }) {
   }
 
   return (
-    <div className="mx-auto w-full max-w-[900px]">
+    <div className="mx-auto w-full max-w-225">
       <div>
         {skillsByCategory.map((category) => (
           <div key={category.categoryId}>
             <div className="text-base font-normal leading-normal pl-0 min-[1440px]:pl-6 pt-3 pb-1.5 text-foreground">
               {category.categoryName}
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-3 gap-y-11 pl-0 min-[1440px]:pl-[40px] pr-6 pt-8 pb-[42px]">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-3 gap-y-11 pl-0 min-[1440px]:pl-10 pr-6 pt-8 pb-10.5">
               {category.skills.map((skill) => {
                 const config = MASTERY_MAP[skill.mastery as Mastery] ?? MASTERY_MAP.Novice;
                 const isSelected = selectedSkills.has(skill.name);
@@ -131,7 +131,7 @@ export function CvSkillsClient({ cvId }: { cvId: string }) {
       </div>
 
       {canMutate && (
-        <div className="flex justify-end items-center gap-6 pl-[40px] pr-6 py-4">
+        <div className="flex justify-end items-center gap-6 pl-10 pr-6 py-4">
           {!removeMode ? (
             <>
               <button

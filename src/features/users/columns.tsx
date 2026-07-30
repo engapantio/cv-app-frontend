@@ -26,6 +26,14 @@ const SortableHeader = ({ column, label }: { column: Column<User, unknown>; labe
 
 export const usersColumns: ColumnDef<User, unknown>[] = [
   {
+    id: "id",
+    accessorKey: "id",
+    enableSorting: true,
+    enableGlobalFilter: false,
+    enableHiding: true,
+    enableColumnFilter: false,
+  },
+  {
     id: "avatar",
     header: "",
     enableSorting: false,

@@ -1,0 +1,316 @@
+"use client";
+
+import { useState, useCallback } from "react";
+import { format } from "date-fns";
+import { CalendarIcon, ChevronDown, ChevronUp, X } from "lucide-react";
+import { toast } from "sonner";
+import { cn } from "@/lib/utils";
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  Input,
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  Calendar,
+} from "@/components/ui";
+
+interface CreateProjectDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  allSkills: string[];
+  onConfirm: (data: {
+    name: string;
+    domain: string;
+    start_date: string;
+    end_date: string | null;
+    description: string;
+    environment: string[];
+  }) => Promise<void>;
+  loading: boolean;
+}
+
+export function CreateProjectDialog({
+  open,
+  onOpenChange,
+  allSkills,
+  onConfirm,
+  loading,
+}: CreateProjectDialogProps) {
+  const [name, setName] = useState("");
+  const [domain, setDomain] = useState("");
+  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
+  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
+  const [description, setDescription] = useState("");
+  const [selectedEnv, setSelectedEnv] = useState<string[]>([]);
+  const [envOpen, setEnvOpen] = useState(false);
+
+  const [startDateOpen, setStartDateOpen] = useState(false);
+  const [endDateOpen, setEndDateOpen] = useState(false);
+
+  const reset = useCallback(() => {
+    setName("");
+    setDomain("");
+    setStartDate(undefined);
+    setEndDate(undefined);
+    setDescription("");
+    setSelectedEnv([]);
+  }, []);
+
+  const toggleEnv = useCallback((skill: string) => {
+    setSelectedEnv((prev) =>
+      prev.includes(skill) ? prev.filter((s) => s !== skill) : [...prev, skill],
+    );
+  }, []);
+
+  const removeEnv = useCallback((skill: string) => {
+    setSelectedEnv((prev) => prev.filter((s) => s !== skill));
+  }, []);
+
+  const handleConfirm = useCallback(async () => {
+    if (!name || !domain || !startDate || !description) {
+      toast.error("Please fill all required fields");
+      return;
+    }
+    try {
+      await onConfirm({
+        name,
+        domain,
+        start_date: startDate.toISOString(),
+        end_date: endDate ? endDate.toISOString() : null,
+        description,
+        environment: selectedEnv,
+      });
+      reset();
+    } catch {
+      toast.error("Failed to create project");
+    }
+  }, [name, domain, startDate, endDate, description, selectedEnv, onConfirm, reset]);
+
+  return (
+    <Dialog
+      open={open}
+      onOpenChange={(o) => {
+        if (!o) reset();
+        onOpenChange(o);
+      }}
+    >
+      <DialogContent showCloseButton className="sm:max-w-xl bg-card border-border rounded-none">
+        <DialogHeader>
+          <DialogTitle className="text-left text-base font-semibold">Create project</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-5">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="relative rounded-none border border-border transition-colors focus-within:border-primary">
+              <Input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder=" "
+                className="peer border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none h-12"
+              />
+              <span className="absolute left-3 bg-background px-1 text-xs text-muted-foreground transition-all duration-200 pointer-events-none peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-sm peer-focus:-top-2.5 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-primary -top-2.5 translate-y-0">
+                Project
+              </span>
+            </div>
+            <div className="relative rounded-none border border-border transition-colors focus-within:border-primary">
+              <Input
+                value={domain}
+                onChange={(e) => setDomain(e.target.value)}
+                placeholder=" "
+                className="peer border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none h-12"
+              />
+              <span className="absolute left-3 bg-background px-1 text-xs text-muted-foreground transition-all duration-200 pointer-events-none peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-sm peer-focus:-top-2.5 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-primary -top-2.5 translate-y-0">
+                Domain
+              </span>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
+              <span
+                className={cn(
+                  "absolute left-3 bg-background px-1 text-xs transition-all duration-200 pointer-events-none z-10",
+                  startDate || startDateOpen
+                    ? "-top-2.5 translate-y-0 text-xs text-foreground group-focus-within:text-primary"
+                    : "top-1/2 -translate-y-1/2 text-sm text-muted-foreground",
+                )}
+              >
+                Start Date
+              </span>
+              <Popover open={startDateOpen} onOpenChange={setStartDateOpen}>
+                <PopoverTrigger
+                  render={
+                    <Button
+                      variant="ghost"
+                      className="w-full border-0 bg-transparent shadow-none rounded-none h-12 justify-start text-left font-normal"
+                    >
+                      {startDate ? format(startDate, "dd/MM/yyyy") : ""}
+                      <CalendarIcon className="ml-auto size-4 text-muted-foreground" />
+                    </Button>
+                  }
+                />
+                <PopoverContent align="start" className="w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    selected={startDate}
+                    onSelect={(d) => {
+                      setStartDate(d);
+                      setStartDateOpen(false);
+                    }}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+            <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
+              <span
+                className={cn(
+                  "absolute left-3 bg-background px-1 text-xs transition-all duration-200 pointer-events-none z-10",
+                  endDate || endDateOpen
+                    ? "-top-2.5 translate-y-0 text-xs text-foreground group-focus-within:text-primary"
+                    : "top-1/2 -translate-y-1/2 text-sm text-muted-foreground",
+                )}
+              >
+                End Date
+              </span>
+              <Popover open={endDateOpen} onOpenChange={setEndDateOpen}>
+                <PopoverTrigger
+                  render={
+                    <Button
+                      variant="ghost"
+                      className="w-full border-0 bg-transparent shadow-none rounded-none h-12 justify-start text-left font-normal"
+                    >
+                      {endDate ? format(endDate, "dd/MM/yyyy") : ""}
+                      <CalendarIcon className="ml-auto size-4 text-muted-foreground" />
+                    </Button>
+                  }
+                />
+                <PopoverContent align="start" className="w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    selected={endDate}
+                    onSelect={(d) => {
+                      setEndDate(d);
+                      setEndDateOpen(false);
+                    }}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+          </div>
+          <div className="relative rounded-none border border-border transition-colors focus-within:border-primary">
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder=" "
+              className="peer flex w-full bg-transparent px-4 pt-6 pb-3 text-sm focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 border-0 min-h-30 resize-none"
+            />
+            <span className="absolute left-3 bg-background px-1 text-xs text-muted-foreground transition-all duration-200 pointer-events-none peer-placeholder-shown:top-4 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-sm peer-focus:-top-2.5 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-primary -top-2.5 translate-y-0">
+              Description
+            </span>
+          </div>
+          <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
+            <span
+              className={cn(
+                "absolute left-3 bg-background px-1 text-xs transition-all duration-200 pointer-events-none z-10",
+                selectedEnv.length > 0 || envOpen
+                  ? "-top-2.5 translate-y-0 text-xs text-foreground group-focus-within:text-primary"
+                  : "top-1/2 -translate-y-1/2 text-sm text-muted-foreground",
+              )}
+            >
+              Environment
+            </span>
+            <Popover open={envOpen} onOpenChange={setEnvOpen}>
+              <PopoverTrigger
+                render={
+                  <Button
+                    variant="ghost"
+                    className="w-full border-0 bg-transparent shadow-none rounded-none h-auto min-h-12 py-2.5 justify-start text-left font-normal items-start"
+                  >
+                    <div className="flex flex-wrap gap-1 flex-1">
+                      {selectedEnv.map((skill) => (
+                        <span
+                          key={skill}
+                          className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm bg-[#e0e0e0] dark:bg-[#4a4a4a] text-black dark:text-white"
+                        >
+                          {skill}
+                          <span
+                            role="button"
+                            tabIndex={0}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              removeEnv(skill);
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" || e.key === " ") {
+                                e.stopPropagation();
+                                removeEnv(skill);
+                              }
+                            }}
+                            className="ml-0.5 rounded-full p-0.5 bg-[#666] dark:bg-[#aaa] text-white dark:text-black cursor-pointer hover:opacity-80 inline-flex items-center justify-center"
+                          >
+                            <X className="size-3" />
+                          </span>
+                        </span>
+                      ))}
+                    </div>
+                    {envOpen ? (
+                      <ChevronUp className="ml-auto size-4 text-muted-foreground shrink-0 mt-1.5" />
+                    ) : (
+                      <ChevronDown className="ml-auto size-4 text-muted-foreground shrink-0 mt-1.5" />
+                    )}
+                  </Button>
+                }
+              />
+              <PopoverContent
+                align="start"
+                className="w-72 p-1 max-h-60 overflow-y-auto rounded-lg bg-popover text-sm shadow-md ring-1 ring-foreground/10"
+              >
+                <div className="space-y-0.5">
+                  {allSkills.map((skill) => (
+                    <label
+                      key={skill}
+                      className="relative flex w-full cursor-pointer items-center gap-2 rounded-md py-1.5 pr-8 pl-2 text-sm outline-hidden hover:bg-muted"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedEnv.includes(skill)}
+                        onChange={() => toggleEnv(skill)}
+                        className="size-4"
+                      />
+                      {skill}
+                    </label>
+                  ))}
+                  {allSkills.length === 0 && (
+                    <p className="text-sm text-muted-foreground px-2 py-2">No skills available</p>
+                  )}
+                </div>
+              </PopoverContent>
+            </Popover>
+          </div>
+        </div>
+        <DialogFooter className="gap-3 border-t-0 bg-transparent mx-0 mb-0 py-0">
+          <Button
+            type="button"
+            variant="ghost"
+            className="uppercase min-w-30 border border-border py-1.5"
+            onClick={() => onOpenChange(false)}
+          >
+            CANCEL
+          </Button>
+          <Button
+            type="submit"
+            className="uppercase text-white min-w-30 py-1.5 hover:brightness-90"
+            style={{ backgroundColor: "#e53935" }}
+            disabled={!name || !domain || !startDate || !description || loading}
+            onClick={handleConfirm}
+          >
+            {loading ? "CREATING..." : "CREATE"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}

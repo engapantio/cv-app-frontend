@@ -83,7 +83,7 @@ export function CvsTable({
           {canCreate && (
             <Button
               variant="ghost"
-              className="uppercase text-primary hover:text-primary hover:bg-transparent text-sm font-medium cursor-pointer"
+              className="uppercase text-primary hover:text-primary text-sm font-medium cursor-pointer"
               onClick={() => setCreateOpen(true)}
             >
               +<span className="hidden md:inline">&nbsp;CREATE CV</span>

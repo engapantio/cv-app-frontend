@@ -44,7 +44,7 @@ export function DataTable<T, V>({
   isLoading = false,
   emptyMessage = "No data found.",
 }: DataTableProps<T, V>) {
-  const [sorting, setSorting] = useState<SortingState>([]);
+  const [sorting, setSorting] = useState<SortingState>([{ id: "id", desc: true }]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
 
@@ -52,6 +52,7 @@ export function DataTable<T, V>({
   const table = useReactTable({
     data,
     columns,
+    initialState: { columnVisibility: { id: false } },
     state: {
       sorting,
       columnFilters,

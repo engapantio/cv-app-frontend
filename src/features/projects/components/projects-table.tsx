@@ -31,18 +31,18 @@ import {
 import { generatePagination } from "@/lib/utils/pagination";
 import { ProjectRow } from "./project-row";
 import { createProjectColumns } from "../columns";
-import type { CvProjectItem } from "../hooks/use-cv-projects-page";
+import type { ProjectItem } from "../hooks/use-projects-page";
 
 interface ProjectsTableProps {
   loading: boolean;
-  projects: CvProjectItem[];
+  projects: ProjectItem[];
   canMutate: boolean;
   globalFilter: string;
   setGlobalFilter: (value: string) => void;
-  onAdd: () => void;
-  onOpen: (project: CvProjectItem) => void;
-  onUpdate: (project: CvProjectItem) => void;
-  onRemove: (project: CvProjectItem) => void;
+  onCreate: () => void;
+  onOpen: (project: ProjectItem) => void;
+  onUpdate: (project: ProjectItem) => void;
+  onDelete: (project: ProjectItem) => void;
   serverError?: string | null;
 }
 
@@ -52,17 +52,17 @@ export function ProjectsTable({
   canMutate,
   globalFilter,
   setGlobalFilter,
-  onAdd,
+  onCreate,
   onOpen,
   onUpdate,
-  onRemove,
+  onDelete,
   serverError,
 }: ProjectsTableProps) {
   const [sorting, setSorting] = useState<SortingState>([{ id: "id", desc: true }]);
 
   const columns = useMemo(() => createProjectColumns(), []);
 
-  // eslint-disable-next-line react-hooks/incompatible-library
+  // eslint-disable-next-line react-hooks/incompatible-library -- TanStack Table requires the table instance to be created directly.
   const table = useReactTable({
     data: projects,
     columns,
@@ -101,9 +101,9 @@ export function ProjectsTable({
           <Button
             variant="ghost"
             className="uppercase text-primary hover:text-primary text-sm font-medium cursor-pointer"
-            onClick={onAdd}
+            onClick={onCreate}
           >
-            +<span className="hidden md:inline">&nbsp;ADD PROJECT</span>
+            +<span className="hidden md:inline">&nbsp;CREATE PROJECT</span>
           </Button>
         )}
       </div>
@@ -169,7 +169,7 @@ export function ProjectsTable({
                 isLast={idx === rows.length - 1}
                 onOpen={onOpen}
                 onUpdate={onUpdate}
-                onRemove={onRemove}
+                onDelete={onDelete}
               />
             ))
           )}
