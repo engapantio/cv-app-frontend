@@ -188,7 +188,7 @@ function MenuItem({
   isMobile,
   onClick,
 }: {
-  item: (typeof menuItems)[0];
+  item: { href: string; label: string; icon: React.ElementType };
   isActive: boolean;
   isMobile: boolean;
   onClick: () => void;
