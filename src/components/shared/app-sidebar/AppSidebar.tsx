@@ -35,19 +35,13 @@ import {
 import { GET_ME, GetMeResponse } from "@/lib/graphql/queries/me.queries";
 import { Container } from "../container";
 import { useTheme } from "next-themes";
+import { useSession } from "@/lib/auth/session";
 
 interface AppSidebarProps {
   isSidebarOpen: boolean;
   setIsSidebarOpen: (open: boolean) => void;
   isTablet: boolean;
 }
-
-const menuItems = [
-  { href: "/users", label: "Employees", icon: Users },
-  { href: "/skills", label: "Skills", icon: TrendingUp },
-  { href: "/languages", label: "Languages", icon: Languages },
-  { href: "/cvs", label: "CVs", icon: FileUser },
-];
 
 const LANGUAGES = ["EN", "PL", "RU"];
 
@@ -78,32 +72,6 @@ function ThemeToggle() {
     </Button>
   );
 }
-
-const getUserIdFromCookie = (): string | null => {
-  if (typeof document === "undefined") return null;
-  const cookie = document.cookie.split("; ").find((row) => row.startsWith("cv_session_user="));
-  if (!cookie) return null;
-  try {
-    let value = cookie.split("=")[1];
-    while (value.includes("%")) {
-      try {
-        const decoded = decodeURIComponent(value);
-        if (decoded === value) break;
-        value = decoded;
-      } catch {
-        break;
-      }
-    }
-    if (value.startsWith("{") && value.endsWith("}")) {
-      const parsed = JSON.parse(value);
-      return parsed?.id || null;
-    }
-    return null;
-  } catch (e) {
-    console.error("[AppSidebar] Error parsing cookie:", e);
-    return null;
-  }
-};
 
 const isActivePath = (pathname: string, href: string): boolean => {
   if (pathname === href || pathname === href + "/") {
@@ -212,7 +180,7 @@ function MenuItem({
   isMobile,
   onClick,
 }: {
-  item: (typeof menuItems)[0];
+  item: { href: string; label: string; icon: React.ElementType };
   isActive: boolean;
   isMobile: boolean;
   onClick: () => void;
@@ -239,7 +207,8 @@ function MenuItem({
 
 export function AppSidebar({ isSidebarOpen, setIsSidebarOpen, isTablet }: AppSidebarProps) {
   const pathname = usePathname();
-  const userId = getUserIdFromCookie();
+  const { user: sessionUser } = useSession();
+  const userId = sessionUser?.id || null;
   const { data, loading, error } = useQuery<GetMeResponse>(GET_ME, {
     variables: { userId },
     skip: !userId,
@@ -252,6 +221,15 @@ export function AppSidebar({ isSidebarOpen, setIsSidebarOpen, isTablet }: AppSid
     "";
   const avatar = user?.profile?.avatar;
   const initial = fullName ? fullName[0].toUpperCase() : "";
+
+  const menuItems = [
+    { href: "/users", label: "Employees", icon: Users },
+    { href: "/skills", label: "Skills", icon: TrendingUp },
+    ...(userId
+      ? [{ href: `/users/${userId}/languages`, label: "Languages", icon: Languages }]
+      : []),
+    { href: "/cvs", label: "CVs", icon: FileUser },
+  ];
 
   const closeSidebar = () => setIsSidebarOpen(false);
 
