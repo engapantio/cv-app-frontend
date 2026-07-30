@@ -1,6 +1,6 @@
 "use client";
 
-import { Inbox, Search } from "lucide-react";
+import { Inbox } from "lucide-react";
 import { type Table, flexRender } from "@tanstack/react-table";
 import {
   Table as UITable,
@@ -9,7 +9,6 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  Input,
   Button,
   Pagination,
   PaginationContent,
@@ -23,6 +22,7 @@ import { cn } from "@/lib/utils";
 import type { SkillItem } from "@/features/skills/types";
 import type { SkillCategoriesQuery } from "@/gql/generated/graphql";
 import { OpenSkillOverlay } from "./open-skill-overlay";
+import { SearchBar } from "@/components/shared/search-bar";
 import { CreateSkillDialog } from "./create-skill-dialog";
 import { UpdateSkillDialog } from "./update-skill-dialog";
 import { DeleteSkillDialog } from "./delete-skill-dialog";
@@ -92,15 +92,7 @@ export function SkillsTable({
     <>
       <div className="space-y-4">
         <div className="flex items-center justify-between gap-3">
-          <div className="relative max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-            <Input
-              placeholder="Search"
-              value={globalFilter ?? ""}
-              onChange={(e) => setGlobalFilter(e.target.value)}
-              className="pl-10 rounded-[40px] placeholder:text-muted-foreground"
-            />
-          </div>
+          <SearchBar value={globalFilter} onChange={setGlobalFilter} />
           {isAdmin && (
             <Button
               variant="ghost"
@@ -185,7 +177,7 @@ export function SkillsTable({
                         <TableCell
                           key={cell.id}
                           className={cn(
-                            "max-md:py-2 md:max-[1439px]:py-3 min-[1440px]:py-4 font-semibold",
+                            "max-md:py-2 md:max-[1439px]:py-3 min-[1440px]:py-4",
                             (cell.column.columnDef.meta as { className?: string } | undefined)
                               ?.className ?? "",
                           )}
@@ -244,6 +236,7 @@ export function SkillsTable({
       />
 
       <UpdateSkillDialog
+        key={updateTarget ? "update-" + updateTarget.id : "update-closed"}
         target={updateTarget}
         onClose={() => setUpdateTarget(null)}
         categories={categories}

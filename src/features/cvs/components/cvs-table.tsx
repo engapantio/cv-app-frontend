@@ -1,6 +1,6 @@
 "use client";
 
-import { Inbox, Search } from "lucide-react";
+import { Inbox } from "lucide-react";
 import { type Table, flexRender } from "@tanstack/react-table";
 import {
   Table as UITable,
@@ -9,7 +9,6 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  Input,
   Button,
   Pagination,
   PaginationContent,
@@ -19,6 +18,8 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui";
+import { type CreateCvMutation } from "@/gql/generated/graphql";
+import { SearchBar } from "@/components/shared/search-bar";
 import { CreateCvDialog } from "@/features/cvs/components/create-cv-dialog";
 import { DeleteCvDialog } from "@/features/cvs/components/delete-cv-dialog";
 import { cn } from "@/lib/utils";
@@ -33,7 +34,7 @@ interface CvsTableProps {
   createOpen: boolean;
   setCreateOpen: (open: boolean) => void;
   deleteTarget: CvItem | null;
-  handleCreated: () => void;
+  handleCreated: (newCv: CreateCvMutation["createCv"]) => void;
   handleDeleted: (cvId: string) => void;
   globalFilter: string;
   setGlobalFilter: (value: string) => void;
@@ -71,15 +72,7 @@ export function CvsTable({
     <>
       <div className="space-y-4">
         <div className="flex items-center justify-between gap-3">
-          <div className="relative max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-            <Input
-              placeholder="Search"
-              value={globalFilter ?? ""}
-              onChange={(e) => setGlobalFilter(e.target.value)}
-              className="pl-10 rounded-[40px] placeholder:text-muted-foreground"
-            />
-          </div>
+          <SearchBar value={globalFilter} onChange={setGlobalFilter} />
           {canCreate && (
             <Button
               variant="ghost"

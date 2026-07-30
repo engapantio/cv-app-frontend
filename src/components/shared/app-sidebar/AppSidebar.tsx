@@ -205,7 +205,7 @@ function MenuItem({
   isMobile,
   onClick,
 }: {
-  item: (typeof menuItems)[0];
+  item: MenuItemData;
   isActive: boolean;
   isMobile: boolean;
   onClick: () => void;
@@ -252,8 +252,8 @@ export function AppSidebar({ isSidebarOpen, setIsSidebarOpen, isTablet }: AppSid
           : item,
       );
 
-  const renderMenuItems = (isMobile: boolean) =>
-    menuItems.map((item) => (
+  const renderMenuItems = (isMobile: boolean, showDivider = false) => {
+    const items = menuItems.map((item) => (
       <MenuItem
         key={item.href}
         item={item}
@@ -262,6 +262,21 @@ export function AppSidebar({ isSidebarOpen, setIsSidebarOpen, isTablet }: AppSid
         onClick={() => {}}
       />
     ));
+
+    if (showDivider && isAdmin) {
+      const beforeDepartments = items.slice(0, 3);
+      const afterDepartments = items.slice(3);
+      return (
+        <>
+          {beforeDepartments}
+          <div className="border-b border-border my-2" />
+          {afterDepartments}
+        </>
+      );
+    }
+
+    return items;
+  };
 
   const renderDesktopHeader = () => {
     if (isTablet || isSidebarOpen) return null;
@@ -307,7 +322,7 @@ export function AppSidebar({ isSidebarOpen, setIsSidebarOpen, isTablet }: AppSid
         }}
       >
         <SidebarContent>
-          <SidebarMenu className="mt-10">{renderMenuItems(false)}</SidebarMenu>
+          <SidebarMenu className="mt-10">{renderMenuItems(false, true)}</SidebarMenu>
         </SidebarContent>
         <SidebarFooter>
           <ProfileSection

@@ -162,7 +162,7 @@ export function useCvSkillsPage(cvId: string) {
           skill: { cvId, name: skillName, mastery, categoryId },
         },
       });
-      await refetchCv();
+      refetchCv();
     },
     [addCvSkill, cvId, refetchCv, skillCategoryMap],
   );
@@ -177,7 +177,7 @@ export function useCvSkillsPage(cvId: string) {
           skill: { cvId, name: skillName, mastery, categoryId },
         },
       });
-      await refetchCv();
+      refetchCv();
     },
     [updateCvSkill, cvId, refetchCv, skillCategoryMap],
   );
@@ -193,7 +193,7 @@ export function useCvSkillsPage(cvId: string) {
       });
       setSelectedSkills(new Set());
       setRemoveMode(false);
-      await refetchCv();
+      refetchCv();
     } catch {
       toast.error("Failed to delete skills");
     }

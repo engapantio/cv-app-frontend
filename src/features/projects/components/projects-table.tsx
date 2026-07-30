@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Search, Inbox } from "lucide-react";
+import { Inbox } from "lucide-react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -18,7 +18,6 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  Input,
   Button,
   Pagination,
   PaginationContent,
@@ -28,6 +27,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui";
+import { SearchBar } from "@/components/shared/search-bar";
 import { generatePagination } from "@/lib/utils/pagination";
 import { ProjectRow } from "./project-row";
 import { createProjectColumns } from "../columns";
@@ -88,15 +88,7 @@ export function ProjectsTable({
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-3">
-        <div className="relative max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-          <Input
-            placeholder="Search"
-            value={globalFilter ?? ""}
-            onChange={(e) => setGlobalFilter(e.target.value)}
-            className="pl-10 rounded-[40px] placeholder:text-muted-foreground"
-          />
-        </div>
+        <SearchBar value={globalFilter} onChange={setGlobalFilter} />
         {canMutate && (
           <Button
             variant="ghost"

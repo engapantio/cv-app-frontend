@@ -46,7 +46,7 @@ export function ProjectRow({
           {formatDate(project.start_date)}
         </td>
         <td className="py-3 px-4 text-sm font-medium hidden xl:table-cell align-middle">
-          {project.end_date ? formatDate(project.end_date) : "Till now"}
+          {formatDate(project.end_date, "Till now")}
         </td>
         <td className="py-3 px-4 w-12 align-middle">
           <div className="flex justify-end" onClick={(e) => e.stopPropagation()}>

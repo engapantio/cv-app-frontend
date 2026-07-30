@@ -23,12 +23,12 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  Input,
   PaginationEllipsis,
   PaginationPrevious,
   PaginationNext,
 } from "@/components/ui";
-import { Inbox, Search } from "lucide-react";
+import { Inbox } from "lucide-react";
+import { SearchBar } from "@/components/shared/search-bar";
 import { generatePagination } from "@/lib/utils/pagination";
 
 interface DataTableProps<T, V> {
@@ -76,15 +76,7 @@ export function DataTable<T, V>({
 
   return (
     <div className="space-y-4">
-      <div className="relative max-w-sm">
-        <Search className="absolute left-3 top-3.5 h-5 w-5 text-icon" />
-        <Input
-          placeholder="Search"
-          value={globalFilter ?? ""}
-          onChange={(e) => setGlobalFilter(e.target.value)}
-          className="pl-10 rounded-[40px] text-foreground !bg-background"
-        />
-      </div>
+      <SearchBar value={globalFilter} onChange={setGlobalFilter} />
 
       <div>
         <Table className="[&_tr]:border-b-border">

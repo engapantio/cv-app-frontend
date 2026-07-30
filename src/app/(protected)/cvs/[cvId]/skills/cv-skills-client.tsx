@@ -84,7 +84,7 @@ export function CvSkillsClient({ cvId }: { cvId: string }) {
                         }
                       }}
                       className={
-                        "w-[113px] md:w-24 min-[1440px]:w-[79px] p-0 bg-transparent border-none shrink-0 " +
+                        "w-28.25 md:w-24 min-[1440px]:w-19.75 p-0 bg-transparent border-none shrink-0 " +
                         (!canMutate || removeMode ? "cursor-default " : "cursor-pointer ")
                       }
                       disabled={!canMutate || removeMode}
@@ -149,7 +149,7 @@ export function CvSkillsClient({ cvId }: { cvId: string }) {
                 style={{ color: "#C63031" }}
               >
                 <Trash2 className="h-4 w-4" />
-                REMOVE SKILL
+                REMOVE SKILLS
               </button>
             </>
           ) : (

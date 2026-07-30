@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useCallback, useEffect } from "react";
+import { useMemo, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@apollo/client/react";
 import type { DocumentNode } from "graphql";
@@ -12,7 +12,7 @@ import {
   getSortedRowModel,
   type SortingState,
 } from "@tanstack/react-table";
-import { type UserQuery } from "@/gql/generated/graphql";
+import { type UserQuery, type CreateCvMutation } from "@/gql/generated/graphql";
 import { usePermissions } from "@/lib/auth/permissions";
 import { createCvsColumns } from "@/features/cvs/columns";
 import { generatePagination } from "@/lib/utils/pagination";
@@ -22,7 +22,6 @@ type CvItem = NonNullable<UserQuery["user"]["cvs"]>[number];
 interface UseCvsTableParams {
   query: DocumentNode;
   variables?: Record<string, unknown>;
-  dataPath: (data: unknown) => CvItem[] | null | undefined;
   initialCvs: CvItem[];
   userId?: string;
   initialUserEmail?: string | null;
@@ -31,14 +30,13 @@ interface UseCvsTableParams {
 export function useCvsTable({
   query,
   variables,
-  dataPath,
   initialCvs,
   userId,
   initialUserEmail,
 }: UseCvsTableParams) {
   const router = useRouter();
 
-  const { data, loading, refetch } = useQuery(query, {
+  const { loading } = useQuery(query, {
     variables,
     fetchPolicy: "network-only",
     errorPolicy: "all",
@@ -48,17 +46,10 @@ export function useCvsTable({
 
   const [cvsList, setCvsList] = useState<CvItem[]>(initialCvs);
 
-  useEffect(() => {
-    const cvs = dataPath(data);
-    if (cvs) {
-      setCvsList(cvs);
-    }
-  }, [data, dataPath]);
-
   const [deleteTarget, setDeleteTarget] = useState<CvItem | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
 
-  const [sorting, setSorting] = useState<SortingState>([{ id: "id", desc: true }]);
+  const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
 
   const handleOpen = useCallback((cvId: string) => router.push(`/cvs/${cvId}/details`), [router]);
@@ -67,17 +58,13 @@ export function useCvsTable({
     setDeleteTarget(cv);
   }, []);
 
-  const handleDeleted = useCallback(
-    (cvId: string) => {
-      setCvsList((prev) => prev.filter((cv) => cv.id !== cvId));
-      refetch();
-    },
-    [refetch],
-  );
+  const handleDeleted = useCallback((cvId: string) => {
+    setCvsList((prev) => prev.filter((cv) => cv.id !== cvId));
+  }, []);
 
-  const handleCreated = useCallback(() => {
-    refetch();
-  }, [refetch]);
+  const handleCreated = useCallback((newCv: CreateCvMutation["createCv"]) => {
+    setCvsList((prev) => [newCv as CvItem, ...prev]);
+  }, []);
 
   const canCreate = userId != null ? currentUserId === userId || isAdmin : !!currentUser;
 
@@ -101,7 +88,6 @@ export function useCvsTable({
   const table = useReactTable({
     data: cvsList,
     columns,
-    initialState: { columnVisibility: { id: false } },
     state: { sorting, globalFilter },
     onSortingChange: setSorting,
     onGlobalFilterChange: setGlobalFilter,

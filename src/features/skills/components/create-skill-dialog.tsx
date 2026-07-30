@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { useMutation } from "@apollo/client/react";
+import { toast } from "sonner";
 import { CreateSkillDocument, type SkillCategoriesQuery } from "@/gql/generated/graphql";
 import {
   Button,
@@ -38,18 +39,19 @@ export function CreateSkillDialog({
   onCreated,
 }: CreateSkillDialogProps) {
   const [name, setName] = useState("");
-  const [categoryId, setCategoryId] = useState<string | null>(null);
+  const [selectedCategoryName, setSelectedCategoryName] = useState<string | null>(null);
 
   const [createSkill, { loading: creating }] = useMutation(CreateSkillDocument);
 
   const handleCreate = useCallback(async () => {
     if (!name.trim()) return;
     try {
+      const categoryId = categories.find((c) => c.name === selectedCategoryName)?.id ?? null;
       const { data } = await createSkill({
         variables: {
           skill: {
             name: name.trim(),
-            categoryId: categoryId || null,
+            categoryId,
           },
         },
       });
@@ -57,10 +59,12 @@ export function CreateSkillDialog({
         onCreated(data.createSkill);
       }
       setName("");
-      setCategoryId(null);
+      setSelectedCategoryName(null);
       onOpenChange(false);
-    } catch {}
-  }, [name, categoryId, createSkill, onCreated, onOpenChange]);
+    } catch {
+      toast.error("Failed to create skill");
+    }
+  }, [name, selectedCategoryName, categories, createSkill, onCreated, onOpenChange]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -85,13 +89,16 @@ export function CreateSkillDialog({
             <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-foreground transition-colors group-focus-within:text-primary">
               Category
             </span>
-            <Select value={categoryId ?? ""} onValueChange={(v) => setCategoryId(v || null)}>
+            <Select
+              value={selectedCategoryName ?? ""}
+              onValueChange={(v) => setSelectedCategoryName(v || null)}
+            >
               <SelectTrigger className="w-full border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none h-12 py-1 text-lg">
                 <SelectValue placeholder="Select category" />
               </SelectTrigger>
               <SelectContent>
                 {categories.map((cat) => (
-                  <SelectItem key={cat.id} value={cat.id}>
+                  <SelectItem key={cat.id} value={cat.name}>
                     {cat.name}
                   </SelectItem>
                 ))}

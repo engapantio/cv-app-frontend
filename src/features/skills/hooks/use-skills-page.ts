@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useMemo, useEffect } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useQuery, useMutation } from "@apollo/client/react";
 import {
   SkillsDocument,
@@ -28,7 +28,7 @@ import type { SkillItem } from "@/features/skills/types";
 export function useSkillsPage(initialSkills: SkillItem[]) {
   const { isAdmin } = usePermissions();
 
-  const { data, loading, refetch } = useQuery(SkillsDocument, {
+  const { loading } = useQuery(SkillsDocument, {
     fetchPolicy: "network-only",
     errorPolicy: "all",
   });
@@ -39,13 +39,6 @@ export function useSkillsPage(initialSkills: SkillItem[]) {
   });
 
   const [skillsList, setSkillsList] = useState<SkillItem[]>(initialSkills);
-
-  useEffect(() => {
-    const fetched = data?.skills;
-    if (fetched) {
-      setSkillsList(fetched);
-    }
-  }, [data]);
 
   const [deleteTarget, setDeleteTarget] = useState<SkillItem | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
@@ -67,48 +60,51 @@ export function useSkillsPage(initialSkills: SkillItem[]) {
     setDeleteTarget(skill);
   }, []);
 
+  const categories: SkillCategoriesQuery["skillCategories"] = useMemo(
+    () => categoriesData?.skillCategories ?? [],
+    [categoriesData],
+  );
+
   const [createSkill] = useMutation(CreateSkillDocument);
 
   const handleCreated = useCallback(
     (newSkill: CreateSkillMutation["createSkill"]) => {
+      const matched = categories.find((c) => c.name === newSkill.category_name);
       const item: SkillItem = {
         ...newSkill,
-        category: null,
+        category_parent_name: newSkill.category_parent_name ?? matched?.parent?.name ?? null,
+        category: matched ?? null,
       } as SkillItem;
       setSkillsList((prev) => [...prev, item]);
-      refetch();
     },
-    [refetch],
+    [categories],
   );
 
   const [updateSkill, { loading: updating }] = useMutation(UpdateSkillDocument);
 
   const handleUpdated = useCallback(
     (updated: UpdateSkillMutation["updateSkill"]) => {
+      const matched = categories.find((c) => c.name === updated.category_name);
       setSkillsList((prev) =>
         prev.map((s) =>
-          s.id === updated.id ? ({ ...updated, category: s.category } as SkillItem) : s,
+          s.id === updated.id
+            ? ({
+                ...updated,
+                category_parent_name: updated.category_parent_name ?? matched?.parent?.name ?? null,
+                category: matched ?? null,
+              } as SkillItem)
+            : s,
         ),
       );
-      refetch();
     },
-    [refetch],
+    [categories],
   );
 
   const [deleteSkill, { loading: deleting }] = useMutation(DeleteSkillDocument);
 
-  const handleDeleted = useCallback(
-    (skillId: string) => {
-      setSkillsList((prev) => prev.filter((s) => s.id !== skillId));
-      refetch();
-    },
-    [refetch],
-  );
-
-  const categories: SkillCategoriesQuery["skillCategories"] = useMemo(
-    () => categoriesData?.skillCategories ?? [],
-    [categoriesData],
-  );
+  const handleDeleted = useCallback((skillId: string) => {
+    setSkillsList((prev) => prev.filter((s) => s.id !== skillId));
+  }, []);
 
   const columns = useMemo(
     () =>
@@ -120,6 +116,7 @@ export function useSkillsPage(initialSkills: SkillItem[]) {
     [isAdmin, handleOpen, handleUpdate, handleDelete],
   );
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data: skillsList,
     columns,
