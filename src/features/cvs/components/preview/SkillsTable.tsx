@@ -72,7 +72,7 @@ export function SkillsTable({
                   style={{ color: fg, borderBottom: `1px solid ${borderColor}` }}
                 >
                   {skills.map((s, i) => (
-                    <Fragment key={i}>
+                    <Fragment key={s.name}>
                       {i > 0 && <br />}
                       {s.name}
                     </Fragment>

@@ -197,18 +197,17 @@ export function CvPreviewClient({
   const fullName = cv.user?.profile?.full_name ?? "Unknown";
   const positionName = cv.user?.position_name ?? "";
 
+  const fgStyle = { color: "var(--foreground)" } as const;
+
   return (
     <div className="mx-auto w-full max-w-225">
       <div className="flex items-start justify-between mb-8">
         <div>
-          <h1
-            className="text-[34px] font-normal leading-10.5 tracking-[0.25px]"
-            style={{ color: "var(--foreground)" }}
-          >
+          <h1 className="text-[34px] font-normal leading-10.5 tracking-[0.25px]" style={fgStyle}>
             {fullName}
           </h1>
           {positionName && (
-            <p className="text-base mt-1" style={{ color: "var(--foreground)" }}>
+            <p className="text-base mt-1" style={fgStyle}>
               {positionName}
             </p>
           )}
@@ -231,7 +230,7 @@ export function CvPreviewClient({
       <div className="grid grid-cols-1 md:grid-cols-[260px_1fr] min-[1440px]:grid-cols-[260px_592px] gap-x-4 gap-y-0">
         <div className="space-y-6">
           <CvSection label="Education">
-            <p className="text-base" style={{ color: "var(--foreground)" }}>
+            <p className="text-base" style={fgStyle}>
               {cv.education || "—"}
             </p>
           </CvSection>
@@ -249,7 +248,7 @@ export function CvPreviewClient({
           <CvSection
             label={`${positionName || "Professional"} with ${years ?? "N/A"} years of experience`}
           >
-            <p className="text-base leading-relaxed" style={{ color: "var(--foreground)" }}>
+            <p className="text-base leading-relaxed" style={fgStyle}>
               {cv.description}
             </p>
           </CvSection>
@@ -259,7 +258,7 @@ export function CvPreviewClient({
             return (
               <div key={catId} className="mt-4">
                 <CvSection label={catName}>
-                  <p className="text-base" style={{ color: "var(--foreground)" }}>
+                  <p className="text-base" style={fgStyle}>
                     {skills.map((s) => s.name).join(", ")}.
                   </p>
                 </CvSection>
@@ -273,7 +272,7 @@ export function CvPreviewClient({
         <>
           <h3
             className="text-[34px] font-normal leading-10.5 tracking-[0.25px] mt-12 mb-6"
-            style={{ color: "var(--foreground)" }}
+            style={fgStyle}
           >
             Projects
           </h3>
@@ -288,7 +287,7 @@ export function CvPreviewClient({
 
       <h3
         className="text-[34px] font-normal leading-10.5 tracking-[0.25px] mt-12 mb-6"
-        style={{ color: "var(--foreground)" }}
+        style={fgStyle}
       >
         Professional skills
       </h3>
