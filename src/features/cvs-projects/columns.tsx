@@ -7,6 +7,14 @@ import type { CvProjectItem } from "./hooks/use-cv-projects-page";
 export function createProjectColumns(): ColumnDef<CvProjectItem>[] {
   return [
     {
+      id: "id",
+      accessorKey: "id",
+      enableSorting: true,
+      enableGlobalFilter: false,
+      enableHiding: true,
+      enableColumnFilter: false,
+    },
+    {
       id: "name",
       header: ({ column }) => (
         <button

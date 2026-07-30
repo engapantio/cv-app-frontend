@@ -16,7 +16,6 @@ export function Pill({ text, variant = "muted" }: PillProps) {
         variant === "transparent" &&
           "bg-transparent text-black dark:text-white border border-current",
       )}
-      style={{ maxWidth: "25%" }}
       title={text}
     >
       {text}

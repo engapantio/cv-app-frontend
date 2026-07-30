@@ -58,7 +58,7 @@ export function ProjectsTable({
   onRemove,
   serverError,
 }: ProjectsTableProps) {
-  const [sorting, setSorting] = useState<SortingState>([]);
+  const [sorting, setSorting] = useState<SortingState>([{ id: "id", desc: true }]);
 
   const columns = useMemo(() => createProjectColumns(), []);
 
@@ -66,6 +66,7 @@ export function ProjectsTable({
   const table = useReactTable({
     data: projects,
     columns,
+    initialState: { columnVisibility: { id: false } },
     state: { sorting, globalFilter },
     onSortingChange: setSorting,
     onGlobalFilterChange: setGlobalFilter,

@@ -32,7 +32,10 @@ export default function ProjectsClient() {
   } = useProjectsPage();
 
   return (
-    <>
+    <main className="flex-1">
+      <div className="flex items-center h-11">
+        <h1 className="text-base text-foreground/70">Projects</h1>
+      </div>
       <ProjectsTable
         loading={loading}
         projects={projects}
@@ -78,6 +81,6 @@ export default function ProjectsClient() {
         onConfirm={handleDelete}
         loading={deleting}
       />
-    </>
+    </main>
   );
 }

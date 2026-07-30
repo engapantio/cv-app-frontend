@@ -58,7 +58,7 @@ export function useCvsTable({
   const [deleteTarget, setDeleteTarget] = useState<CvItem | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
 
-  const [sorting, setSorting] = useState<SortingState>([]);
+  const [sorting, setSorting] = useState<SortingState>([{ id: "id", desc: true }]);
   const [globalFilter, setGlobalFilter] = useState("");
 
   const handleOpen = useCallback((cvId: string) => router.push(`/cvs/${cvId}/details`), [router]);
@@ -101,6 +101,7 @@ export function useCvsTable({
   const table = useReactTable({
     data: cvsList,
     columns,
+    initialState: { columnVisibility: { id: false } },
     state: { sorting, globalFilter },
     onSortingChange: setSorting,
     onGlobalFilterChange: setGlobalFilter,

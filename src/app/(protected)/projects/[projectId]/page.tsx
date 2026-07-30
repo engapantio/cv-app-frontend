@@ -16,10 +16,13 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ projec
   const { projectId } = use(params);
   const { isAdmin } = usePermissions();
 
-  const { data, loading } = useQuery(ProjectDocument, {
+  const projectIdValid = !!projectId;
+
+  const { data, loading, error } = useQuery(ProjectDocument, {
     variables: { projectId },
     fetchPolicy: "network-only",
-    errorPolicy: "all",
+    errorPolicy: "none",
+    skip: !projectIdValid,
   });
 
   const { data: skillsData } = useQuery(SkillsDocument, {
@@ -53,6 +56,14 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ projec
     },
     [updateProject],
   );
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <p className="text-destructive">Project not found</p>
+      </div>
+    );
+  }
 
   if (loading) {
     return (

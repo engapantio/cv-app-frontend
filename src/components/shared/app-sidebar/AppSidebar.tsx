@@ -25,7 +25,7 @@ import {
   Languages,
   TrendingUp,
   FileUser,
-  FolderKanban,
+  Folders,
   Menu,
   Globe,
   ChevronLeft,
@@ -45,7 +45,7 @@ interface AppSidebarProps {
 
 const menuItems = [
   { href: "/users", label: "Employees", icon: Users },
-  { href: "/projects", label: "Projects", icon: FolderKanban, adminOnly: true as const },
+  { href: "/projects", label: "Projects", icon: Folders, adminOnly: true as const },
   { href: "/skills", label: "Skills", icon: TrendingUp },
   { href: "/languages", label: "Languages", icon: Languages },
   { href: "/cvs", label: "CVs", icon: FileUser },

@@ -32,8 +32,12 @@ export function useProjectsPage() {
   const [localProjects, setLocalProjects] = useState<ProjectItem[]>([]);
 
   const projects = useMemo(() => {
-    const items = localProjects.length > 0 ? localProjects : (data?.projects ?? []);
-    return [...items].sort(
+    const serverProjects = data?.projects ?? [];
+    const merged = new Map<string, ProjectItem>(serverProjects.map((p) => [p.id, p]));
+    for (const p of localProjects) {
+      merged.set(p.id, p);
+    }
+    return [...merged.values()].sort(
       (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
     );
   }, [data, localProjects]);
