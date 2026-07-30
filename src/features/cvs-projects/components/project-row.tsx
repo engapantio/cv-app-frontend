@@ -58,7 +58,10 @@ export function ProjectRow({
 
   return (
     <tbody className={cn("group", !isLast && "border-b border-border")}>
-      <tr className="cursor-pointer group-hover:bg-muted/50" onClick={() => onOpen(project)}>
+      <tr
+        className="cursor-pointer group-hover:bg-muted/50 dark:group-hover:bg-white/15"
+        onClick={() => onOpen(project)}
+      >
         <td className="py-3 px-4 text-sm font-medium align-middle">{project.name}</td>
         <td className="py-3 px-4 text-sm font-medium hidden max-md:hidden md:table-cell align-middle">
           {project.domain}
@@ -106,7 +109,10 @@ export function ProjectRow({
           </div>
         </td>
       </tr>
-      <tr className="cursor-pointer group-hover:bg-muted/50" onClick={() => onOpen(project)}>
+      <tr
+        className="cursor-pointer group-hover:bg-muted/50 dark:group-hover:bg-white/15"
+        onClick={() => onOpen(project)}
+      >
         <td
           colSpan={columnCount}
           className="px-4 pb-2 pt-0 text-sm text-muted-foreground whitespace-normal break-words"
@@ -114,7 +120,10 @@ export function ProjectRow({
           {project.description}
         </td>
       </tr>
-      <tr className="cursor-pointer group-hover:bg-muted/50" onClick={() => onOpen(project)}>
+      <tr
+        className="cursor-pointer group-hover:bg-muted/50 dark:group-hover:bg-white/15"
+        onClick={() => onOpen(project)}
+      >
         <td colSpan={columnCount} className="px-4 pb-3 pt-0">
           <div className="flex flex-wrap gap-2">
             {displayPills.map((pill, index) => (

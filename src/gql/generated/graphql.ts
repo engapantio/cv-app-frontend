@@ -427,7 +427,12 @@ export type CvQuery = {
     name: string;
     education: string | null;
     description: string;
-    user: { id: string; email: string } | null;
+    user: {
+      id: string;
+      email: string;
+      position_name: string | null;
+      profile: { id: string; full_name: string | null; avatar: string | null };
+    } | null;
     projects: Array<{
       id: string;
       name: string;
@@ -442,7 +447,7 @@ export type CvQuery = {
       project: { id: string; name: string; internal_name: string };
     }> | null;
     skills: Array<{ name: string; mastery: Mastery; categoryId: string | null }>;
-    languages: Array<{ __typename: "LanguageProficiency" }>;
+    languages: Array<{ name: string; proficiency: Proficiency }>;
   };
 };
 
@@ -1720,6 +1725,19 @@ export const CvDocument = {
                     selections: [
                       { kind: "Field", name: { kind: "Name", value: "id" } },
                       { kind: "Field", name: { kind: "Name", value: "email" } },
+                      { kind: "Field", name: { kind: "Name", value: "position_name" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "profile" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "full_name" } },
+                            { kind: "Field", name: { kind: "Name", value: "avatar" } },
+                          ],
+                        },
+                      },
                     ],
                   },
                 },
@@ -1771,7 +1789,10 @@ export const CvDocument = {
                   name: { kind: "Name", value: "languages" },
                   selectionSet: {
                     kind: "SelectionSet",
-                    selections: [{ kind: "Field", name: { kind: "Name", value: "__typename" } }],
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "name" } },
+                      { kind: "Field", name: { kind: "Name", value: "proficiency" } },
+                    ],
                   },
                 },
               ],

@@ -8,6 +8,12 @@ query Cv($cvId: ID!) {
     user {
       id
       email
+      position_name
+      profile {
+        id
+        full_name
+        avatar
+      }
     }
     projects {
       id
@@ -32,7 +38,8 @@ query Cv($cvId: ID!) {
       categoryId
     }
     languages {
-      __typename
+      name
+      proficiency
     }
   }
 }
