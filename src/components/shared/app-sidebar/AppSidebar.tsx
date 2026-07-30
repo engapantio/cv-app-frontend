@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useSyncExternalStore } from "react";
-import { useQuery } from "@apollo/client/react";
 import { cn } from "@/lib/utils";
 import {
   Button,
@@ -26,22 +25,31 @@ import {
   Languages,
   TrendingUp,
   FileUser,
+  Folders,
   Menu,
   Globe,
   ChevronLeft,
   Sun,
   Moon,
 } from "lucide-react";
-import { GET_ME, GetMeResponse } from "@/lib/graphql/queries/me.queries";
 import { Container } from "../container";
 import { useTheme } from "next-themes";
 import { useSession } from "@/lib/auth/session";
+import { usePermissions } from "@/lib/auth/permissions";
 
 interface AppSidebarProps {
   isSidebarOpen: boolean;
   setIsSidebarOpen: (open: boolean) => void;
   isTablet: boolean;
 }
+
+const menuItems = [
+  { href: "/users", label: "Employees", icon: Users },
+  { href: "/projects", label: "Projects", icon: Folders, adminOnly: true as const },
+  { href: "/skills", label: "Skills", icon: TrendingUp },
+  { href: "/languages", label: "Languages", icon: Languages },
+  { href: "/cvs", label: "CVs", icon: FileUser },
+];
 
 const LANGUAGES = ["EN", "PL", "RU"];
 
@@ -207,34 +215,22 @@ function MenuItem({
 
 export function AppSidebar({ isSidebarOpen, setIsSidebarOpen, isTablet }: AppSidebarProps) {
   const pathname = usePathname();
-  const { user: sessionUser } = useSession();
-  const userId = sessionUser?.id || null;
-  const { data, loading, error } = useQuery<GetMeResponse>(GET_ME, {
-    variables: { userId },
-    skip: !userId,
-  });
+  const { user, loading } = useSession();
+  const { isAdmin } = usePermissions();
 
-  const user = data?.user;
+  const userId = user?.id ?? null;
   const fullName =
     user?.profile?.full_name ||
     `${user?.profile?.first_name || ""} ${user?.profile?.last_name || ""}`.trim() ||
     "";
   const avatar = user?.profile?.avatar;
   const initial = fullName ? fullName[0].toUpperCase() : "";
-
-  const menuItems = [
-    { href: "/users", label: "Employees", icon: Users },
-    { href: "/skills", label: "Skills", icon: TrendingUp },
-    ...(userId
-      ? [{ href: `/users/${userId}/languages`, label: "Languages", icon: Languages }]
-      : []),
-    { href: "/cvs", label: "CVs", icon: FileUser },
-  ];
-
   const closeSidebar = () => setIsSidebarOpen(false);
 
+  const visibleMenuItems = menuItems.filter((item) => !item.adminOnly || isAdmin);
+
   const renderMenuItems = (isMobile: boolean) =>
-    menuItems.map((item) => (
+    visibleMenuItems.map((item) => (
       <MenuItem
         key={item.href}
         item={item}
@@ -262,7 +258,6 @@ export function AppSidebar({ isSidebarOpen, setIsSidebarOpen, isTablet }: AppSid
             <ThemeToggle />
             <ProfileSection
               loading={loading}
-              error={error}
               fullName={fullName}
               avatar={avatar}
               initial={initial}
@@ -294,7 +289,6 @@ export function AppSidebar({ isSidebarOpen, setIsSidebarOpen, isTablet }: AppSid
         <SidebarFooter>
           <ProfileSection
             loading={loading}
-            error={error}
             fullName={fullName}
             avatar={avatar}
             initial={initial}
@@ -318,7 +312,6 @@ export function AppSidebar({ isSidebarOpen, setIsSidebarOpen, isTablet }: AppSid
         <div className="flex items-center gap-1">
           <ProfileSection
             loading={loading}
-            error={error}
             fullName={fullName}
             avatar={avatar}
             initial={initial}

@@ -26,6 +26,14 @@ export function createCvsColumns(
 ): ColumnDef<CvItem>[] {
   return [
     {
+      id: "id",
+      accessorKey: "id",
+      enableSorting: true,
+      enableGlobalFilter: false,
+      enableHiding: true,
+      enableColumnFilter: false,
+    },
+    {
       id: "name",
       header: ({ column }) => (
         <button

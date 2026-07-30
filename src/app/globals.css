@@ -39,12 +39,12 @@
 }
 
 .dark {
-  --background: #121212;
+  --background: #353535;
   --foreground: #ffffff;
   --icon: rgba(255, 255, 255, 0.7);
-  --card: #121212;
+  --card: #353535;
   --card-foreground: #ffffff;
-  --popover: #121212;
+  --popover: #353535;
   --popover-foreground: #ffffff;
   --primary: #c63031;
   --primary-foreground: #ffffff;
@@ -90,6 +90,14 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-roboto), Arial, Helvetica, sans-serif;
+}
+
+.group:hover .row-highlight {
+  background-color: rgba(245, 245, 247, 0.5);
+}
+
+.dark .group:hover .row-highlight {
+  background-color: rgba(255, 255, 255, 0.15);
 }
 
 @theme inline {

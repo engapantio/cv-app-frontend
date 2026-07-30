@@ -83,7 +83,7 @@ export function CvsTable({
           {canCreate && (
             <Button
               variant="ghost"
-              className="uppercase text-primary hover:text-primary hover:bg-transparent text-sm font-medium cursor-pointer"
+              className="uppercase text-primary hover:text-primary text-sm font-medium cursor-pointer"
               onClick={() => setCreateOpen(true)}
             >
               +<span className="hidden md:inline">&nbsp;CREATE CV</span>
@@ -154,7 +154,7 @@ export function CvsTable({
                   className={cn("group", idx < rows.length - 1 && "[&_tr:last-child]:border-b")}
                 >
                   <TableRow
-                    className="cursor-pointer border-b-0 group-hover:bg-muted/50"
+                    className="cursor-pointer border-b-0 group-hover:bg-muted/50 dark:group-hover:bg-white/15"
                     onClick={() => handleOpen(row.original.id)}
                   >
                     {row.getVisibleCells().map((cell) => (
@@ -171,7 +171,7 @@ export function CvsTable({
                     ))}
                   </TableRow>
                   <TableRow
-                    className="cursor-pointer border-b-0 group-hover:bg-muted/50"
+                    className="cursor-pointer border-b-0 group-hover:bg-muted/50 dark:group-hover:bg-white/15"
                     onClick={() => handleOpen(row.original.id)}
                   >
                     <TableCell
