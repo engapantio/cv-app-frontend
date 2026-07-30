@@ -26,6 +26,8 @@ import {
   TrendingUp,
   FileUser,
   Folders,
+  Building,
+  Briefcase,
   Menu,
   Globe,
   ChevronLeft,
@@ -43,9 +45,18 @@ interface AppSidebarProps {
   isTablet: boolean;
 }
 
-const menuItems = [
+const adminMenuItems = [
   { href: "/users", label: "Employees", icon: Users },
-  { href: "/projects", label: "Projects", icon: Folders, adminOnly: true as const },
+  { href: "/projects", label: "Projects", icon: Folders },
+  { href: "/cvs", label: "CVs", icon: FileUser },
+  { href: "/departments", label: "Departments", icon: Building },
+  { href: "/positions", label: "Positions", icon: Briefcase },
+  { href: "/skills", label: "Skills", icon: TrendingUp },
+  { href: "/languages", label: "Languages", icon: Languages },
+];
+
+const employeeMenuItems = [
+  { href: "/users", label: "Employees", icon: Users },
   { href: "/skills", label: "Skills", icon: TrendingUp },
   { href: "/languages", label: "Languages", icon: Languages },
   { href: "/cvs", label: "CVs", icon: FileUser },
@@ -182,13 +193,19 @@ function ProfileSection({
   );
 }
 
+interface MenuItemData {
+  href: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+}
+
 function MenuItem({
   item,
   isActive,
   isMobile,
   onClick,
 }: {
-  item: { href: string; label: string; icon: React.ElementType };
+  item: (typeof menuItems)[0];
   isActive: boolean;
   isMobile: boolean;
   onClick: () => void;
@@ -227,10 +244,16 @@ export function AppSidebar({ isSidebarOpen, setIsSidebarOpen, isTablet }: AppSid
   const initial = fullName ? fullName[0].toUpperCase() : "";
   const closeSidebar = () => setIsSidebarOpen(false);
 
-  const visibleMenuItems = menuItems.filter((item) => !item.adminOnly || isAdmin);
+  const menuItems: MenuItemData[] = isAdmin
+    ? adminMenuItems
+    : employeeMenuItems.map((item) =>
+        item.label === "Skills"
+          ? { ...item, href: userId ? `/users/${userId}/skills` : item.href }
+          : item,
+      );
 
   const renderMenuItems = (isMobile: boolean) =>
-    visibleMenuItems.map((item) => (
+    menuItems.map((item) => (
       <MenuItem
         key={item.href}
         item={item}
