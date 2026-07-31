@@ -32,7 +32,7 @@ export function UserProfileClient({ user, isOwner }: UserProfileClientProps) {
   const tabs = [
     { name: "profile", href: `/users/${user.id}/profile` },
     { name: "skills", href: `/users/${user.id}/skills` },
-    // { name: "languages", href: `/users/${user.id}/languages` },
+    { name: "languages", href: `/users/${user.id}/languages` },
     { name: "cvs", href: `/users/${user.id}/cvs` },
   ];
 

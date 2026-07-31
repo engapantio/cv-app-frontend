@@ -9,22 +9,29 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui";
-import type { UserQuery } from "@/gql/generated/graphql";
+import type { SkillItem } from "./types";
 
-type CvItem = NonNullable<UserQuery["user"]["cvs"]>[number];
-
-interface CvActions {
-  onOpen: (cvId: string) => void;
-  onDelete: (cv: CvItem) => void;
+interface SkillActions {
+  onOpen: (skill: SkillItem) => void;
+  onUpdate: (skill: SkillItem) => void;
+  onDelete: (skill: SkillItem) => void;
 }
 
-export function createCvsColumns(
-  currentUserId: string | undefined,
+export function createSkillsColumns(
   isAdmin: boolean,
-  actions: CvActions,
-  userEmail?: string | null,
-): ColumnDef<CvItem>[] {
+  actions: SkillActions,
+): ColumnDef<SkillItem>[] {
   return [
+    {
+      id: "id",
+      accessorKey: "id",
+      enableSorting: true,
+      enableGlobalFilter: false,
+      enableHiding: false,
+      meta: { className: "hidden" },
+      header: () => null,
+      cell: () => null,
+    },
     {
       id: "name",
       header: ({ column }) => (
@@ -41,35 +48,36 @@ export function createCvsColumns(
       enableGlobalFilter: true,
     },
     {
-      id: "education",
+      id: "type",
       header: ({ column }) => (
         <button
           onClick={column.getToggleSortingHandler()}
           className="flex items-center gap-1 cursor-pointer font-medium"
         >
-          Education
+          Type
           {column.getIsSorted() === "asc" && <ArrowUp className="size-4" />}
           {column.getIsSorted() === "desc" && <ArrowDown className="size-4" />}
         </button>
       ),
-      accessorFn: (row) => row.education ?? "",
+      accessorFn: (row) => row.category_parent_name ?? "",
       enableGlobalFilter: true,
       meta: { className: "max-md:hidden" },
     },
     {
-      id: "employee",
+      id: "category",
       header: ({ column }) => (
         <button
           onClick={column.getToggleSortingHandler()}
           className="flex items-center gap-1 cursor-pointer font-medium"
         >
-          Employee
+          Category
           {column.getIsSorted() === "asc" && <ArrowUp className="size-4" />}
           {column.getIsSorted() === "desc" && <ArrowDown className="size-4" />}
         </button>
       ),
-      accessorFn: (row) => row.user?.email ?? userEmail ?? "",
+      accessorFn: (row) => row.category_name ?? "",
       enableGlobalFilter: true,
+      meta: { className: "max-md:hidden" },
     },
     {
       id: "actions",
@@ -77,10 +85,7 @@ export function createCvsColumns(
       enableSorting: false,
       enableGlobalFilter: false,
       cell: ({ row }) => {
-        const cv = row.original;
-        const isOwn = currentUserId === cv.user?.id;
-        const canMutate = isOwn || isAdmin;
-
+        const skill = row.original;
         return (
           <div className="flex justify-end" onClick={(e) => e.stopPropagation()}>
             <DropdownMenu>
@@ -93,21 +98,21 @@ export function createCvsColumns(
               />
               <DropdownMenuContent align="end" className="min-w-32">
                 <DropdownMenuItem
-                  onClick={() => actions.onOpen(cv.id)}
+                  onClick={() => actions.onOpen(skill)}
                   className="justify-center cursor-pointer"
                 >
                   Open
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  onClick={() => actions.onOpen(cv.id)}
-                  disabled={!canMutate}
+                  onClick={() => actions.onUpdate(skill)}
+                  disabled={!isAdmin}
                   className="justify-center cursor-pointer"
                 >
                   Update
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  onClick={() => actions.onDelete(cv)}
-                  disabled={!canMutate}
+                  onClick={() => actions.onDelete(skill)}
+                  disabled={!isAdmin}
                   variant="destructive"
                   className="justify-center cursor-pointer"
                 >

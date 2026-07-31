@@ -17,10 +17,6 @@ export function useCvsPage({
   return useCvsTable({
     query: UserDocument,
     variables: { userId },
-    dataPath: (data: unknown) => {
-      const d = data as { user?: { cvs?: CvItem[] } } | null;
-      return d?.user?.cvs;
-    },
     initialCvs,
     userId,
     initialUserEmail,
