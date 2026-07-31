@@ -1,37 +1,29 @@
-"use client";
-
-import { DataTable } from "@/components/shared/";
-import { Button } from "@/components/ui";
-import { usersColumns } from "@/features/users/columns";
-import { useDataTable } from "@/hooks/use-data-table";
-import { UsersDocument, type UsersQuery } from "@/gql/generated/graphql";
+import { createServerApolloClientForRequest } from "@/lib/apollo/server-client";
+import { UsersDocument } from "@/gql/generated/graphql";
 import { User } from "cv-graphql";
+import UsersClient from "./users-client";
 
-export default function UsersPage() {
-  const { data, isLoading, error, refetch } = useDataTable<UsersQuery, User>({
-    query: UsersDocument,
-    getData: (data) => data.users as User[],
-  });
+const INITIAL_PAGE_SIZE = 10;
 
-  if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center py-12 text-center">
-        <p className="text-muted-foreground mb-4">Failed to load users</p>
-        <Button variant="outline" onClick={() => refetch()}>
-          Try again
-        </Button>
-      </div>
-    );
+export default async function UsersPage() {
+  const { client } = await createServerApolloClientForRequest();
+
+  let initialUsers: User[] = [];
+  let serverError: string | null = null;
+
+  try {
+    const { data } = await client.query({
+      query: UsersDocument,
+      errorPolicy: "all",
+      fetchPolicy: "no-cache",
+    });
+    const users = (data?.users ?? []) as User[];
+    initialUsers = [...users]
+      .sort((a, b) => Number(b.id) - Number(a.id))
+      .slice(0, INITIAL_PAGE_SIZE);
+  } catch (e) {
+    serverError = e instanceof Error ? e.message : "Failed to load users";
   }
 
-  return (
-    <div className="flex min-h-screen w-full">
-      <main className="flex-1">
-        <div className="flex items-center h-11">
-          <h1 className="text-base text-foreground/70">Employees</h1>
-        </div>
-        <DataTable columns={usersColumns} data={data} isLoading={isLoading} />
-      </main>
-    </div>
-  );
+  return <UsersClient initialUsers={initialUsers} serverError={serverError} />;
 }

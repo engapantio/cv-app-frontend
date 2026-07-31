@@ -1,6 +1,7 @@
 import { Column, ColumnDef } from "@tanstack/react-table";
 import { User } from "cv-graphql";
-import { Avatar, AvatarFallback, AvatarImage, Button } from "@/components/ui";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import { ArrowDown, ArrowUp, ChevronRight } from "lucide-react";
 
 const SortableHeader = ({ column, label }: { column: Column<User, unknown>; label: string }) => {

@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { Inbox } from "lucide-react";
 import { type Table, flexRender } from "@tanstack/react-table";
 import {
@@ -9,7 +10,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  Button,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import {
   Pagination,
   PaginationContent,
   PaginationEllipsis,
@@ -17,13 +20,20 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/components/ui";
+} from "@/components/ui/pagination";
 import { type CreateCvMutation } from "@/gql/generated/graphql";
 import { SearchBar } from "@/components/shared/search-bar";
-import { CreateCvDialog } from "@/features/cvs/components/create-cv-dialog";
-import { DeleteCvDialog } from "@/features/cvs/components/delete-cv-dialog";
 import { cn } from "@/lib/utils";
 import type { CvItem } from "@/features/cvs/types";
+
+const CreateCvDialog = dynamic(
+  () => import("@/features/cvs/components/create-cv-dialog").then((m) => m.CreateCvDialog),
+  { loading: () => null },
+);
+const DeleteCvDialog = dynamic(
+  () => import("@/features/cvs/components/delete-cv-dialog").then((m) => m.DeleteCvDialog),
+  { loading: () => null },
+);
 
 interface CvsTableProps {
   loading: boolean;
@@ -214,18 +224,22 @@ export function CvsTable({
         )}
       </div>
 
-      <CreateCvDialog
-        open={createOpen}
-        onOpenChange={setCreateOpen}
-        userId={createUserId}
-        onCreated={handleCreated}
-      />
+      {createOpen && (
+        <CreateCvDialog
+          open={createOpen}
+          onOpenChange={setCreateOpen}
+          userId={createUserId}
+          onCreated={handleCreated}
+        />
+      )}
 
-      <DeleteCvDialog
-        target={deleteTarget}
-        onClose={() => setDeleteTarget(null)}
-        onDeleted={handleDeleted}
-      />
+      {deleteTarget && (
+        <DeleteCvDialog
+          target={deleteTarget}
+          onClose={() => setDeleteTarget(null)}
+          onDeleted={handleDeleted}
+        />
+      )}
     </>
   );
 }

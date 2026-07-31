@@ -1,12 +1,21 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { Trash2 } from "lucide-react";
 import { useCvSkillsPage } from "@/features/cvs-skills/hooks/use-cv-skills-page";
 import { MASTERY_MAP } from "@/features/cvs-skills/utils/mastery-mapping";
-import { AddSkillDialog } from "@/features/cvs-skills/components/add-skill-dialog";
-import { UpdateSkillDialog } from "@/features/cvs-skills/components/update-skill-dialog";
-import { Button } from "@/components/ui";
+import { Button } from "@/components/ui/button";
 import type { Mastery } from "@/gql/generated/graphql";
+
+const AddSkillDialog = dynamic(
+  () => import("@/features/cvs-skills/components/add-skill-dialog").then((m) => m.AddSkillDialog),
+  { loading: () => null },
+);
+const UpdateSkillDialog = dynamic(
+  () =>
+    import("@/features/cvs-skills/components/update-skill-dialog").then((m) => m.UpdateSkillDialog),
+  { loading: () => null },
+);
 
 export function CvSkillsClient({ cvId }: { cvId: string }) {
   const {
@@ -51,13 +60,15 @@ export function CvSkillsClient({ cvId }: { cvId: string }) {
             </button>
           </div>
         )}
-        <AddSkillDialog
-          open={addDialogOpen}
-          onOpenChange={setAddDialogOpen}
-          availableSkills={availableSkills}
-          onConfirm={handleAddSkill}
-          loading={addingSkill}
-        />
+        {addDialogOpen && (
+          <AddSkillDialog
+            open={addDialogOpen}
+            onOpenChange={setAddDialogOpen}
+            availableSkills={availableSkills}
+            onConfirm={handleAddSkill}
+            loading={addingSkill}
+          />
+        )}
       </div>
     );
   }
@@ -180,13 +191,15 @@ export function CvSkillsClient({ cvId }: { cvId: string }) {
         </div>
       )}
 
-      <AddSkillDialog
-        open={addDialogOpen}
-        onOpenChange={setAddDialogOpen}
-        availableSkills={availableSkills}
-        onConfirm={handleAddSkill}
-        loading={addingSkill}
-      />
+      {addDialogOpen && (
+        <AddSkillDialog
+          open={addDialogOpen}
+          onOpenChange={setAddDialogOpen}
+          availableSkills={availableSkills}
+          onConfirm={handleAddSkill}
+          loading={addingSkill}
+        />
+      )}
 
       {updateSkillTarget && (
         <UpdateSkillDialog

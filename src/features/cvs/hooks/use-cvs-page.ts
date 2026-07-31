@@ -17,6 +17,7 @@ export function useCvsPage({
   return useCvsTable({
     query: UserDocument,
     variables: { userId },
+    getData: (data) => data.user?.cvs ?? [],
     initialCvs,
     userId,
     initialUserEmail,

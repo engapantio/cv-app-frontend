@@ -20,7 +20,6 @@ export * from "./select";
 export * from "./field";
 export * from "./dropdown-menu";
 export * from "./dialog";
-export * from "./command";
 export * from "./combobox";
 export { Checkbox } from "./checkbox";
 export * from "./card";

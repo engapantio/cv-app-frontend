@@ -1,7 +1,7 @@
 "use client";
 
 import { Search } from "lucide-react";
-import { Input } from "@/components/ui";
+import { Input } from "@/components/ui/input";
 
 interface SearchBarProps {
   value: string;

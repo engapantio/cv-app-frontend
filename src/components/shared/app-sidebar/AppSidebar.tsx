@@ -4,23 +4,23 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useSyncExternalStore } from "react";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
-  Button,
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-  Skeleton,
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarMenu,
   SidebarMenuButton,
-} from "@/components/ui";
+} from "@/components/ui/sidebar";
 import {
   Users,
   Languages,
@@ -53,13 +53,13 @@ const adminMenuItems = [
   { href: "/departments", label: "Departments", icon: Building },
   { href: "/positions", label: "Positions", icon: Briefcase },
   { href: "/skills", label: "Skills", icon: TrendingUp },
-  { href: "/languages", label: "Languages", icon: Languages },
+  { href: "/users/languages", label: "Languages", icon: Languages, prefetch: false },
 ];
 
 const employeeMenuItems = [
   { href: "/users", label: "Employees", icon: Users },
   { href: "/skills", label: "Skills", icon: TrendingUp },
-  { href: "/languages", label: "Languages", icon: Languages },
+  { href: "/users/languages", label: "Languages", icon: Languages, prefetch: false },
   { href: "/cvs", label: "CVs", icon: FileUser },
 ];
 
@@ -229,6 +229,7 @@ interface MenuItemData {
   href: string;
   label: string;
   icon: React.ComponentType<{ className?: string }>;
+  prefetch?: boolean;
 }
 
 function MenuItem({
@@ -254,7 +255,12 @@ function MenuItem({
 
   return (
     <SidebarMenuButton className={baseClasses}>
-      <Link href={item.href} onClick={onClick} className="flex items-center gap-4 w-full h-full">
+      <Link
+        href={item.href}
+        prefetch={item.prefetch ?? true}
+        onClick={onClick}
+        className="flex items-center gap-4 w-full h-full"
+      >
         <item.icon className="h-4 w-4" />
         <span>{item.label}</span>
       </Link>
@@ -276,13 +282,9 @@ export function AppSidebar({ isSidebarOpen, setIsSidebarOpen, isTablet }: AppSid
   const initial = fullName ? fullName[0].toUpperCase() : "";
   const closeSidebar = () => setIsSidebarOpen(false);
 
-  const menuItems: MenuItemData[] = isAdmin
-    ? adminMenuItems
-    : employeeMenuItems.map((item) =>
-        item.label === "Skills"
-          ? { ...item, href: userId ? `/users/${userId}/skills` : item.href }
-          : item,
-      );
+  const menuItems: MenuItemData[] = (isAdmin ? adminMenuItems : employeeMenuItems).map((item) =>
+    item.label === "Languages" && userId ? { ...item, href: `/users/${userId}/languages` } : item,
+  );
 
   const renderMenuItems = (isMobile: boolean, showDivider = false) => {
     const items = menuItems.map((item) => (

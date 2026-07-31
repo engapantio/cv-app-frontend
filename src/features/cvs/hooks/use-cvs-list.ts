@@ -8,6 +8,7 @@ type CvItem = NonNullable<UserQuery["user"]["cvs"]>[number];
 export function useCvsListPage(initialCvs: CvItem[]) {
   return useCvsTable({
     query: CvsDocument,
+    getData: (data) => data.cvs ?? [],
     initialCvs,
   });
 }

@@ -31,7 +31,11 @@ function extractProjects(cv: CvQuery["cv"] | null | undefined): CvProjectItem[] 
   return cv.projects as CvProjectItem[];
 }
 
-export function useCvProjectsPage(cvId: string, initialCv?: CvQuery["cv"] | null) {
+export function useCvProjectsPage(
+  cvId: string,
+  initialCv?: CvQuery["cv"] | null,
+  serverError?: string | null,
+) {
   const {
     data: cvData,
     loading: cvLoading,
@@ -40,6 +44,7 @@ export function useCvProjectsPage(cvId: string, initialCv?: CvQuery["cv"] | null
     variables: { cvId },
     fetchPolicy: "network-only",
     errorPolicy: "all",
+    skip: serverError == null,
   });
 
   const { data: projectsData } = useQuery(ProjectsDocument, {

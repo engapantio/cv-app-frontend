@@ -461,9 +461,6 @@ export type CvsQuery = {
     education: string | null;
     description: string;
     user: { id: string; email: string } | null;
-    projects: Array<{ __typename: "CvProject" }> | null;
-    skills: Array<{ __typename: "SkillMastery" }>;
-    languages: Array<{ __typename: "LanguageProficiency" }>;
   }>;
 };
 
@@ -1833,30 +1830,6 @@ export const CvsDocument = {
                       { kind: "Field", name: { kind: "Name", value: "id" } },
                       { kind: "Field", name: { kind: "Name", value: "email" } },
                     ],
-                  },
-                },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "projects" },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [{ kind: "Field", name: { kind: "Name", value: "__typename" } }],
-                  },
-                },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "skills" },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [{ kind: "Field", name: { kind: "Name", value: "__typename" } }],
-                  },
-                },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "languages" },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [{ kind: "Field", name: { kind: "Name", value: "__typename" } }],
                   },
                 },
               ],

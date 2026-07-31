@@ -1,6 +1,6 @@
 "use client";
 
-import type { SkillsQuery } from "@/gql/generated/graphql";
+import type { SkillsQuery, SkillCategoriesQuery } from "@/gql/generated/graphql";
 import { SkillsTable } from "@/features/skills/components/skills-table";
 import { useSkillsPage } from "@/features/skills/hooks/use-skills-page";
 
@@ -8,12 +8,14 @@ type SkillItem = SkillsQuery["skills"][number];
 
 export default function SkillsClient({
   initialSkills,
+  initialCategories,
   serverError,
 }: {
   initialSkills: SkillItem[];
+  initialCategories: SkillCategoriesQuery["skillCategories"];
   serverError?: string | null;
 }) {
-  const tableData = useSkillsPage(initialSkills);
+  const tableData = useSkillsPage(initialSkills, serverError, initialCategories);
 
   return (
     <div className="flex w-full">

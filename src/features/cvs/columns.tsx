@@ -2,13 +2,13 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreVertical, ArrowUp, ArrowDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
-  Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui";
+} from "@/components/ui/dropdown-menu";
 import type { UserQuery } from "@/gql/generated/graphql";
 
 type CvItem = NonNullable<UserQuery["user"]["cvs"]>[number];
