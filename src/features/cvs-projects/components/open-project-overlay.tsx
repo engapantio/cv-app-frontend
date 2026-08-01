@@ -2,6 +2,7 @@
 
 import { format } from "date-fns";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, Input } from "@/components/ui";
+import { EnvPill } from "@/components/shared";
 import type { CvProjectItem } from "../hooks/use-cv-projects-page";
 
 interface OpenProjectOverlayProps {
@@ -80,12 +81,7 @@ export function OpenProjectOverlay({ open, onOpenChange, project }: OpenProjectO
             </span>
             <div className="flex flex-wrap gap-2 px-4 py-3 min-h-12">
               {project.environment.map((env) => (
-                <span
-                  key={env}
-                  className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-muted text-muted-foreground"
-                >
-                  {env}
-                </span>
+                <EnvPill key={env} env={env} />
               ))}
             </div>
           </div>

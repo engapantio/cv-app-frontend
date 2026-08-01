@@ -1,7 +1,7 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { MoreVertical, ArrowUp, ArrowDown } from "lucide-react";
+import { MoreVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -9,6 +9,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { RowActions } from "@/components/shared/row-actions";
+import { SortableHeader } from "@/components/shared/sortable-header";
 import type { SkillItem } from "./types";
 
 interface SkillActions {
@@ -34,47 +36,20 @@ export function createSkillsColumns(
     },
     {
       id: "name",
-      header: ({ column }) => (
-        <button
-          onClick={column.getToggleSortingHandler()}
-          className="flex items-center gap-1 cursor-pointer font-medium"
-        >
-          Name
-          {column.getIsSorted() === "asc" && <ArrowUp className="size-4" />}
-          {column.getIsSorted() === "desc" && <ArrowDown className="size-4" />}
-        </button>
-      ),
+      header: ({ column }) => <SortableHeader column={column} label="Name" />,
       accessorKey: "name",
       enableGlobalFilter: true,
     },
     {
       id: "type",
-      header: ({ column }) => (
-        <button
-          onClick={column.getToggleSortingHandler()}
-          className="flex items-center gap-1 cursor-pointer font-medium"
-        >
-          Type
-          {column.getIsSorted() === "asc" && <ArrowUp className="size-4" />}
-          {column.getIsSorted() === "desc" && <ArrowDown className="size-4" />}
-        </button>
-      ),
+      header: ({ column }) => <SortableHeader column={column} label="Type" />,
       accessorFn: (row) => row.category_parent_name ?? "",
       enableGlobalFilter: true,
       meta: { className: "max-md:hidden" },
     },
     {
       id: "category",
-      header: ({ column }) => (
-        <button
-          onClick={column.getToggleSortingHandler()}
-          className="flex items-center gap-1 cursor-pointer font-medium"
-        >
-          Category
-          {column.getIsSorted() === "asc" && <ArrowUp className="size-4" />}
-          {column.getIsSorted() === "desc" && <ArrowDown className="size-4" />}
-        </button>
-      ),
+      header: ({ column }) => <SortableHeader column={column} label="Category" />,
       accessorFn: (row) => row.category_name ?? "",
       enableGlobalFilter: true,
       meta: { className: "max-md:hidden" },
@@ -87,7 +62,7 @@ export function createSkillsColumns(
       cell: ({ row }) => {
         const skill = row.original;
         return (
-          <div className="flex justify-end" onClick={(e) => e.stopPropagation()}>
+          <RowActions canMutate={isAdmin} onOpen={() => actions.onOpen(skill)}>
             <DropdownMenu>
               <DropdownMenuTrigger
                 render={
@@ -120,7 +95,7 @@ export function createSkillsColumns(
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          </div>
+          </RowActions>
         );
       },
     },

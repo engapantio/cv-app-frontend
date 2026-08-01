@@ -2,8 +2,9 @@
 
 import { useState, useCallback } from "react";
 import { format } from "date-fns";
-import { CalendarIcon, ChevronDown, ChevronUp, X } from "lucide-react";
+import { CalendarIcon, ChevronDown, ChevronUp } from "lucide-react";
 import { toast } from "sonner";
+import { EnvPill } from "@/components/shared";
 import { cn } from "@/lib/utils";
 import {
   Button,
@@ -231,29 +232,7 @@ export function CreateProjectDialog({
                   >
                     <div className="flex flex-wrap gap-1 flex-1">
                       {selectedEnv.map((skill) => (
-                        <span
-                          key={skill}
-                          className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm bg-[#e0e0e0] dark:bg-[#4a4a4a] text-black dark:text-white"
-                        >
-                          {skill}
-                          <span
-                            role="button"
-                            tabIndex={0}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              removeEnv(skill);
-                            }}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter" || e.key === " ") {
-                                e.stopPropagation();
-                                removeEnv(skill);
-                              }
-                            }}
-                            className="ml-0.5 rounded-full p-0.5 bg-[#666] dark:bg-[#aaa] text-white dark:text-black cursor-pointer hover:opacity-80 inline-flex items-center justify-center"
-                          >
-                            <X className="size-3" />
-                          </span>
-                        </span>
+                        <EnvPill key={skill} env={skill} onRemove={removeEnv} />
                       ))}
                     </div>
                     {envOpen ? (

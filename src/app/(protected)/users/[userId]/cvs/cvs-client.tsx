@@ -29,7 +29,7 @@ export default function UserCvsClient({
           {...tableData}
           serverError={serverError}
           createUserId={userId}
-          tableClassName="table-fixed w-full [&_tr]:border-b-gray-200 [border-collapse:collapse]"
+          tableClassName="table-fixed w-full [&_tr]:border-b-table-border [border-collapse:collapse]"
         />
       </main>
     </div>

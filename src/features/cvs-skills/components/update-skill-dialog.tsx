@@ -39,6 +39,8 @@ export function UpdateSkillDialog({
 }: UpdateSkillDialogProps) {
   const [selectedMastery, setSelectedMastery] = useState<Mastery>(currentMastery);
 
+  const isDirty = selectedMastery !== currentMastery;
+
   const handleConfirm = useCallback(async () => {
     try {
       await onConfirm(skillName, selectedMastery);
@@ -100,7 +102,7 @@ export function UpdateSkillDialog({
             type="button"
             className="uppercase text-white min-w-30 py-1.5"
             style={{ backgroundColor: "#e53935" }}
-            disabled={loading}
+            disabled={!isDirty || loading}
             onClick={handleConfirm}
           >
             {loading ? "CONFIRMING..." : "CONFIRM"}

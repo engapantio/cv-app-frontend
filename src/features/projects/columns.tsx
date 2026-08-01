@@ -7,14 +7,6 @@ import type { ProjectItem } from "./hooks/use-projects-page";
 export function createProjectColumns(): ColumnDef<ProjectItem>[] {
   return [
     {
-      id: "id",
-      accessorKey: "id",
-      enableSorting: true,
-      enableGlobalFilter: false,
-      enableHiding: true,
-      enableColumnFilter: false,
-    },
-    {
       id: "name",
       header: ({ column }) => (
         <button

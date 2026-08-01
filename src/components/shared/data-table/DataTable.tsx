@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -13,15 +13,6 @@ import {
   ColumnFiltersState,
 } from "@tanstack/react-table";
 import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationEllipsis,
-  PaginationPrevious,
-  PaginationNext,
-} from "@/components/ui/pagination";
-import {
   Table,
   TableBody,
   TableCell,
@@ -29,9 +20,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Inbox } from "lucide-react";
 import { SearchBar } from "@/components/shared/search-bar";
-import { generatePagination } from "@/lib/utils/pagination";
+import { TableEmptyState } from "@/components/shared/table-empty-state";
+import { TablePagination } from "@/components/shared/table-pagination";
 
 interface DataTableProps<T, V> {
   columns: ColumnDef<T, V>[];
@@ -69,19 +60,22 @@ export function DataTable<T, V>({
     getPaginationRowModel: getPaginationRowModel(),
   });
 
-  const currentPage = table.getState().pagination.pageIndex + 1;
-  const totalPages = table.getPageCount();
-  const pageNumbers = useMemo(
-    () => generatePagination(currentPage, totalPages),
-    [currentPage, totalPages],
-  );
-
   return (
     <div className="space-y-4">
       <SearchBar value={globalFilter} onChange={setGlobalFilter} />
 
       <div>
-        <Table className="[&_tr]:border-b-border">
+        <Table className="table-fixed [&_tr]:border-b-border">
+          <colgroup>
+            {table.getVisibleLeafColumns().map((column) => (
+              <col
+                key={column.id}
+                className={
+                  (column.columnDef.meta as { className?: string } | undefined)?.className ?? ""
+                }
+              />
+            ))}
+          </colgroup>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -105,10 +99,12 @@ export function DataTable<T, V>({
             ) : data.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={columns.length}>
-                  <div className="flex flex-col items-center py-12 text-muted-foreground">
-                    <Inbox className="h-12 w-12 mb-2" />
-                    <p>{emptyMessage}</p>
-                  </div>
+                  <TableEmptyState
+                    message={emptyMessage}
+                    className="py-12"
+                    iconClassName="h-12 w-12"
+                    textClassName="text-base"
+                  />
                 </TableCell>
               </TableRow>
             ) : (
@@ -126,36 +122,10 @@ export function DataTable<T, V>({
         </Table>
       </div>
 
-      <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-        <Pagination>
-          <PaginationContent>
-            <PaginationPrevious
-              onClick={() => table.previousPage()}
-              aria-disabled={!table.getCanPreviousPage()}
-              className={!table.getCanPreviousPage() ? "pointer-events-none opacity-50" : ""}
-            />
-            {pageNumbers.map((page, i) => (
-              <PaginationItem key={i}>
-                {page === "..." ? (
-                  <PaginationEllipsis />
-                ) : (
-                  <PaginationLink
-                    isActive={page === currentPage}
-                    onClick={() => table.setPageIndex((page as number) - 1)}
-                  >
-                    {page}
-                  </PaginationLink>
-                )}
-              </PaginationItem>
-            ))}
-            <PaginationNext
-              onClick={() => table.nextPage()}
-              aria-disabled={!table.getCanNextPage()}
-              className={!table.getCanNextPage() ? "pointer-events-none opacity-50" : ""}
-            />
-          </PaginationContent>
-        </Pagination>
-      </div>
+      <TablePagination
+        table={table}
+        className="flex flex-col items-center justify-between gap-4 md:flex-row"
+      />
     </div>
   );
 }

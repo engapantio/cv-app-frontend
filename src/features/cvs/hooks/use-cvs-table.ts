@@ -15,7 +15,6 @@ import {
 import { type UserQuery, type CreateCvMutation } from "@/gql/generated/graphql";
 import { usePermissions } from "@/lib/auth/permissions";
 import { createCvsColumns } from "@/features/cvs/columns";
-import { generatePagination } from "@/lib/utils/pagination";
 
 type CvItem = NonNullable<UserQuery["user"]["cvs"]>[number];
 
@@ -94,8 +93,9 @@ export function useCvsTable({
           onDelete: handleDelete,
         },
         userEmail,
+        userId,
       ),
-    [currentUserId, isAdmin, handleOpen, handleDelete, userEmail],
+    [currentUserId, isAdmin, handleOpen, handleDelete, userEmail, userId],
   );
 
   // eslint-disable-next-line react-hooks/incompatible-library
@@ -111,12 +111,6 @@ export function useCvsTable({
     getPaginationRowModel: getPaginationRowModel(),
   });
 
-  const currentPage = table.getState().pagination.pageIndex + 1;
-  const totalPages = table.getPageCount();
-  const pageNumbers = useMemo(
-    () => generatePagination(currentPage, totalPages),
-    [currentPage, totalPages],
-  );
   const columnCount = columns.length;
 
   return {
@@ -124,9 +118,6 @@ export function useCvsTable({
     table,
     rows: table.getRowModel().rows,
     columnCount,
-    currentPage,
-    totalPages,
-    pageNumbers,
     canCreate,
     createOpen,
     setCreateOpen,

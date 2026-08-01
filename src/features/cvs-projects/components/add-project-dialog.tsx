@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { toast } from "sonner";
+import { EnvPill } from "@/components/shared";
 import {
   Button,
   Dialog,
@@ -222,14 +223,7 @@ export function AddProjectDialog({
             </span>
             <div className="flex flex-wrap gap-2 px-4 py-3 min-h-12">
               {selectedProject?.environment?.length ? (
-                selectedProject.environment.map((env) => (
-                  <span
-                    key={env}
-                    className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-muted text-muted-foreground"
-                  >
-                    {env}
-                  </span>
-                ))
+                selectedProject.environment.map((env) => <EnvPill key={env} env={env} />)
               ) : (
                 <span className="text-sm text-muted-foreground">—</span>
               )}

@@ -22,7 +22,6 @@ import {
   getSortedRowModel,
   type SortingState,
 } from "@tanstack/react-table";
-import { generatePagination } from "@/lib/utils/pagination";
 import type { SkillItem } from "@/features/skills/types";
 
 export function useSkillsPage(
@@ -143,21 +142,12 @@ export function useSkillsPage(
     getPaginationRowModel: getPaginationRowModel(),
   });
 
-  const currentPage = table.getState().pagination.pageIndex + 1;
-  const totalPages = table.getPageCount();
-  const pageNumbers = useMemo(
-    () => generatePagination(currentPage, totalPages),
-    [currentPage, totalPages],
-  );
   const columnCount = columns.length;
 
   return {
     loading: loading && skillsList.length === 0,
     table,
     columnCount,
-    currentPage,
-    totalPages,
-    pageNumbers,
     isAdmin,
     createOpen,
     setCreateOpen,
