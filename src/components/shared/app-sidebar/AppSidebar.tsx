@@ -39,7 +39,6 @@ import { Container } from "../container";
 import { useTheme } from "next-themes";
 import { useSession, logout } from "@/lib/auth/session";
 import { usePermissions } from "@/lib/auth/permissions";
-
 interface AppSidebarProps {
   isSidebarOpen: boolean;
   setIsSidebarOpen: (open: boolean) => void;
