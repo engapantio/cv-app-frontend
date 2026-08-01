@@ -1,5 +1,4 @@
-import { createServerApolloClient } from "@/lib/apollo/server-client";
-import { getServerAccessToken } from "@/lib/auth/cookies";
+import { createServerApolloClientForRequest } from "@/lib/apollo/server-client";
 import {
   CvDocument,
   SkillCategoriesDocument,
@@ -55,12 +54,11 @@ export default async function CvPreviewPage({ params }: { params: Promise<{ cvId
   let lastUsed: number | null = null;
 
   try {
-    const token = await getServerAccessToken();
+    const { client, accessToken: token } = await createServerApolloClientForRequest();
     if (!token) {
       throw new Error("Unauthorized");
     }
 
-    const client = createServerApolloClient(token);
     const [cvResult, categoriesResult] = await Promise.all([
       client.query({
         query: CvDocument,

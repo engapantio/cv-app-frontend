@@ -1,11 +1,35 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useProjectsPage } from "@/features/projects/hooks/use-projects-page";
 import { ProjectsTable } from "@/features/projects/components/projects-table";
-import { CreateProjectDialog } from "@/features/projects/components/create-project-dialog";
-import { UpdateProjectDialog } from "@/features/projects/components/update-project-dialog";
-import { OpenProjectOverlay } from "@/features/projects/components/open-project-overlay";
-import { DeleteProjectDialog } from "@/features/projects/components/delete-project-dialog";
+
+const CreateProjectDialog = dynamic(
+  () =>
+    import("@/features/projects/components/create-project-dialog").then(
+      (m) => m.CreateProjectDialog,
+    ),
+  { loading: () => null },
+);
+const UpdateProjectDialog = dynamic(
+  () =>
+    import("@/features/projects/components/update-project-dialog").then(
+      (m) => m.UpdateProjectDialog,
+    ),
+  { loading: () => null },
+);
+const OpenProjectOverlay = dynamic(
+  () =>
+    import("@/features/projects/components/open-project-overlay").then((m) => m.OpenProjectOverlay),
+  { loading: () => null },
+);
+const DeleteProjectDialog = dynamic(
+  () =>
+    import("@/features/projects/components/delete-project-dialog").then(
+      (m) => m.DeleteProjectDialog,
+    ),
+  { loading: () => null },
+);
 
 export default function ProjectsClient() {
   const {
@@ -48,39 +72,47 @@ export default function ProjectsClient() {
         onDelete={(p) => setDeleteTarget(p)}
       />
 
-      <OpenProjectOverlay
-        open={!!openProject}
-        onOpenChange={(open) => {
-          if (!open) setOpenProject(null);
-        }}
-        project={openProject}
-      />
+      {openProject && (
+        <OpenProjectOverlay
+          open={!!openProject}
+          onOpenChange={(open) => {
+            if (!open) setOpenProject(null);
+          }}
+          project={openProject}
+        />
+      )}
 
-      <CreateProjectDialog
-        open={createOpen}
-        onOpenChange={setCreateOpen}
-        allSkills={allSkills}
-        onConfirm={handleCreate}
-        loading={creating}
-      />
+      {createOpen && (
+        <CreateProjectDialog
+          open={createOpen}
+          onOpenChange={setCreateOpen}
+          allSkills={allSkills}
+          onConfirm={handleCreate}
+          loading={creating}
+        />
+      )}
 
-      <UpdateProjectDialog
-        open={!!updateTarget}
-        onOpenChange={(open) => {
-          if (!open) setUpdateTarget(null);
-        }}
-        project={updateTarget}
-        allSkills={allSkills}
-        onConfirm={handleUpdate}
-        loading={updating}
-      />
+      {updateTarget && (
+        <UpdateProjectDialog
+          open={!!updateTarget}
+          onOpenChange={(open) => {
+            if (!open) setUpdateTarget(null);
+          }}
+          project={updateTarget}
+          allSkills={allSkills}
+          onConfirm={handleUpdate}
+          loading={updating}
+        />
+      )}
 
-      <DeleteProjectDialog
-        target={deleteTarget}
-        onClose={() => setDeleteTarget(null)}
-        onConfirm={handleDelete}
-        loading={deleting}
-      />
+      {deleteTarget && (
+        <DeleteProjectDialog
+          target={deleteTarget}
+          onClose={() => setDeleteTarget(null)}
+          onConfirm={handleDelete}
+          loading={deleting}
+        />
+      )}
     </main>
   );
 }

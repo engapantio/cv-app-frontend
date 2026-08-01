@@ -18,8 +18,10 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  Input,
-  Button,
+} from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
   Pagination,
   PaginationContent,
   PaginationEllipsis,
@@ -27,7 +29,7 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/components/ui";
+} from "@/components/ui/pagination";
 import { generatePagination } from "@/lib/utils/pagination";
 import { ProjectRow } from "./project-row";
 import { createProjectColumns } from "../columns";

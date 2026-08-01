@@ -6,7 +6,8 @@ import { z } from "zod";
 import { useMutation } from "@apollo/client/react";
 import { UpdateCvDocument, type CvQuery } from "@/gql/generated/graphql";
 import { usePermissions } from "@/lib/auth/permissions";
-import { Button, Input } from "@/components/ui";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 
 type CvData = CvQuery["cv"];

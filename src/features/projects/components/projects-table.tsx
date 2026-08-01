@@ -18,7 +18,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  Button,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import {
   Pagination,
   PaginationContent,
   PaginationEllipsis,
@@ -26,7 +28,7 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/components/ui";
+} from "@/components/ui/pagination";
 import { SearchBar } from "@/components/shared/search-bar";
 import { generatePagination } from "@/lib/utils/pagination";
 import { ProjectRow } from "./project-row";

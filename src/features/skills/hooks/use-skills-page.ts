@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import { useQuery, useMutation } from "@apollo/client/react";
 import {
   SkillsDocument,
@@ -25,10 +25,14 @@ import {
 import { generatePagination } from "@/lib/utils/pagination";
 import type { SkillItem } from "@/features/skills/types";
 
-export function useSkillsPage(initialSkills: SkillItem[]) {
+export function useSkillsPage(
+  initialSkills: SkillItem[],
+  serverError?: string | null,
+  initialCategories: SkillCategoriesQuery["skillCategories"] = [],
+) {
   const { isAdmin } = usePermissions();
 
-  const { loading } = useQuery(SkillsDocument, {
+  const { data: skillsData, loading } = useQuery(SkillsDocument, {
     fetchPolicy: "network-only",
     errorPolicy: "all",
   });
@@ -36,9 +40,19 @@ export function useSkillsPage(initialSkills: SkillItem[]) {
   const { data: categoriesData } = useQuery(SkillCategoriesDocument, {
     fetchPolicy: "cache-first",
     errorPolicy: "all",
+    skip: serverError == null,
   });
 
   const [skillsList, setSkillsList] = useState<SkillItem[]>(initialSkills);
+
+  const hydratedRef = useRef(false);
+
+  useEffect(() => {
+    if (skillsData?.skills && !hydratedRef.current) {
+      hydratedRef.current = true;
+      setSkillsList(skillsData.skills as SkillItem[]);
+    }
+  }, [skillsData]);
 
   const [deleteTarget, setDeleteTarget] = useState<SkillItem | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
@@ -61,8 +75,8 @@ export function useSkillsPage(initialSkills: SkillItem[]) {
   }, []);
 
   const categories: SkillCategoriesQuery["skillCategories"] = useMemo(
-    () => categoriesData?.skillCategories ?? [],
-    [categoriesData],
+    () => categoriesData?.skillCategories ?? initialCategories,
+    [categoriesData, initialCategories],
   );
 
   const [createSkill] = useMutation(CreateSkillDocument);
@@ -138,7 +152,7 @@ export function useSkillsPage(initialSkills: SkillItem[]) {
   const columnCount = columns.length;
 
   return {
-    loading,
+    loading: loading && skillsList.length === 0,
     table,
     columnCount,
     currentPage,

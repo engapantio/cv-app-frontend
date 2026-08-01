@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { Inbox } from "lucide-react";
 import { type Table, flexRender } from "@tanstack/react-table";
 import {
@@ -9,7 +10,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  Button,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import {
   Pagination,
   PaginationContent,
   PaginationEllipsis,
@@ -17,15 +20,28 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/components/ui";
+} from "@/components/ui/pagination";
 import { cn } from "@/lib/utils";
 import type { SkillItem } from "@/features/skills/types";
 import type { SkillCategoriesQuery } from "@/gql/generated/graphql";
-import { OpenSkillOverlay } from "./open-skill-overlay";
 import { SearchBar } from "@/components/shared/search-bar";
-import { CreateSkillDialog } from "./create-skill-dialog";
-import { UpdateSkillDialog } from "./update-skill-dialog";
-import { DeleteSkillDialog } from "./delete-skill-dialog";
+
+const OpenSkillOverlay = dynamic(
+  () => import("./open-skill-overlay").then((m) => m.OpenSkillOverlay),
+  { loading: () => null },
+);
+const CreateSkillDialog = dynamic(
+  () => import("./create-skill-dialog").then((m) => m.CreateSkillDialog),
+  { loading: () => null },
+);
+const UpdateSkillDialog = dynamic(
+  () => import("./update-skill-dialog").then((m) => m.UpdateSkillDialog),
+  { loading: () => null },
+);
+const DeleteSkillDialog = dynamic(
+  () => import("./delete-skill-dialog").then((m) => m.DeleteSkillDialog),
+  { loading: () => null },
+);
 
 interface SkillsTableProps {
   loading: boolean;
@@ -226,28 +242,34 @@ export function SkillsTable({
         )}
       </div>
 
-      <OpenSkillOverlay target={openTarget} onClose={() => setOpenTarget(null)} />
+      {openTarget && <OpenSkillOverlay target={openTarget} onClose={() => setOpenTarget(null)} />}
 
-      <CreateSkillDialog
-        open={createOpen}
-        onOpenChange={setCreateOpen}
-        categories={categories}
-        onCreated={handleCreated}
-      />
+      {createOpen && (
+        <CreateSkillDialog
+          open={createOpen}
+          onOpenChange={setCreateOpen}
+          categories={categories}
+          onCreated={handleCreated}
+        />
+      )}
 
-      <UpdateSkillDialog
-        key={updateTarget ? "update-" + updateTarget.id : "update-closed"}
-        target={updateTarget}
-        onClose={() => setUpdateTarget(null)}
-        categories={categories}
-        onUpdated={handleUpdated}
-      />
+      {updateTarget && (
+        <UpdateSkillDialog
+          key={"update-" + updateTarget.id}
+          target={updateTarget}
+          onClose={() => setUpdateTarget(null)}
+          categories={categories}
+          onUpdated={handleUpdated}
+        />
+      )}
 
-      <DeleteSkillDialog
-        target={deleteTarget}
-        onClose={() => setDeleteTarget(null)}
-        onDeleted={handleDeleted}
-      />
+      {deleteTarget && (
+        <DeleteSkillDialog
+          target={deleteTarget}
+          onClose={() => setDeleteTarget(null)}
+          onDeleted={handleDeleted}
+        />
+      )}
     </>
   );
 }

@@ -17,16 +17,18 @@ import {
   PaginationContent,
   PaginationItem,
   PaginationLink,
+  PaginationEllipsis,
+  PaginationPrevious,
+  PaginationNext,
+} from "@/components/ui/pagination";
+import {
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-  PaginationEllipsis,
-  PaginationPrevious,
-  PaginationNext,
-} from "@/components/ui";
+} from "@/components/ui/table";
 import { Inbox } from "lucide-react";
 import { SearchBar } from "@/components/shared/search-bar";
 import { generatePagination } from "@/lib/utils/pagination";

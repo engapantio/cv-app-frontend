@@ -1,5 +1,4 @@
-import { createServerApolloClient } from "@/lib/apollo/server-client";
-import { getServerAccessToken } from "@/lib/auth/cookies";
+import { createServerApolloClientForRequest } from "@/lib/apollo/server-client";
 import { CvDocument, type CvQuery } from "@/gql/generated/graphql";
 import CvDetailsClient from "./details-client";
 
@@ -10,12 +9,11 @@ export default async function CvDetailsPage({ params }: { params: Promise<{ cvId
   let serverError: string | null = null;
 
   try {
-    const token = await getServerAccessToken();
+    const { client, accessToken: token } = await createServerApolloClientForRequest();
     if (!token) {
       throw new Error("Unauthorized");
     }
 
-    const client = createServerApolloClient(token);
     const { data } = await client.query({
       query: CvDocument,
       variables: { cvId },

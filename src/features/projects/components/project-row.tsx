@@ -4,13 +4,13 @@ import { MoreVertical } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatDate } from "@/lib/utils/date";
 import { Pill } from "@/components/shared/pill";
+import { Button } from "@/components/ui/button";
 import {
-  Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui";
+} from "@/components/ui/dropdown-menu";
 import type { ProjectItem } from "../hooks/use-projects-page";
 
 interface ProjectRowProps {

@@ -2,8 +2,6 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { useQuery } from "@apollo/client/react";
-import { CvDocument } from "@/gql/generated/graphql";
 import { ChevronRight } from "lucide-react";
 
 const TABS = [
@@ -13,15 +11,18 @@ const TABS = [
   { label: "Preview", href: "preview" },
 ] as const;
 
-export function CvLayoutClient({ cvId, children }: { cvId: string; children: React.ReactNode }) {
+export function CvLayoutClient({
+  cvId,
+  initialCvName,
+  children,
+}: {
+  cvId: string;
+  initialCvName?: string | null;
+  children: React.ReactNode;
+}) {
   const pathname = usePathname();
-  const { data } = useQuery(CvDocument, {
-    variables: { cvId },
-    fetchPolicy: "cache-first",
-    errorPolicy: "all",
-  });
 
-  const cvName = data?.cv?.name ?? "CV";
+  const cvName = initialCvName ?? "CV";
   const currentTab = pathname.split("/").pop() ?? "details";
 
   return (
