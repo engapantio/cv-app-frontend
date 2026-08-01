@@ -36,16 +36,17 @@ function createAuthLink(token?: string) {
   });
 }
 
-function createHttpLink() {
+function createHttpLink(headers?: Record<string, string>) {
   return new HttpLink({
     uri: getGraphqlUri(),
+    headers,
     fetchOptions: { cache: "no-store" },
   });
 }
 
-export function createServerApolloClient(token?: string) {
+export function createServerApolloClient(token?: string, headers?: Record<string, string>) {
   return new ApolloClient({
     cache: new InMemoryCache({ typePolicies }),
-    link: errorLink.concat(createAuthLink(token).concat(createHttpLink())),
+    link: errorLink.concat(createAuthLink(token).concat(createHttpLink(headers))),
   });
 }

@@ -12,7 +12,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: "Email and password are required" }, { status: 400 });
     }
 
-    const client = createServerApolloClient();
+    const origin = request.headers.get("origin") ?? request.nextUrl.origin;
+    const client = createServerApolloClient(undefined, { Origin: origin });
     const { data } = await client.mutate({
       mutation: SignupDocument,
       variables: { auth: { email, password } },
