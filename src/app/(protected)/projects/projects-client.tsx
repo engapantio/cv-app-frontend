@@ -1,8 +1,9 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useProjectsPage } from "@/features/projects/hooks/use-projects-page";
+import { useProjectsPage, type ProjectItem } from "@/features/projects/hooks/use-projects-page";
 import { ProjectsTable } from "@/features/projects/components/projects-table";
+import { TablePageLayout } from "@/components/shared/table-page-layout";
 
 const CreateProjectDialog = dynamic(
   () =>
@@ -31,7 +32,13 @@ const DeleteProjectDialog = dynamic(
   { loading: () => null },
 );
 
-export default function ProjectsClient() {
+export default function ProjectsClient({
+  initialProjects,
+  serverError,
+}: {
+  initialProjects: ProjectItem[];
+  serverError?: string | null;
+}) {
   const {
     loading,
     projects,
@@ -53,19 +60,17 @@ export default function ProjectsClient() {
     creating,
     updating,
     deleting,
-  } = useProjectsPage();
+  } = useProjectsPage(initialProjects);
 
   return (
-    <main className="flex-1">
-      <div className="flex items-center h-11">
-        <h1 className="text-base text-foreground/70">Projects</h1>
-      </div>
+    <TablePageLayout title="Projects">
       <ProjectsTable
         loading={loading}
         projects={projects}
         canMutate={canMutate}
         globalFilter={globalFilter}
         setGlobalFilter={setGlobalFilter}
+        serverError={serverError}
         onCreate={() => setCreateOpen(true)}
         onOpen={(p) => setOpenProject(p)}
         onUpdate={(p) => setUpdateTarget(p)}
@@ -113,6 +118,6 @@ export default function ProjectsClient() {
           loading={deleting}
         />
       )}
-    </main>
+    </TablePageLayout>
   );
 }

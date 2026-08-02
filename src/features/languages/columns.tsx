@@ -1,0 +1,103 @@
+"use client";
+
+import { ColumnDef } from "@tanstack/react-table";
+import { MoreVertical } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { RowActions } from "@/components/shared/row-actions";
+import { SortableHeader } from "@/components/shared/sortable-header";
+import type { LanguageItem } from "./types";
+
+interface LanguageActions {
+  onOpen: (language: LanguageItem) => void;
+  onUpdate: (language: LanguageItem) => void;
+  onDelete: (language: LanguageItem) => void;
+}
+
+export function createLanguagesColumns(
+  isAdmin: boolean,
+  actions: LanguageActions,
+): ColumnDef<LanguageItem>[] {
+  return [
+    {
+      id: "id",
+      accessorKey: "id",
+      enableSorting: true,
+      enableGlobalFilter: false,
+      enableHiding: false,
+      meta: { className: "hidden" },
+      header: () => null,
+      cell: () => null,
+    },
+    {
+      id: "name",
+      header: ({ column }) => <SortableHeader column={column} label="Name" />,
+      accessorKey: "name",
+      enableGlobalFilter: true,
+    },
+    {
+      id: "native_name",
+      header: ({ column }) => <SortableHeader column={column} label="Native Name" />,
+      accessorFn: (row) => row.native_name ?? "",
+      enableGlobalFilter: false,
+      meta: { className: "max-md:hidden" },
+    },
+    {
+      id: "iso2",
+      header: ({ column }) => <SortableHeader column={column} label="ISO2" />,
+      accessorKey: "iso2",
+      enableGlobalFilter: false,
+      meta: { className: "max-md:hidden" },
+    },
+    {
+      id: "actions",
+      header: "",
+      enableSorting: false,
+      enableGlobalFilter: false,
+      cell: ({ row }) => {
+        const language = row.original;
+        return (
+          <RowActions canMutate={isAdmin} onOpen={() => actions.onOpen(language)}>
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                render={
+                  <Button variant="ghost" size="icon" className="rounded-[20px] cursor-pointer">
+                    <MoreVertical className="size-6" />
+                  </Button>
+                }
+              />
+              <DropdownMenuContent align="end" className="min-w-32">
+                <DropdownMenuItem
+                  onClick={() => actions.onOpen(language)}
+                  className="justify-center cursor-pointer"
+                >
+                  Open
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => actions.onUpdate(language)}
+                  disabled={!isAdmin}
+                  className="justify-center cursor-pointer"
+                >
+                  Update
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => actions.onDelete(language)}
+                  disabled={!isAdmin}
+                  variant="destructive"
+                  className="justify-center cursor-pointer"
+                >
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </RowActions>
+        );
+      },
+    },
+  ];
+}

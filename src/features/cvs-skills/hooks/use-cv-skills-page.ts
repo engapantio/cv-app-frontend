@@ -23,7 +23,7 @@ export interface SkillsByCategory {
   skills: CvSkill[];
 }
 
-export function useCvSkillsPage(cvId: string) {
+export function useCvSkillsPage(cvId: string, initialCv: CvQuery["cv"] | null = null) {
   const { user: currentUser } = useSession();
 
   const {
@@ -46,7 +46,7 @@ export function useCvSkillsPage(cvId: string) {
     errorPolicy: "all",
   });
 
-  const cv = cvData?.cv;
+  const cv = cvData?.cv ?? initialCv;
   const cvUserId = cv?.user?.id;
   const isAdmin = currentUser?.role === "Admin";
   const isOwner = currentUser?.id === cvUserId;
@@ -200,7 +200,8 @@ export function useCvSkillsPage(cvId: string) {
   }, [deleteCvSkill, cvId, selectedSkills, refetchCv]);
 
   return {
-    loading: cvLoading,
+    loading: cvLoading && cv == null,
+    hasCv: cv != null,
     skillsByCategory,
     availableSkills,
     canMutate,

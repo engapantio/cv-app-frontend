@@ -5,7 +5,7 @@ import { Trash2 } from "lucide-react";
 import { useCvSkillsPage } from "@/features/cvs-skills/hooks/use-cv-skills-page";
 import { MASTERY_MAP } from "@/features/cvs-skills/utils/mastery-mapping";
 import { Button } from "@/components/ui/button";
-import type { Mastery } from "@/gql/generated/graphql";
+import type { Mastery, CvQuery } from "@/gql/generated/graphql";
 
 const AddSkillDialog = dynamic(
   () => import("@/features/cvs-skills/components/add-skill-dialog").then((m) => m.AddSkillDialog),
@@ -17,9 +17,18 @@ const UpdateSkillDialog = dynamic(
   { loading: () => null },
 );
 
-export function CvSkillsClient({ cvId }: { cvId: string }) {
+export function CvSkillsClient({
+  cvId,
+  initialCv,
+  serverError,
+}: {
+  cvId: string;
+  initialCv: CvQuery["cv"] | null;
+  serverError?: string | null;
+}) {
   const {
     loading,
+    hasCv,
     skillsByCategory,
     availableSkills,
     canMutate,
@@ -38,10 +47,14 @@ export function CvSkillsClient({ cvId }: { cvId: string }) {
     addingSkill,
     updatingSkill,
     deletingSkill,
-  } = useCvSkillsPage(cvId);
+  } = useCvSkillsPage(cvId, initialCv);
 
   if (loading) {
     return <div className="text-center text-muted-foreground py-8">Loading...</div>;
+  }
+
+  if (serverError && !hasCv) {
+    return <div className="text-center text-destructive py-8">{serverError}</div>;
   }
 
   if (skillsByCategory.length === 0) {

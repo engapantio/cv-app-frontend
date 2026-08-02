@@ -1,29 +1,15 @@
-import { createServerApolloClientForRequest } from "@/lib/apollo/server-client";
-import { UsersDocument } from "@/gql/generated/graphql";
+import { fetchInitialRows } from "@/lib/apollo/initial-data";
+import { UsersDocument, type UsersQuery } from "@/gql/generated/graphql";
 import { User } from "cv-graphql";
 import UsersClient from "./users-client";
 
-const INITIAL_PAGE_SIZE = 10;
-
 export default async function UsersPage() {
-  const { client } = await createServerApolloClientForRequest();
+  const { initial, serverError } = await fetchInitialRows<UsersQuery, User>({
+    query: UsersDocument,
+    getData: (data) => (data?.users ?? []) as User[],
+    sort: (a, b) => Number(b.id) - Number(a.id),
+    errorMessage: "Failed to load users",
+  });
 
-  let initialUsers: User[] = [];
-  let serverError: string | null = null;
-
-  try {
-    const { data } = await client.query({
-      query: UsersDocument,
-      errorPolicy: "all",
-      fetchPolicy: "no-cache",
-    });
-    const users = (data?.users ?? []) as User[];
-    initialUsers = [...users]
-      .sort((a, b) => Number(b.id) - Number(a.id))
-      .slice(0, INITIAL_PAGE_SIZE);
-  } catch (e) {
-    serverError = e instanceof Error ? e.message : "Failed to load users";
-  }
-
-  return <UsersClient initialUsers={initialUsers} serverError={serverError} />;
+  return <UsersClient initialUsers={initial} serverError={serverError} />;
 }

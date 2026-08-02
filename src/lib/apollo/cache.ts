@@ -97,7 +97,7 @@ export const typePolicies: TypePolicies = {
       positions: paginatedFieldPolicy("items"),
       projects: paginatedFieldPolicy("items"),
       skills: { merge: false },
-      languages: paginatedFieldPolicy("items"),
+      languages: { merge: false },
       skillCategories: { merge: false },
     },
   },
