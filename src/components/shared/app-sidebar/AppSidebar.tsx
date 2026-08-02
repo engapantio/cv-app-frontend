@@ -51,13 +51,13 @@ const adminMenuItems = [
   { href: "/departments", label: "Departments", icon: Building },
   { href: "/positions", label: "Positions", icon: Briefcase },
   { href: "/skills", label: "Skills", icon: TrendingUp },
-  { href: "/users/languages", label: "Languages", icon: Languages, prefetch: false },
+  { href: "/languages", label: "Languages", icon: Languages, prefetch: false },
 ];
 
 const employeeMenuItems = [
   { href: "/users", label: "Employees", icon: Users },
   { href: "/skills", label: "Skills", icon: TrendingUp },
-  { href: "/users/languages", label: "Languages", icon: Languages, prefetch: false },
+  { href: "/languages", label: "Languages", icon: Languages, prefetch: false },
   { href: "/cvs", label: "CVs", icon: FileUser },
 ];
 
@@ -285,9 +285,15 @@ export function AppSidebar({ isSidebarOpen, setIsSidebarOpen }: AppSidebarProps)
   const initial = fullName ? fullName[0].toUpperCase() : "";
   const closeSidebar = () => setIsSidebarOpen(false);
 
-  const menuItems: MenuItemData[] = (isAdmin ? adminMenuItems : employeeMenuItems).map((item) =>
-    item.label === "Languages" && userId ? { ...item, href: `/users/${userId}/languages` } : item,
-  );
+  const employeePersonalLinks: Record<string, string> = {
+    Skills: `/users/${userId}/skills`,
+    Languages: `/users/${userId}/languages`,
+  };
+
+  const menuItems: MenuItemData[] = (isAdmin ? adminMenuItems : employeeMenuItems).map((item) => {
+    const personalHref = !isAdmin && userId ? employeePersonalLinks[item.label] : undefined;
+    return personalHref ? { ...item, href: personalHref } : item;
+  });
 
   const renderMenuItems = (isMobile: boolean, showDivider = false) => {
     const items = menuItems.map((item) => (

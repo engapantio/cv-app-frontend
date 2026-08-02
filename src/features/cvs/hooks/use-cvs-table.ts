@@ -75,9 +75,17 @@ export function useCvsTable({
     setCvsList((prev) => prev.filter((cv) => cv.id !== cvId));
   }, []);
 
-  const handleCreated = useCallback((newCv: CreateCvMutation["createCv"]) => {
-    setCvsList((prev) => [newCv as CvItem, ...prev]);
-  }, []);
+  const handleCreated = useCallback(
+    (newCv: CreateCvMutation["createCv"]) => {
+      const ownerId = userId ?? currentUserId ?? "";
+      const ownerEmail = initialUserEmail ?? currentUser?.email ?? "";
+      setCvsList((prev) => [
+        { ...newCv, user: { id: ownerId, email: ownerEmail } } as CvItem,
+        ...prev,
+      ]);
+    },
+    [userId, currentUserId, initialUserEmail, currentUser],
+  );
 
   const canCreate = userId != null ? currentUserId === userId || isAdmin : !!currentUser;
 

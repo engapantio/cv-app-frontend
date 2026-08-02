@@ -3,6 +3,7 @@
 import type { SkillsQuery, SkillCategoriesQuery } from "@/gql/generated/graphql";
 import { SkillsTable } from "@/features/skills/components/skills-table";
 import { useSkillsPage } from "@/features/skills/hooks/use-skills-page";
+import { TablePageLayout } from "@/components/shared/table-page-layout";
 
 type SkillItem = SkillsQuery["skills"][number];
 
@@ -18,13 +19,8 @@ export default function SkillsClient({
   const tableData = useSkillsPage(initialSkills, serverError, initialCategories);
 
   return (
-    <div className="flex w-full">
-      <main className="flex-1">
-        <div className="flex items-center h-11">
-          <h1 className="text-base text-foreground/70">Skills</h1>
-        </div>
-        <SkillsTable {...tableData} serverError={serverError} />
-      </main>
-    </div>
+    <TablePageLayout title="Skills">
+      <SkillsTable {...tableData} serverError={serverError} />
+    </TablePageLayout>
   );
 }

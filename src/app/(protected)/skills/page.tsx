@@ -1,4 +1,4 @@
-import { createServerApolloClientForRequest } from "@/lib/apollo/server-client";
+import { fetchInitialRows } from "@/lib/apollo/initial-data";
 import {
   SkillsDocument,
   SkillCategoriesDocument,
@@ -8,42 +8,29 @@ import {
 import SkillsClient from "./skills-client";
 
 type SkillItem = SkillsQuery["skills"][number];
-
-const INITIAL_PAGE_SIZE = 10;
+type SkillCategoryItem = SkillCategoriesQuery["skillCategories"][number];
 
 export default async function SkillsPage() {
-  const { client } = await createServerApolloClientForRequest();
+  const [skills, categories] = await Promise.all([
+    fetchInitialRows<SkillsQuery, SkillItem>({
+      query: SkillsDocument,
+      getData: (data) => (data?.skills ?? []) as SkillItem[],
+      sort: (a, b) => Number(b.id) - Number(a.id),
+      errorMessage: "Failed to load skills",
+    }),
+    fetchInitialRows<SkillCategoriesQuery, SkillCategoryItem>({
+      query: SkillCategoriesDocument,
+      getData: (data) => (data?.skillCategories ?? []) as SkillCategoryItem[],
+      errorMessage: "Failed to load skills",
+    }),
+  ]);
 
-  let initialSkills: SkillItem[] = [];
-  let initialCategories: SkillCategoriesQuery["skillCategories"] = [];
-  let serverError: string | null = null;
-
-  try {
-    const [{ data: skillsData }, { data: categoriesData }] = await Promise.all([
-      client.query({
-        query: SkillsDocument,
-        errorPolicy: "all",
-        fetchPolicy: "no-cache",
-      }),
-      client.query({
-        query: SkillCategoriesDocument,
-        errorPolicy: "all",
-        fetchPolicy: "no-cache",
-      }),
-    ]);
-    initialSkills = ((skillsData?.skills ?? []) as SkillItem[])
-      .sort((a, b) => Number(b.id) - Number(a.id))
-      .slice(0, INITIAL_PAGE_SIZE);
-    initialCategories = (categoriesData?.skillCategories ??
-      []) as SkillCategoriesQuery["skillCategories"];
-  } catch (e) {
-    serverError = e instanceof Error ? e.message : "Failed to load skills";
-  }
+  const serverError = skills.serverError ?? categories.serverError;
 
   return (
     <SkillsClient
-      initialSkills={initialSkills}
-      initialCategories={initialCategories}
+      initialSkills={skills.initial}
+      initialCategories={categories.initial}
       serverError={serverError}
     />
   );

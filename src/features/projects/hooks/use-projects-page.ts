@@ -14,7 +14,7 @@ import { usePermissions } from "@/lib/auth/permissions";
 
 export type ProjectItem = ProjectsQuery["projects"][number];
 
-export function useProjectsPage() {
+export function useProjectsPage(initialProjects: ProjectItem[]) {
   const { data, loading, refetch } = useQuery(ProjectsDocument, {
     fetchPolicy: "network-only",
     errorPolicy: "all",
@@ -32,7 +32,7 @@ export function useProjectsPage() {
   const [localProjects, setLocalProjects] = useState<ProjectItem[]>([]);
 
   const projects = useMemo(() => {
-    const serverProjects = data?.projects ?? [];
+    const serverProjects = data?.projects ?? initialProjects;
     const merged = new Map<string, ProjectItem>(serverProjects.map((p) => [p.id, p]));
     for (const p of localProjects) {
       merged.set(p.id, p);
@@ -40,7 +40,7 @@ export function useProjectsPage() {
     return [...merged.values()].sort(
       (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
     );
-  }, [data, localProjects]);
+  }, [data, localProjects, initialProjects]);
 
   const [globalFilter, setGlobalFilter] = useState("");
 
@@ -112,7 +112,7 @@ export function useProjectsPage() {
   );
 
   return {
-    loading,
+    loading: loading && projects.length === 0,
     projects,
     allSkills,
     canMutate: isAdmin,

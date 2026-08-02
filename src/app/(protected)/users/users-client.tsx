@@ -1,6 +1,7 @@
 "use client";
 
 import { DataTable } from "@/components/shared/";
+import { TablePageLayout } from "@/components/shared/table-page-layout";
 import { Button } from "@/components/ui/button";
 import { usersColumns } from "@/features/users/columns";
 import { useDataTable } from "@/hooks/use-data-table";
@@ -37,23 +38,18 @@ export default function UsersClient({
   }
 
   return (
-    <div className="flex min-h-screen w-full">
-      <main className="flex-1">
-        <div className="flex items-center h-11">
-          <h1 className="text-base text-foreground/70">Employees</h1>
+    <TablePageLayout title="Employees">
+      {error && hasRows && (
+        <div className="flex items-center justify-between gap-3 pb-3">
+          <p className="text-sm text-muted-foreground">
+            Showing partial data — failed to load the full list.
+          </p>
+          <Button variant="outline" size="sm" onClick={() => refetch()}>
+            Try again
+          </Button>
         </div>
-        {error && hasRows && (
-          <div className="flex items-center justify-between gap-3 pb-3">
-            <p className="text-sm text-muted-foreground">
-              Showing partial data — failed to load the full list.
-            </p>
-            <Button variant="outline" size="sm" onClick={() => refetch()}>
-              Try again
-            </Button>
-          </div>
-        )}
-        <DataTable columns={usersColumns} data={data} isLoading={isLoading && !hasRows} />
-      </main>
-    </div>
+      )}
+      <DataTable columns={usersColumns} data={data} isLoading={isLoading && !hasRows} />
+    </TablePageLayout>
   );
 }
