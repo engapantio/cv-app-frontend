@@ -1,15 +1,30 @@
 import { fetchInitialRows } from "@/lib/apollo/initial-data";
 import { UsersDocument, type UsersQuery } from "@/gql/generated/graphql";
-import { User } from "cv-graphql";
+import { getServerUserId } from "@/lib/auth/cookies";
+import { orderUsers } from "@/features/users/order-users";
 import UsersClient from "./users-client";
 
+type UserItem = UsersQuery["users"][number];
+
 export default async function UsersPage() {
-  const { initial, serverError } = await fetchInitialRows<UsersQuery, User>({
+  const { initial, serverError } = await fetchInitialRows<UsersQuery, UserItem>({
     query: UsersDocument,
-    getData: (data) => (data?.users ?? []) as User[],
-    sort: (a, b) => Number(b.id) - Number(a.id),
+    getData: (data) => (data?.users ?? []) as UserItem[],
+    pageSize: 10000,
     errorMessage: "Failed to load users",
   });
 
-  return <UsersClient initialUsers={initial} serverError={serverError} />;
+  const currentUserId = await getServerUserId();
+  const currentUser = initial.find((u) => u.id === currentUserId);
+  const isAdmin = currentUser?.role === "Admin";
+  const ordered = orderUsers(initial, currentUserId, isAdmin);
+
+  return (
+    <UsersClient
+      initialUsers={ordered}
+      serverError={serverError}
+      initialUserId={currentUserId}
+      initialIsAdmin={isAdmin}
+    />
+  );
 }

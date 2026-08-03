@@ -1,19 +1,23 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useCallback } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { useMutation } from "@apollo/client/react";
 import { toast } from "sonner";
 import { UpdateLanguageDocument } from "@/gql/generated/graphql";
-import {
-  Button,
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-  Input,
-} from "@/components/ui";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, Input } from "@/components/ui";
+import { DialogActions, FloatingField } from "@/components/shared";
 import type { LanguageItem } from "@/features/languages/types";
+
+const updateLanguageSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  iso2: z.string().min(1, "ISO2 is required").length(2, "ISO2 must be exactly 2 characters"),
+  nativeName: z.string().optional(),
+});
+
+type UpdateLanguageFormData = z.infer<typeof updateLanguageSchema>;
 
 interface UpdateLanguageDialogProps {
   target: LanguageItem | null;
@@ -28,39 +32,49 @@ interface UpdateLanguageDialogProps {
 }
 
 export function UpdateLanguageDialog({ target, onClose, onUpdated }: UpdateLanguageDialogProps) {
-  const [name, setName] = useState(target?.name ?? "");
-  const [iso2, setIso2] = useState(target?.iso2 ?? "");
-  const [nativeName, setNativeName] = useState(target?.native_name ?? "");
-
-  const isDirty =
-    name.trim() !== (target?.name ?? "").trim() ||
-    iso2.trim() !== (target?.iso2 ?? "").trim() ||
-    nativeName.trim() !== (target?.native_name ?? "").trim();
-
   const [updateLanguage, { loading: updating }] = useMutation(UpdateLanguageDocument);
 
-  const handleUpdate = useCallback(async () => {
-    if (!target || !name.trim() || !iso2.trim()) return;
-    try {
-      const { data } = await updateLanguage({
-        variables: {
-          language: {
-            languageId: target.id,
-            name: name.trim(),
-            iso2: iso2.trim(),
-            native_name: nativeName.trim() || null,
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting, isDirty },
+  } = useForm<UpdateLanguageFormData>({
+    resolver: zodResolver(updateLanguageSchema),
+    defaultValues: {
+      name: target?.name ?? "",
+      iso2: target?.iso2 ?? "",
+      nativeName: target?.native_name ?? "",
+    },
+  });
+
+  const onSubmit = useCallback(
+    async (formData: UpdateLanguageFormData) => {
+      if (!target) return;
+      try {
+        const { data } = await updateLanguage({
+          variables: {
+            language: {
+              languageId: target.id,
+              name: formData.name.trim(),
+              iso2: formData.iso2.trim(),
+              native_name: formData.nativeName?.trim() || null,
+            },
           },
-        },
-      });
-      if (data?.updateLanguage) {
-        onUpdated(data.updateLanguage);
+        });
+        if (data?.updateLanguage) {
+          onUpdated(data.updateLanguage);
+        }
+        onClose();
+      } catch {
+        toast.error("Failed to update language");
+        onClose();
       }
-      onClose();
-    } catch {
-      toast.error("Failed to update language");
-      onClose();
-    }
-  }, [target, name, iso2, nativeName, updateLanguage, onUpdated, onClose]);
+    },
+    [target, updateLanguage, onUpdated, onClose],
+  );
+
+  const inputClasses =
+    "peer border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none h-12";
 
   return (
     <Dialog open={!!target} onOpenChange={(open) => !open && onClose()}>
@@ -68,63 +82,41 @@ export function UpdateLanguageDialog({ target, onClose, onUpdated }: UpdateLangu
         <DialogHeader>
           <DialogTitle className="text-left text-base font-semibold">Update Language</DialogTitle>
         </DialogHeader>
-        <div className="space-y-6 py-4">
-          <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
-            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-foreground transition-colors group-focus-within:text-primary">
-              Name
-            </span>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 py-4">
+          <FloatingField label="Name" error={errors.name?.message}>
             <Input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              {...register("name")}
               placeholder=" "
-              disabled={updating}
-              className="peer border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none h-12 py-1 text-lg"
+              disabled={isSubmitting || updating}
+              className={inputClasses}
             />
-          </div>
-          <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
-            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-foreground transition-colors group-focus-within:text-primary">
-              ISO2
-            </span>
+          </FloatingField>
+          <FloatingField label="Native Name" error={errors.nativeName?.message}>
             <Input
-              value={iso2}
-              onChange={(e) => setIso2(e.target.value)}
+              {...register("nativeName")}
               placeholder=" "
-              disabled={updating}
-              className="peer border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none h-12 py-1 text-lg"
+              disabled={isSubmitting || updating}
+              className={inputClasses}
             />
-          </div>
-          <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
-            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-foreground transition-colors group-focus-within:text-primary">
-              Native Name
-            </span>
+          </FloatingField>
+          <FloatingField label="ISO2" error={errors.iso2?.message}>
             <Input
-              value={nativeName}
-              onChange={(e) => setNativeName(e.target.value)}
+              {...register("iso2")}
               placeholder=" "
-              disabled={updating}
-              className="peer border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none h-12 py-1 text-lg"
+              disabled={isSubmitting || updating}
+              className={inputClasses}
             />
-          </div>
-        </div>
-        <DialogFooter className="gap-3 border-t-0 bg-transparent mx-0 mb-0 py-0">
-          <Button
-            type="button"
-            variant="ghost"
-            className="uppercase min-w-30 border border-border py-1.5"
-            onClick={onClose}
-          >
-            CANCEL
-          </Button>
-          <Button
-            type="button"
-            className="uppercase text-white min-w-30 py-1.5"
-            style={{ backgroundColor: "#e53935" }}
-            disabled={!name.trim() || !iso2.trim() || !isDirty || updating}
-            onClick={handleUpdate}
-          >
-            {updating ? "UPDATING..." : "UPDATE"}
-          </Button>
-        </DialogFooter>
+          </FloatingField>
+          <DialogActions
+            type="submit"
+            submitLabel="UPDATE"
+            loadingLabel="UPDATING..."
+            loading={updating}
+            disabled={!isDirty || isSubmitting}
+            onCancel={onClose}
+            className="pt-1"
+          />
+        </form>
       </DialogContent>
     </Dialog>
   );

@@ -29,7 +29,7 @@ export function VerifyEmailForm() {
   const router = useRouter();
   const [verified, setVerified] = useState(false);
   const [verifyMail] = useMutation(VerifyMailDocument);
-  useSession();
+  const { user } = useSession();
   const {
     register,
     handleSubmit,
@@ -40,7 +40,7 @@ export function VerifyEmailForm() {
   });
 
   const continueIntoApp = () => {
-    router.replace("/users");
+    router.replace(`/users/${user?.id ?? ""}/profile`);
     router.refresh();
   };
 

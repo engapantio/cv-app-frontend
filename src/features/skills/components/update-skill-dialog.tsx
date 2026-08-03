@@ -5,12 +5,10 @@ import { useMutation } from "@apollo/client/react";
 import { toast } from "sonner";
 import { UpdateSkillDocument, type SkillCategoriesQuery } from "@/gql/generated/graphql";
 import {
-  Button,
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
   Input,
   Select,
   SelectContent,
@@ -18,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui";
+import { DialogActions, FloatingField } from "@/components/shared";
 import type { SkillItem } from "@/features/skills/types";
 
 interface UpdateSkillDialogProps {
@@ -46,6 +45,7 @@ export function UpdateSkillDialog({
   const [selectedCategoryName, setSelectedCategoryName] = useState<string | null>(
     initialCategoryName,
   );
+  const [categoryOpen, setCategoryOpen] = useState(false);
 
   const isDirty =
     name.trim() !== (target?.name ?? "").trim() || selectedCategoryName !== initialCategoryName;
@@ -75,6 +75,11 @@ export function UpdateSkillDialog({
     }
   }, [target, name, selectedCategoryName, categories, updateSkill, onUpdated, onClose]);
 
+  const inputClasses =
+    "peer border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none h-12";
+  const selectTriggerClasses =
+    "w-full border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none h-12 py-1 text-sm";
+
   return (
     <Dialog open={!!target} onOpenChange={(open) => !open && onClose()}>
       <DialogContent showCloseButton className="sm:max-w-md bg-card border-border rounded-none">
@@ -82,27 +87,26 @@ export function UpdateSkillDialog({
           <DialogTitle className="text-left text-base font-semibold">Update Skill</DialogTitle>
         </DialogHeader>
         <div className="space-y-6 py-4">
-          <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
-            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-foreground transition-colors group-focus-within:text-primary">
-              Name
-            </span>
+          <FloatingField label="Name">
             <Input
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder=" "
               disabled={updating}
-              className="peer border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none h-12 py-1 text-lg"
+              className={inputClasses}
             />
-          </div>
-          <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
-            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-foreground transition-colors group-focus-within:text-primary">
-              Category
-            </span>
+          </FloatingField>
+          <FloatingField
+            label="Category"
+            variant="select"
+            active={!!selectedCategoryName || categoryOpen}
+          >
             <Select
               value={selectedCategoryName ?? ""}
               onValueChange={(v) => setSelectedCategoryName(v || null)}
+              onOpenChange={setCategoryOpen}
             >
-              <SelectTrigger className="w-full border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none h-12 py-1 text-lg">
+              <SelectTrigger className={selectTriggerClasses}>
                 <SelectValue placeholder="Select category" />
               </SelectTrigger>
               <SelectContent>
@@ -113,27 +117,16 @@ export function UpdateSkillDialog({
                 ))}
               </SelectContent>
             </Select>
-          </div>
+          </FloatingField>
         </div>
-        <DialogFooter className="gap-3 border-t-0 bg-transparent mx-0 mb-0 py-0">
-          <Button
-            type="button"
-            variant="ghost"
-            className="uppercase min-w-30 border border-border py-1.5"
-            onClick={onClose}
-          >
-            CANCEL
-          </Button>
-          <Button
-            type="button"
-            className="uppercase text-white min-w-30 py-1.5"
-            style={{ backgroundColor: "#e53935" }}
-            disabled={!name.trim() || !isDirty || updating}
-            onClick={handleUpdate}
-          >
-            {updating ? "UPDATING..." : "UPDATE"}
-          </Button>
-        </DialogFooter>
+        <DialogActions
+          submitLabel="UPDATE"
+          loadingLabel="UPDATING..."
+          loading={updating}
+          disabled={!name.trim() || !isDirty}
+          onCancel={onClose}
+          onSubmit={handleUpdate}
+        />
       </DialogContent>
     </Dialog>
   );

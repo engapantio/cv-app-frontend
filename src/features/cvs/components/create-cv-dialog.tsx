@@ -6,15 +6,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation } from "@apollo/client/react";
 import { CreateCvDocument, type CreateCvMutation } from "@/gql/generated/graphql";
-import {
-  Button,
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-  Input,
-} from "@/components/ui";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, Input } from "@/components/ui";
+import { DialogActions, FloatingField } from "@/components/shared";
 
 const createCvSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -23,6 +16,9 @@ const createCvSchema = z.object({
 });
 
 type CreateCvFormData = z.infer<typeof createCvSchema>;
+
+const inputClasses =
+  "peer border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none py-3";
 
 export function CreateCvDialog({
   open,
@@ -77,70 +73,48 @@ export function CreateCvDialog({
           <DialogTitle className="text-left text-base font-semibold">Create CV</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="relative mb-5">
-            <div className="relative rounded-none border border-border transition-colors focus-within:border-primary">
+          <div className="mb-5">
+            <FloatingField label="Name" error={errors.name?.message}>
               <Input
                 {...register("name")}
                 placeholder=" "
                 disabled={isSubmitting}
-                className="peer border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none py-3"
+                className={inputClasses}
               />
-              <span className="absolute left-3 bg-background px-1 text-xs text-muted-foreground transition-all duration-200 pointer-events-none peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-sm peer-focus:-top-2.5 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-primary -top-2.5 translate-y-0">
-                Name
-              </span>
-            </div>
-            {errors.name && <p className="text-sm text-destructive mt-1">{errors.name.message}</p>}
+            </FloatingField>
           </div>
-          <div className="relative mb-5">
-            <div className="relative rounded-none border border-border transition-colors focus-within:border-primary">
+          <div className="mb-5">
+            <FloatingField label="Education" error={errors.education?.message}>
               <Input
                 {...register("education")}
                 placeholder=" "
                 disabled={isSubmitting}
-                className="peer border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none py-3"
+                className={inputClasses}
               />
-              <span className="absolute left-3 bg-background px-1 text-xs text-muted-foreground transition-all duration-200 pointer-events-none peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-sm peer-focus:-top-2.5 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-primary -top-2.5 translate-y-0">
-                Education
-              </span>
-            </div>
-            {errors.education && (
-              <p className="text-sm text-destructive mt-1">{errors.education.message}</p>
-            )}
+            </FloatingField>
           </div>
-          <div className="relative mb-3">
-            <div className="relative rounded-none border border-border transition-colors focus-within:border-primary">
+          <div className="mb-3">
+            <FloatingField
+              label="Description"
+              variant="textarea"
+              error={errors.description?.message}
+            >
               <textarea
                 {...register("description")}
                 placeholder=" "
                 disabled={isSubmitting}
                 className="peer flex w-full bg-background px-4 pt-6 pb-3 text-sm focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 border-0 min-h-30 resize-none disabled:opacity-50 disabled:cursor-not-allowed"
               />
-              <span className="absolute left-3 bg-background px-1 text-xs text-muted-foreground transition-all duration-200 pointer-events-none peer-placeholder-shown:top-4 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-sm peer-focus:-top-2.5 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-primary -top-2.5 translate-y-0">
-                Description
-              </span>
-            </div>
-            {errors.description && (
-              <p className="text-sm text-destructive mt-1">{errors.description.message}</p>
-            )}
+            </FloatingField>
           </div>
-          <DialogFooter className="gap-3 border-t-0 bg-transparent mx-0 mb-0 py-0">
-            <Button
-              type="button"
-              variant="ghost"
-              className="uppercase min-w-30 border border-border py-1.5"
-              onClick={() => onOpenChange(false)}
-            >
-              CANCEL
-            </Button>
-            <Button
-              type="submit"
-              className="uppercase text-white min-w-30 py-1.5"
-              style={{ backgroundColor: "#e53935" }}
-              disabled={isSubmitting || creating}
-            >
-              {creating ? "CREATING..." : "CREATE"}
-            </Button>
-          </DialogFooter>
+          <DialogActions
+            type="submit"
+            submitLabel="CREATE"
+            loadingLabel="CREATING..."
+            loading={creating}
+            disabled={isSubmitting}
+            onCancel={() => onOpenChange(false)}
+          />
         </form>
       </DialogContent>
     </Dialog>

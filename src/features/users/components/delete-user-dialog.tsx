@@ -2,39 +2,37 @@
 
 import { useCallback } from "react";
 import { useMutation } from "@apollo/client/react";
-import { DeleteCvDocument, type UserQuery } from "@/gql/generated/graphql";
+import { DeleteUserDocument } from "@/gql/generated/graphql";
 import { Button, Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui";
+import type { UserItem } from "@/features/users/types";
 
-type CvItem = NonNullable<UserQuery["user"]["cvs"]>[number];
-
-export function DeleteCvDialog({
-  target,
-  onClose,
-  onDeleted,
-}: {
-  target: CvItem | null;
+interface DeleteUserDialogProps {
+  target: UserItem | null;
   onClose: () => void;
-  onDeleted: (cvId: string) => void;
-}) {
-  const [deleteCv, { loading: deleting }] = useMutation(DeleteCvDocument);
+  onDeleted: (userId: string) => void;
+}
+
+export function DeleteUserDialog({ target, onClose, onDeleted }: DeleteUserDialogProps) {
+  const [deleteUser, { loading: deleting }] = useMutation(DeleteUserDocument);
 
   const handleConfirm = useCallback(async () => {
     if (!target) return;
     try {
-      await deleteCv({ variables: { cv: { cvId: target.id } } });
-      onDeleted(target.id);
+      await deleteUser({ variables: { userId: target.id } });
+      await onDeleted(target.id);
       onClose();
     } catch {}
-  }, [target, deleteCv, onDeleted, onClose]);
+  }, [target, deleteUser, onDeleted, onClose]);
 
   return (
     <Dialog open={!!target} onOpenChange={(open) => !open && onClose()}>
       <DialogContent showCloseButton className="sm:max-w-lg bg-card border-border rounded-none">
         <DialogHeader>
-          <DialogTitle className="text-left text-base font-semibold">Delete CV</DialogTitle>
+          <DialogTitle className="text-left text-base font-semibold">Delete User</DialogTitle>
         </DialogHeader>
         <p className="text-sm text-muted-foreground">
-          Are you sure you want to delete CV <strong>{target?.name}</strong>?
+          Are you sure you want to delete user{" "}
+          <strong>{target?.profile?.full_name || target?.email || ""}</strong>?
         </p>
         <div
           className="flex flex-row items-center justify-end gap-3 mt-2 py-3"

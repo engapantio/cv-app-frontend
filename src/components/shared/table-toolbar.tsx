@@ -11,6 +11,8 @@ interface TableToolbarProps {
   onAction?: () => void;
   showAction?: boolean;
   actionClassName?: string;
+  searchClassName?: string;
+  searchInputClassName?: string;
 }
 
 export function TableToolbar({
@@ -20,10 +22,17 @@ export function TableToolbar({
   onAction,
   showAction = true,
   actionClassName,
+  searchClassName,
+  searchInputClassName,
 }: TableToolbarProps) {
   return (
     <div className="flex items-center justify-between gap-3">
-      <SearchBar value={value} onChange={onChange} />
+      <SearchBar
+        value={value}
+        onChange={onChange}
+        wrapperClassName={searchClassName}
+        inputClassName={searchInputClassName}
+      />
       {showAction && onAction && (
         <Button
           variant="ghost"

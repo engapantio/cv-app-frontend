@@ -1,18 +1,22 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useCallback } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { useMutation } from "@apollo/client/react";
 import { toast } from "sonner";
 import { CreateLanguageDocument } from "@/gql/generated/graphql";
-import {
-  Button,
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-  Input,
-} from "@/components/ui";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, Input } from "@/components/ui";
+import { DialogActions, FloatingField } from "@/components/shared";
+
+const createLanguageSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  iso2: z.string().min(1, "ISO2 is required").length(2, "ISO2 must be exactly 2 characters"),
+  nativeName: z.string().optional(),
+});
+
+type CreateLanguageFormData = z.infer<typeof createLanguageSchema>;
 
 interface CreateLanguageDialogProps {
   open: boolean;
@@ -27,35 +31,44 @@ interface CreateLanguageDialogProps {
 }
 
 export function CreateLanguageDialog({ open, onOpenChange, onCreated }: CreateLanguageDialogProps) {
-  const [name, setName] = useState("");
-  const [iso2, setIso2] = useState("");
-  const [nativeName, setNativeName] = useState("");
-
   const [createLanguage, { loading: creating }] = useMutation(CreateLanguageDocument);
 
-  const handleCreate = useCallback(async () => {
-    if (!name.trim() || !iso2.trim()) return;
-    try {
-      const { data } = await createLanguage({
-        variables: {
-          language: {
-            name: name.trim(),
-            iso2: iso2.trim(),
-            native_name: nativeName.trim() || null,
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<CreateLanguageFormData>({
+    resolver: zodResolver(createLanguageSchema),
+    defaultValues: { name: "", iso2: "", nativeName: "" },
+  });
+
+  const onSubmit = useCallback(
+    async (formData: CreateLanguageFormData) => {
+      try {
+        const { data } = await createLanguage({
+          variables: {
+            language: {
+              name: formData.name.trim(),
+              iso2: formData.iso2.trim(),
+              native_name: formData.nativeName?.trim() || null,
+            },
           },
-        },
-      });
-      if (data?.createLanguage) {
-        onCreated(data.createLanguage);
+        });
+        if (data?.createLanguage) {
+          onCreated(data.createLanguage);
+        }
+        reset();
+        onOpenChange(false);
+      } catch {
+        toast.error("Failed to create language");
       }
-      setName("");
-      setIso2("");
-      setNativeName("");
-      onOpenChange(false);
-    } catch {
-      toast.error("Failed to create language");
-    }
-  }, [name, iso2, nativeName, createLanguage, onCreated, onOpenChange]);
+    },
+    [createLanguage, onCreated, reset, onOpenChange],
+  );
+
+  const inputClasses =
+    "peer border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none h-12";
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -63,63 +76,41 @@ export function CreateLanguageDialog({ open, onOpenChange, onCreated }: CreateLa
         <DialogHeader>
           <DialogTitle className="text-left text-base font-semibold">Create Language</DialogTitle>
         </DialogHeader>
-        <div className="space-y-6 py-4">
-          <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
-            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-foreground transition-colors group-focus-within:text-primary">
-              Name
-            </span>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 py-4">
+          <FloatingField label="Name" error={errors.name?.message}>
             <Input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              {...register("name")}
               placeholder=" "
-              disabled={creating}
-              className="peer border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none h-12 py-1 text-lg"
+              disabled={isSubmitting || creating}
+              className={inputClasses}
             />
-          </div>
-          <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
-            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-foreground transition-colors group-focus-within:text-primary">
-              ISO2
-            </span>
+          </FloatingField>
+          <FloatingField label="Native Name" error={errors.nativeName?.message}>
             <Input
-              value={iso2}
-              onChange={(e) => setIso2(e.target.value)}
+              {...register("nativeName")}
               placeholder=" "
-              disabled={creating}
-              className="peer border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none h-12 py-1 text-lg"
+              disabled={isSubmitting || creating}
+              className={inputClasses}
             />
-          </div>
-          <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
-            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-foreground transition-colors group-focus-within:text-primary">
-              Native Name
-            </span>
+          </FloatingField>
+          <FloatingField label="ISO2" error={errors.iso2?.message}>
             <Input
-              value={nativeName}
-              onChange={(e) => setNativeName(e.target.value)}
+              {...register("iso2")}
               placeholder=" "
-              disabled={creating}
-              className="peer border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none h-12 py-1 text-lg"
+              disabled={isSubmitting || creating}
+              className={inputClasses}
             />
-          </div>
-        </div>
-        <DialogFooter className="gap-3 border-t-0 bg-transparent mx-0 mb-0 py-0">
-          <Button
-            type="button"
-            variant="ghost"
-            className="uppercase min-w-30 border border-border py-1.5"
-            onClick={() => onOpenChange(false)}
-          >
-            CANCEL
-          </Button>
-          <Button
-            type="button"
-            className="uppercase text-white min-w-30 py-1.5"
-            style={{ backgroundColor: "#e53935" }}
-            disabled={!name.trim() || !iso2.trim() || creating}
-            onClick={handleCreate}
-          >
-            {creating ? "CREATING..." : "CREATE"}
-          </Button>
-        </DialogFooter>
+          </FloatingField>
+          <DialogActions
+            type="submit"
+            submitLabel="CREATE"
+            loadingLabel="CREATING..."
+            loading={creating}
+            disabled={isSubmitting}
+            onCancel={() => onOpenChange(false)}
+            className="pt-1"
+          />
+        </form>
       </DialogContent>
     </Dialog>
   );

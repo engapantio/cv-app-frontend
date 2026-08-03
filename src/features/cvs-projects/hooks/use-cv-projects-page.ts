@@ -62,7 +62,12 @@ export function useCvProjectsPage(
     return extractProjects(cv);
   }, [cv, localProjects]);
 
-  const allProjects = useMemo(() => projectsData?.projects ?? [], [projectsData]);
+  const allProjects = useMemo(() => {
+    const addedIds = new Set(
+      projects.map((p) => p.project?.id).filter((id): id is string => Boolean(id)),
+    );
+    return (projectsData?.projects ?? []).filter((p) => !addedIds.has(p.id));
+  }, [projectsData, projects]);
 
   const [globalFilter, setGlobalFilter] = useState("");
 

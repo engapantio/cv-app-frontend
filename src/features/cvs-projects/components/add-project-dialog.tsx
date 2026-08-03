@@ -4,14 +4,14 @@ import { useState, useCallback } from "react";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { toast } from "sonner";
-import { EnvPill } from "@/components/shared";
+import { DialogActions, EnvPill, FloatingField } from "@/components/shared";
+import { cn } from "@/lib/utils";
 import {
   Button,
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
   Input,
   Textarea,
   Popover,
@@ -62,6 +62,7 @@ export function AddProjectDialog({
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
   const [rolesInput, setRolesInput] = useState("");
+  const [projectOpen, setProjectOpen] = useState(false);
 
   const [startDateOpen, setStartDateOpen] = useState(false);
   const [endDateOpen, setEndDateOpen] = useState(false);
@@ -121,11 +122,16 @@ export function AddProjectDialog({
         </DialogHeader>
         <div className="space-y-5">
           <div className="grid grid-cols-2 gap-4">
-            <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
-              <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-foreground transition-colors group-focus-within:text-primary">
-                Project
-              </span>
-              <Select value={selectedProject?.name ?? ""} onValueChange={handleProjectSelect}>
+            <FloatingField
+              label="Project"
+              variant="select"
+              active={!!selectedProject || projectOpen}
+            >
+              <Select
+                value={selectedProject?.name ?? ""}
+                onValueChange={handleProjectSelect}
+                onOpenChange={setProjectOpen}
+              >
                 <SelectTrigger className="w-full border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none text-sm data-[size=default]:h-12">
                   <SelectValue placeholder="Select project" />
                 </SelectTrigger>
@@ -137,7 +143,7 @@ export function AddProjectDialog({
                   ))}
                 </SelectContent>
               </Select>
-            </div>
+            </FloatingField>
             <div className="group relative rounded-none border border-border">
               <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground">
                 Domain
@@ -151,7 +157,14 @@ export function AddProjectDialog({
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
-              <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-foreground transition-colors group-focus-within:text-primary z-10">
+              <span
+                className={cn(
+                  "absolute left-3 bg-background px-1 text-xs transition-all duration-200 pointer-events-none z-10",
+                  startDate || startDateOpen
+                    ? "-top-2.5 translate-y-0 text-xs text-foreground group-focus-within:text-primary"
+                    : "top-1/2 -translate-y-1/2 text-sm text-muted-foreground",
+                )}
+              >
                 Start Date
               </span>
               <Popover open={startDateOpen} onOpenChange={setStartDateOpen}>
@@ -161,7 +174,7 @@ export function AddProjectDialog({
                       variant="ghost"
                       className="w-full border-0 bg-transparent shadow-none rounded-none h-12 justify-start text-left font-normal"
                     >
-                      {startDate ? format(startDate, "dd/MM/yyyy") : "Select date"}
+                      {startDate ? format(startDate, "dd/MM/yyyy") : ""}
                       <CalendarIcon className="ml-auto size-4 text-muted-foreground" />
                     </Button>
                   }
@@ -179,7 +192,14 @@ export function AddProjectDialog({
               </Popover>
             </div>
             <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
-              <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-foreground transition-colors group-focus-within:text-primary z-10">
+              <span
+                className={cn(
+                  "absolute left-3 bg-background px-1 text-xs transition-all duration-200 pointer-events-none z-10",
+                  endDate || endDateOpen
+                    ? "-top-2.5 translate-y-0 text-xs text-foreground group-focus-within:text-primary"
+                    : "top-1/2 -translate-y-1/2 text-sm text-muted-foreground",
+                )}
+              >
                 End Date
               </span>
               <Popover open={endDateOpen} onOpenChange={setEndDateOpen}>
@@ -189,7 +209,7 @@ export function AddProjectDialog({
                       variant="ghost"
                       className="w-full border-0 bg-transparent shadow-none rounded-none h-12 justify-start text-left font-normal"
                     >
-                      {endDate ? format(endDate, "dd/MM/yyyy") : "Select date"}
+                      {endDate ? format(endDate, "dd/MM/yyyy") : ""}
                       <CalendarIcon className="ml-auto size-4 text-muted-foreground" />
                     </Button>
                   }
@@ -237,29 +257,19 @@ export function AddProjectDialog({
               value={rolesInput}
               onChange={(e) => setRolesInput(e.target.value)}
               placeholder="Enter roles and responsibilities (one per line)"
-              className="border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none min-h-[100px] resize-none pt-6"
+              className="border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none min-h-[100px] resize-none pt-6 placeholder:text-muted-foreground dark:placeholder:text-muted-foreground"
             />
           </div>
         </div>
-        <DialogFooter className="gap-3 border-t-0 bg-transparent mx-0 mb-0 py-0">
-          <Button
-            type="button"
-            variant="ghost"
-            className="uppercase min-w-30 border border-border py-1.5"
-            onClick={() => onOpenChange(false)}
-          >
-            CANCEL
-          </Button>
-          <Button
-            type="submit"
-            className="uppercase text-white min-w-30 py-1.5 hover:brightness-90"
-            style={{ backgroundColor: "#e53935" }}
-            disabled={!selectedProject || loading}
-            onClick={handleConfirm}
-          >
-            {loading ? "ADDING..." : "ADD"}
-          </Button>
-        </DialogFooter>
+        <DialogActions
+          submitLabel="ADD"
+          loadingLabel="ADDING..."
+          loading={loading}
+          disabled={!selectedProject}
+          onCancel={() => onOpenChange(false)}
+          onSubmit={handleConfirm}
+          submitClassName="hover:brightness-90"
+        />
       </DialogContent>
     </Dialog>
   );

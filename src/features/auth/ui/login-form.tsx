@@ -56,7 +56,8 @@ export function LoginForm() {
         setTokens(payload.accessToken, payload.refreshToken ?? null);
       }
       setAuthenticatedSession(payload.user);
-      router.replace("/users");
+      const profileUrl = `/users/${payload.user.id}/profile`;
+      router.replace(profileUrl);
       router.refresh();
     } catch {
       setError("root", { message: "Unexpected error. Please try again." });
