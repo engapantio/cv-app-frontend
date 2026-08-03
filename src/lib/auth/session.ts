@@ -59,6 +59,50 @@ export function markUserVerified() {
   });
 }
 
+export function updateSessionProfile(patch: {
+  first_name?: string | null;
+  last_name?: string | null;
+  full_name?: string | null;
+  department?: { id: string; name?: string | null } | null;
+  position?: { id: string; name?: string | null } | null;
+  department_name?: string | null;
+  position_name?: string | null;
+}) {
+  const current = sessionStateVar();
+  if (current.status !== "authenticated" || !current.user?.profile) return;
+  sessionStateVar({
+    status: "authenticated",
+    user: {
+      ...current.user,
+      ...("department" in patch
+        ? { department: patch.department ? { id: patch.department.id } : null }
+        : {}),
+      ...("position" in patch
+        ? { position: patch.position ? { id: patch.position.id } : null }
+        : {}),
+      ...("department_name" in patch ? { department_name: patch.department_name } : {}),
+      ...("position_name" in patch ? { position_name: patch.position_name } : {}),
+      profile: { ...current.user.profile, ...patch },
+    },
+  });
+}
+
+export function syncSessionProfileFromUpdate(patch: {
+  first_name?: string | null;
+  last_name?: string | null;
+  department?: { id: string; name?: string | null } | null;
+  position?: { id: string; name?: string | null } | null;
+}) {
+  const first = patch.first_name ?? null;
+  const last = patch.last_name ?? null;
+  updateSessionProfile({
+    ...patch,
+    full_name: [first, last].filter(Boolean).join(" ").trim() || null,
+    department_name: patch.department?.name ?? null,
+    position_name: patch.position?.name ?? null,
+  });
+}
+
 export function setAuthenticatedSession(user: SessionUser) {
   bootstrapAbortController?.abort();
   bootstrapped = false;

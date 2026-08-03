@@ -4,7 +4,7 @@ import { useState, useCallback } from "react";
 import { format } from "date-fns";
 import { CalendarIcon, ChevronDown, ChevronUp } from "lucide-react";
 import { toast } from "sonner";
-import { EnvPill } from "@/components/shared";
+import { DialogActions, EnvPill, FloatingField } from "@/components/shared";
 import { cn } from "@/lib/utils";
 import {
   Button,
@@ -12,7 +12,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
   Input,
   Popover,
   PopoverTrigger,
@@ -106,28 +105,22 @@ export function CreateProjectDialog({
         </DialogHeader>
         <div className="space-y-5">
           <div className="grid grid-cols-2 gap-4">
-            <div className="relative rounded-none border border-border transition-colors focus-within:border-primary">
+            <FloatingField label="Project">
               <Input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder=" "
                 className="peer border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none h-12"
               />
-              <span className="absolute left-3 bg-background px-1 text-xs text-muted-foreground transition-all duration-200 pointer-events-none peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-sm peer-focus:-top-2.5 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-primary -top-2.5 translate-y-0">
-                Project
-              </span>
-            </div>
-            <div className="relative rounded-none border border-border transition-colors focus-within:border-primary">
+            </FloatingField>
+            <FloatingField label="Domain">
               <Input
                 value={domain}
                 onChange={(e) => setDomain(e.target.value)}
                 placeholder=" "
                 className="peer border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none h-12"
               />
-              <span className="absolute left-3 bg-background px-1 text-xs text-muted-foreground transition-all duration-200 pointer-events-none peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-sm peer-focus:-top-2.5 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-primary -top-2.5 translate-y-0">
-                Domain
-              </span>
-            </div>
+            </FloatingField>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
@@ -201,17 +194,14 @@ export function CreateProjectDialog({
               </Popover>
             </div>
           </div>
-          <div className="relative rounded-none border border-border transition-colors focus-within:border-primary">
+          <FloatingField label="Description" variant="textarea">
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder=" "
               className="peer flex w-full bg-transparent px-4 pt-6 pb-3 text-sm focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 border-0 min-h-30 resize-none"
             />
-            <span className="absolute left-3 bg-background px-1 text-xs text-muted-foreground transition-all duration-200 pointer-events-none peer-placeholder-shown:top-4 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-sm peer-focus:-top-2.5 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-primary -top-2.5 translate-y-0">
-              Description
-            </span>
-          </div>
+          </FloatingField>
           <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
             <span
               className={cn(
@@ -270,25 +260,15 @@ export function CreateProjectDialog({
             </Popover>
           </div>
         </div>
-        <DialogFooter className="gap-3 border-t-0 bg-transparent mx-0 mb-0 py-0">
-          <Button
-            type="button"
-            variant="ghost"
-            className="uppercase min-w-30 border border-border py-1.5"
-            onClick={() => onOpenChange(false)}
-          >
-            CANCEL
-          </Button>
-          <Button
-            type="submit"
-            className="uppercase text-white min-w-30 py-1.5 hover:brightness-90"
-            style={{ backgroundColor: "#e53935" }}
-            disabled={!name || !domain || !startDate || !description || loading}
-            onClick={handleConfirm}
-          >
-            {loading ? "CREATING..." : "CREATE"}
-          </Button>
-        </DialogFooter>
+        <DialogActions
+          submitLabel="CREATE"
+          loadingLabel="CREATING..."
+          loading={loading}
+          disabled={!name || !domain || !startDate || !description}
+          onCancel={() => onOpenChange(false)}
+          onSubmit={handleConfirm}
+          submitClassName="hover:brightness-90"
+        />
       </DialogContent>
     </Dialog>
   );

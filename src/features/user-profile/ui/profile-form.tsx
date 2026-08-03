@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui";
 import { toast } from "sonner";
+import { syncSessionProfileFromUpdate } from "@/lib/auth/session";
 import {
   UpdateProfileDocument,
   UpdateUserDocument,
@@ -87,30 +88,58 @@ export function ProfileForm({
   }, [defaultValues, reset]);
 
   const onSubmit = async (data: ProfileFormValues) => {
+    const namesChanged =
+      (data.first_name ?? "") !== (defaultValues.first_name ?? "") ||
+      (data.last_name ?? "") !== (defaultValues.last_name ?? "");
+    const employmentChanged =
+      (data.departmentId ?? "") !== (defaultValues.departmentId ?? "") ||
+      (data.positionId ?? "") !== (defaultValues.positionId ?? "");
+
+    if (!namesChanged && !employmentChanged) return;
+
     try {
-      const [profileResult, userResult] = await Promise.all([
-        updateProfile({
-          variables: {
-            profile: {
-              userId,
-              first_name: data.first_name,
-              last_name: data.last_name,
+      const operations = [];
+      if (namesChanged) {
+        operations.push(
+          updateProfile({
+            variables: {
+              profile: {
+                userId,
+                first_name: data.first_name || null,
+                last_name: data.last_name || null,
+              },
             },
-          },
-        }),
-        updateUser({
-          variables: {
-            user: {
-              userId,
-              departmentId: data.departmentId || null,
-              positionId: data.positionId || null,
+          }),
+        );
+      }
+      if (employmentChanged) {
+        operations.push(
+          updateUser({
+            variables: {
+              user: {
+                userId,
+                departmentId: data.departmentId || null,
+                positionId: data.positionId || null,
+              },
             },
-          },
-        }),
-      ]);
-      if (profileResult.error || userResult.error) {
+          }),
+        );
+      }
+
+      const results = await Promise.all(operations);
+      if (results.some((result) => result.error)) {
         throw new Error("Partial update — some fields failed");
       }
+
+      const dept = departments.find((d) => d.id === data.departmentId);
+      const pos = positions.find((p) => p.id === data.positionId);
+
+      syncSessionProfileFromUpdate({
+        first_name: data.first_name || null,
+        last_name: data.last_name || null,
+        department: data.departmentId ? { id: data.departmentId, name: dept?.name ?? null } : null,
+        position: data.positionId ? { id: data.positionId, name: pos?.name ?? null } : null,
+      });
 
       toast.success("Profile updated successfully");
       reset(data);

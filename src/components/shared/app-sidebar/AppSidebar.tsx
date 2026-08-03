@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useSyncExternalStore } from "react";
-import { cn } from "@/lib/utils";
+import { cn, buildFullName } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -278,9 +278,7 @@ export function AppSidebar({ isSidebarOpen, setIsSidebarOpen }: AppSidebarProps)
 
   const userId = user?.id ?? null;
   const fullName =
-    user?.profile?.full_name ||
-    `${user?.profile?.first_name || ""} ${user?.profile?.last_name || ""}`.trim() ||
-    "";
+    user?.profile?.full_name || buildFullName(user?.profile?.first_name, user?.profile?.last_name);
   const avatar = user?.profile?.avatar;
   const initial = fullName ? fullName[0].toUpperCase() : "";
   const closeSidebar = () => setIsSidebarOpen(false);

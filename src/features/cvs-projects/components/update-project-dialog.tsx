@@ -4,14 +4,13 @@ import { useState, useCallback } from "react";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { toast } from "sonner";
-import { EnvPill } from "@/components/shared";
+import { DialogActions, EnvPill } from "@/components/shared";
 import {
   Button,
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
   Input,
   Textarea,
   Popover,
@@ -206,29 +205,19 @@ function UpdateProjectForm({
             value={rolesInput}
             onChange={(e) => setRolesInput(e.target.value)}
             placeholder="Enter roles and responsibilities (one per line)"
-            className="border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none min-h-25 resize-none pt-6"
+            className="border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none min-h-25 resize-none pt-6 placeholder:text-muted-foreground dark:placeholder:text-muted-foreground"
           />
         </div>
       </div>
-      <DialogFooter className="gap-3 border-t-0 bg-transparent mx-0 mb-0 py-0">
-        <Button
-          type="button"
-          variant="ghost"
-          className="uppercase min-w-30 border border-border py-1.5"
-          onClick={() => onOpenChange(false)}
-        >
-          CANCEL
-        </Button>
-        <Button
-          type="submit"
-          className="uppercase text-white min-w-30 py-1.5 hover:brightness-90"
-          style={{ backgroundColor: "#e53935" }}
-          disabled={!isDirty || loading}
-          onClick={handleConfirm}
-        >
-          {loading ? "UPDATING..." : "UPDATE"}
-        </Button>
-      </DialogFooter>
+      <DialogActions
+        submitLabel="UPDATE"
+        loadingLabel="UPDATING..."
+        loading={loading}
+        disabled={!isDirty}
+        onCancel={() => onOpenChange(false)}
+        onSubmit={handleConfirm}
+        submitClassName="hover:brightness-90"
+      />
     </>
   );
 }

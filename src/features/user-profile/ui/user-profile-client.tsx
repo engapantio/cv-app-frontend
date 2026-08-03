@@ -44,12 +44,30 @@ export function UserProfileClient({ user, isOwner }: UserProfileClientProps) {
     if (tab) router.push(tab.href);
   };
 
-  const fullName = user.profile?.full_name || "";
-  const avatar = user.profile?.avatar;
-  const first_name = user.profile?.first_name;
-  const last_name = user.profile?.last_name;
-  const departmentId = user.department?.id || null;
-  const positionId = user.position?.id || null;
+  const isSelf = currentUser?.id === user.id;
+  const fullName =
+    (isSelf
+      ? (currentUser?.profile?.full_name ?? user.profile?.full_name)
+      : user.profile?.full_name) || "";
+  const avatar = isSelf
+    ? (currentUser?.profile?.avatar ?? user.profile?.avatar)
+    : user.profile?.avatar;
+  const first_name = isSelf
+    ? (currentUser?.profile?.first_name ?? user.profile?.first_name)
+    : user.profile?.first_name;
+  const last_name = isSelf
+    ? (currentUser?.profile?.last_name ?? user.profile?.last_name)
+    : user.profile?.last_name;
+  const departmentId = isSelf
+    ? (currentUser?.department?.id ?? user.department?.id)
+    : user.department?.id;
+  const positionId = isSelf ? (currentUser?.position?.id ?? user.position?.id) : user.position?.id;
+  const userDepartmentName = isSelf
+    ? (currentUser?.department_name ?? user.department_name)
+    : user.department_name;
+  const userPositionName = isSelf
+    ? (currentUser?.position_name ?? user.position_name)
+    : user.position_name;
 
   const formatDate = (value: string | number | null | undefined) => {
     if (!value) return "N/A";
@@ -116,8 +134,8 @@ export function UserProfileClient({ user, isOwner }: UserProfileClientProps) {
               departmentId,
               positionId,
             }}
-            userDepartmentName={user.department_name}
-            userPositionName={user.position_name}
+            userDepartmentName={userDepartmentName}
+            userPositionName={userPositionName}
             isOwner={canEdit}
           />
         </div>

@@ -4,14 +4,13 @@ import { useState, useCallback } from "react";
 import { format } from "date-fns";
 import { CalendarIcon, ChevronDown, ChevronUp } from "lucide-react";
 import { toast } from "sonner";
-import { EnvPill } from "@/components/shared";
+import { DialogActions, EnvPill, FloatingField } from "@/components/shared";
 import {
   Button,
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
   Input,
   Textarea,
   Popover,
@@ -122,28 +121,22 @@ function UpdateProjectForm({
       </DialogHeader>
       <div className="space-y-5">
         <div className="grid grid-cols-2 gap-4">
-          <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
-            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-foreground transition-colors group-focus-within:text-primary">
-              Project
-            </span>
+          <FloatingField label="Project">
             <Input
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder=" "
               className="peer border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none h-12"
             />
-          </div>
-          <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
-            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-foreground transition-colors group-focus-within:text-primary">
-              Domain
-            </span>
+          </FloatingField>
+          <FloatingField label="Domain">
             <Input
               value={domain}
               onChange={(e) => setDomain(e.target.value)}
               placeholder=" "
               className="peer border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none h-12"
             />
-          </div>
+          </FloatingField>
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
@@ -203,17 +196,14 @@ function UpdateProjectForm({
             </Popover>
           </div>
         </div>
-        <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
-          <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-foreground transition-colors group-focus-within:text-primary">
-            Description
-          </span>
+        <FloatingField label="Description" variant="textarea">
           <Textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder=" "
-            className="peer border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none min-h-20 resize-none pt-6"
+            className="peer border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none min-h-20 resize-none pt-6 px-4"
           />
-        </div>
+        </FloatingField>
         <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
           <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-foreground transition-colors group-focus-within:text-primary z-10">
             Environment
@@ -265,25 +255,15 @@ function UpdateProjectForm({
           </Popover>
         </div>
       </div>
-      <DialogFooter className="gap-3 border-t-0 bg-transparent mx-0 mb-0 py-0">
-        <Button
-          type="button"
-          variant="ghost"
-          className="uppercase min-w-30 border border-border py-1.5"
-          onClick={() => onOpenChange(false)}
-        >
-          CANCEL
-        </Button>
-        <Button
-          type="submit"
-          className="uppercase text-white min-w-30 py-1.5 hover:brightness-90"
-          style={{ backgroundColor: "#e53935" }}
-          disabled={!isDirty || loading}
-          onClick={handleConfirm}
-        >
-          {loading ? "UPDATING..." : "UPDATE"}
-        </Button>
-      </DialogFooter>
+      <DialogActions
+        submitLabel="UPDATE"
+        loadingLabel="UPDATING..."
+        loading={loading}
+        disabled={!isDirty}
+        onCancel={() => onOpenChange(false)}
+        onSubmit={handleConfirm}
+        submitClassName="hover:brightness-90"
+      />
     </>
   );
 }

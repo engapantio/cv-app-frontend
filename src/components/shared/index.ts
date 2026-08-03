@@ -9,3 +9,5 @@ export { TableEmptyState } from "./table-empty-state";
 export { TablePagination } from "./table-pagination";
 export { TableToolbar } from "./table-toolbar";
 export { VerifiedBadge } from "./verified-badge";
+export { FloatingField } from "./floating-field";
+export { DialogActions } from "./dialog-actions";

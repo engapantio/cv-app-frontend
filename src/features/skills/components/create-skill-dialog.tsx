@@ -5,12 +5,10 @@ import { useMutation } from "@apollo/client/react";
 import { toast } from "sonner";
 import { CreateSkillDocument, type SkillCategoriesQuery } from "@/gql/generated/graphql";
 import {
-  Button,
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
   Input,
   Select,
   SelectContent,
@@ -18,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui";
+import { DialogActions, FloatingField } from "@/components/shared";
 
 interface CreateSkillDialogProps {
   open: boolean;
@@ -40,6 +39,7 @@ export function CreateSkillDialog({
 }: CreateSkillDialogProps) {
   const [name, setName] = useState("");
   const [selectedCategoryName, setSelectedCategoryName] = useState<string | null>(null);
+  const [categoryOpen, setCategoryOpen] = useState(false);
 
   const [createSkill, { loading: creating }] = useMutation(CreateSkillDocument);
 
@@ -66,6 +66,11 @@ export function CreateSkillDialog({
     }
   }, [name, selectedCategoryName, categories, createSkill, onCreated, onOpenChange]);
 
+  const inputClasses =
+    "peer border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none h-12";
+  const selectTriggerClasses =
+    "w-full border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none h-12 py-1 text-sm";
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent showCloseButton className="sm:max-w-md bg-card border-border rounded-none">
@@ -73,27 +78,26 @@ export function CreateSkillDialog({
           <DialogTitle className="text-left text-base font-semibold">Create Skill</DialogTitle>
         </DialogHeader>
         <div className="space-y-6 py-4">
-          <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
-            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-foreground transition-colors group-focus-within:text-primary">
-              Name
-            </span>
+          <FloatingField label="Name">
             <Input
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder=" "
               disabled={creating}
-              className="peer border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none h-12 py-1 text-lg"
+              className={inputClasses}
             />
-          </div>
-          <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
-            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-foreground transition-colors group-focus-within:text-primary">
-              Category
-            </span>
+          </FloatingField>
+          <FloatingField
+            label="Category"
+            variant="select"
+            active={!!selectedCategoryName || categoryOpen}
+          >
             <Select
               value={selectedCategoryName ?? ""}
               onValueChange={(v) => setSelectedCategoryName(v || null)}
+              onOpenChange={setCategoryOpen}
             >
-              <SelectTrigger className="w-full border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none h-12 py-1 text-lg">
+              <SelectTrigger className={selectTriggerClasses}>
                 <SelectValue placeholder="Select category" />
               </SelectTrigger>
               <SelectContent>
@@ -104,27 +108,16 @@ export function CreateSkillDialog({
                 ))}
               </SelectContent>
             </Select>
-          </div>
+          </FloatingField>
         </div>
-        <DialogFooter className="gap-3 border-t-0 bg-transparent mx-0 mb-0 py-0">
-          <Button
-            type="button"
-            variant="ghost"
-            className="uppercase min-w-30 border border-border py-1.5"
-            onClick={() => onOpenChange(false)}
-          >
-            CANCEL
-          </Button>
-          <Button
-            type="button"
-            className="uppercase text-white min-w-30 py-1.5"
-            style={{ backgroundColor: "#e53935" }}
-            disabled={!name.trim() || creating}
-            onClick={handleCreate}
-          >
-            {creating ? "CREATING..." : "CREATE"}
-          </Button>
-        </DialogFooter>
+        <DialogActions
+          submitLabel="CREATE"
+          loadingLabel="CREATING..."
+          loading={creating}
+          disabled={!name.trim()}
+          onCancel={() => onOpenChange(false)}
+          onSubmit={handleCreate}
+        />
       </DialogContent>
     </Dialog>
   );
