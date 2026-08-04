@@ -11,6 +11,12 @@ interface Props {
   color?: string;
   primary?: string;
   muted?: string;
+  labels?: {
+    skills?: string;
+    experience?: string;
+    inYears?: string;
+    lastUsed?: string;
+  };
 }
 
 export function SkillsTable({
@@ -21,10 +27,12 @@ export function SkillsTable({
   color,
   primary,
   muted,
+  labels,
 }: Props) {
   const fg = color ?? "var(--foreground)";
   const red = primary ?? "#c63031";
   const borderColor = muted ?? "#bdbdbd";
+  const l = labels ?? {};
 
   return (
     <div className="overflow-x-auto">
@@ -35,7 +43,7 @@ export function SkillsTable({
               className="text-left font-medium text-sm py-3 px-3 align-top"
               style={{ color: fg, borderBottom: `1px solid ${red}` }}
             >
-              SKILLS
+              {l.skills ?? "SKILLS"}
             </th>
             <th
               className="text-left font-medium text-sm py-3 px-3"
@@ -45,14 +53,14 @@ export function SkillsTable({
               className="text-center font-medium text-sm py-3 px-3 leading-tight"
               style={{ color: fg, borderBottom: `1px solid ${red}`, verticalAlign: "middle" }}
             >
-              <span className="block">EXPERIENCE</span>
-              <span className="block">IN YEARS</span>
+              <span className="block">{l.experience ?? "EXPERIENCE"}</span>
+              <span className="block">{l.inYears ?? "IN YEARS"}</span>
             </th>
             <th
               className="text-center font-medium text-sm py-3 px-3 align-top"
               style={{ color: fg, borderBottom: `1px solid ${red}` }}
             >
-              LAST USED
+              {l.lastUsed ?? "LAST USED"}
             </th>
           </tr>
         </thead>

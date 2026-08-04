@@ -15,6 +15,7 @@ import type { LanguageItem } from "@/features/languages/types";
 import { TableEmptyState } from "@/components/shared/table-empty-state";
 import { TablePagination } from "@/components/shared/table-pagination";
 import { TableToolbar } from "@/components/shared/table-toolbar";
+import { useTranslations } from "next-intl";
 
 const OpenLanguageOverlay = dynamic(
   () => import("./open-language-overlay").then((m) => m.OpenLanguageOverlay),
@@ -87,6 +88,8 @@ export function LanguagesTable({
   serverError,
 }: LanguagesTableProps) {
   const rows = table.getRowModel().rows;
+  const tButtons = useTranslations("buttons");
+  const tCommon = useTranslations("common");
 
   return (
     <>
@@ -94,7 +97,7 @@ export function LanguagesTable({
         <TableToolbar
           value={globalFilter}
           onChange={setGlobalFilter}
-          actionLabel="CREATE LANGUAGE"
+          actionLabel={tButtons("createLanguage")}
           onAction={() => setCreateOpen(true)}
           showAction={isAdmin}
           actionClassName="hover:bg-transparent"
@@ -140,13 +143,13 @@ export function LanguagesTable({
                 {loading ? (
                   <TableRow>
                     <TableCell colSpan={columnCount} className="text-center">
-                      Loading...
+                      {tCommon("loading")}
                     </TableCell>
                   </TableRow>
                 ) : (
                   <TableRow>
                     <TableCell colSpan={columnCount}>
-                      <TableEmptyState message="No languages found." responsive />
+                      <TableEmptyState message={tCommon("noLanguagesFound")} responsive />
                     </TableCell>
                   </TableRow>
                 )}

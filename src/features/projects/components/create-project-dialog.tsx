@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import { format } from "date-fns";
 import { CalendarIcon, ChevronDown, ChevronUp } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import { DialogActions, EnvPill, FloatingField } from "@/components/shared";
 import { cn } from "@/lib/utils";
 import {
@@ -41,6 +42,7 @@ export function CreateProjectDialog({
   onConfirm,
   loading,
 }: CreateProjectDialogProps) {
+  const t = useTranslations();
   const [name, setName] = useState("");
   const [domain, setDomain] = useState("");
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
@@ -73,7 +75,7 @@ export function CreateProjectDialog({
 
   const handleConfirm = useCallback(async () => {
     if (!name || !domain || !startDate || !description) {
-      toast.error("Please fill all required fields");
+      toast.error(t("common.fillRequiredFields"));
       return;
     }
     try {
@@ -87,9 +89,9 @@ export function CreateProjectDialog({
       });
       reset();
     } catch {
-      toast.error("Failed to create project");
+      toast.error(t("common.createProjectFailed"));
     }
-  }, [name, domain, startDate, endDate, description, selectedEnv, onConfirm, reset]);
+  }, [name, domain, startDate, endDate, description, selectedEnv, onConfirm, reset, t]);
 
   return (
     <Dialog
@@ -101,11 +103,13 @@ export function CreateProjectDialog({
     >
       <DialogContent showCloseButton className="sm:max-w-xl bg-card border-border rounded-none">
         <DialogHeader>
-          <DialogTitle className="text-left text-base font-semibold">Create project</DialogTitle>
+          <DialogTitle className="text-left text-base font-semibold">
+            {t("dialogs.createProject")}
+          </DialogTitle>
         </DialogHeader>
         <div className="space-y-5">
           <div className="grid grid-cols-2 gap-4">
-            <FloatingField label="Project">
+            <FloatingField label={t("fields.project")}>
               <Input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -113,7 +117,7 @@ export function CreateProjectDialog({
                 className="peer border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none h-12"
               />
             </FloatingField>
-            <FloatingField label="Domain">
+            <FloatingField label={t("fields.domain")}>
               <Input
                 value={domain}
                 onChange={(e) => setDomain(e.target.value)}
@@ -132,7 +136,7 @@ export function CreateProjectDialog({
                     : "top-1/2 -translate-y-1/2 text-sm text-muted-foreground",
                 )}
               >
-                Start Date
+                {t("fields.startDate")}
               </span>
               <Popover open={startDateOpen} onOpenChange={setStartDateOpen}>
                 <PopoverTrigger
@@ -167,7 +171,7 @@ export function CreateProjectDialog({
                     : "top-1/2 -translate-y-1/2 text-sm text-muted-foreground",
                 )}
               >
-                End Date
+                {t("fields.endDate")}
               </span>
               <Popover open={endDateOpen} onOpenChange={setEndDateOpen}>
                 <PopoverTrigger
@@ -194,7 +198,7 @@ export function CreateProjectDialog({
               </Popover>
             </div>
           </div>
-          <FloatingField label="Description" variant="textarea">
+          <FloatingField label={t("fields.description")} variant="textarea">
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -211,7 +215,7 @@ export function CreateProjectDialog({
                   : "top-1/2 -translate-y-1/2 text-sm text-muted-foreground",
               )}
             >
-              Environment
+              {t("fields.environment")}
             </span>
             <Popover open={envOpen} onOpenChange={setEnvOpen}>
               <PopoverTrigger
@@ -253,7 +257,9 @@ export function CreateProjectDialog({
                     </label>
                   ))}
                   {allSkills.length === 0 && (
-                    <p className="text-sm text-muted-foreground px-2 py-2">No skills available</p>
+                    <p className="text-sm text-muted-foreground px-2 py-2">
+                      {t("common.noSkillsAvailable")}
+                    </p>
                   )}
                 </div>
               </PopoverContent>
@@ -261,8 +267,8 @@ export function CreateProjectDialog({
           </div>
         </div>
         <DialogActions
-          submitLabel="CREATE"
-          loadingLabel="CREATING..."
+          submitLabel={t("buttons.create")}
+          loadingLabel={t("buttons.creating")}
           loading={loading}
           disabled={!name || !domain || !startDate || !description}
           onCancel={() => onOpenChange(false)}

@@ -21,6 +21,7 @@ import {
 import { TableEmptyState } from "@/components/shared/table-empty-state";
 import { TablePagination } from "@/components/shared/table-pagination";
 import { TableToolbar } from "@/components/shared/table-toolbar";
+import { useTranslations } from "next-intl";
 import { ProjectRow } from "./project-row";
 import { createProjectColumns } from "../columns";
 import type { CvProjectItem } from "../hooks/use-cv-projects-page";
@@ -52,7 +53,10 @@ export function ProjectsTable({
 }: ProjectsTableProps) {
   const [sorting, setSorting] = useState<SortingState>([]);
 
-  const columns = useMemo(() => createProjectColumns(), []);
+  const tColumns = useTranslations("columns.projects");
+  const tButtons = useTranslations("buttons");
+  const tCommon = useTranslations("common");
+  const columns = useMemo(() => createProjectColumns(tColumns), [tColumns]);
 
   // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
@@ -75,7 +79,7 @@ export function ProjectsTable({
       <TableToolbar
         value={globalFilter}
         onChange={setGlobalFilter}
-        actionLabel="ADD PROJECT"
+        actionLabel={tButtons("addProject")}
         onAction={onAdd}
         showAction={canMutate}
       />
@@ -121,9 +125,9 @@ export function ProjectsTable({
               <TableRow>
                 <TableCell colSpan={columnCount} className="text-center py-20">
                   {loading ? (
-                    <span className="text-muted-foreground">Loading...</span>
+                    <span className="text-muted-foreground">{tCommon("loading")}</span>
                   ) : (
-                    <TableEmptyState message="No projects found." />
+                    <TableEmptyState message={tCommon("noProjectsFound")} />
                   )}
                 </TableCell>
               </TableRow>

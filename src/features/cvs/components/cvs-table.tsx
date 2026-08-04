@@ -16,6 +16,7 @@ import { TablePagination } from "@/components/shared/table-pagination";
 import { TableToolbar } from "@/components/shared/table-toolbar";
 import { cn } from "@/lib/utils";
 import type { CvItem } from "@/features/cvs/types";
+import { useTranslations } from "next-intl";
 
 const CreateCvDialog = dynamic(
   () => import("@/features/cvs/components/create-cv-dialog").then((m) => m.CreateCvDialog),
@@ -64,6 +65,8 @@ export function CvsTable({
   tableClassName,
 }: CvsTableProps) {
   const rows = table.getRowModel().rows;
+  const tButtons = useTranslations("buttons");
+  const tCommon = useTranslations("common");
 
   return (
     <>
@@ -71,7 +74,7 @@ export function CvsTable({
         <TableToolbar
           value={globalFilter}
           onChange={setGlobalFilter}
-          actionLabel="CREATE CV"
+          actionLabel={tButtons("createCv")}
           onAction={() => setCreateOpen(true)}
           showAction={canCreate}
         />
@@ -116,13 +119,13 @@ export function CvsTable({
                 {loading ? (
                   <TableRow>
                     <TableCell colSpan={columnCount} className="text-center">
-                      Loading...
+                      {tCommon("loading")}
                     </TableCell>
                   </TableRow>
                 ) : (
                   <TableRow>
                     <TableCell colSpan={columnCount}>
-                      <TableEmptyState message="No CVs found." responsive />
+                      <TableEmptyState message={tCommon("noCvsFound")} responsive />
                     </TableCell>
                   </TableRow>
                 )}

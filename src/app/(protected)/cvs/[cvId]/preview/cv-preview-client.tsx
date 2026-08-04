@@ -3,6 +3,7 @@
 import { useMemo, useCallback } from "react";
 import { useMutation } from "@apollo/client/react";
 import { renderToString } from "react-dom/server";
+import { useTranslations } from "next-intl";
 import {
   ExportPdfDocument,
   type CvQuery,
@@ -36,6 +37,30 @@ export function CvPreviewClient({
   lastUsed,
 }: Props) {
   const [exportPdf, { loading: exporting }] = useMutation(ExportPdfDocument);
+  const t = useTranslations();
+
+  const previewLabels = useMemo(
+    () => ({
+      education: t("preview.education"),
+      languageProficiency: t("preview.languageProficiency"),
+      domains: t("preview.domains"),
+      professional: t("preview.professional"),
+      na: t("common.na"),
+      projects: t("preview.projects"),
+      professionalSkills: t("preview.professionalSkills"),
+      projectRoles: t("preview.projectRoles"),
+      period: t("preview.period"),
+      tillNow: t("common.tillNow"),
+      responsibilities: t("preview.responsibilities"),
+      environment: t("preview.environment"),
+      skills: t("preview.skills"),
+      experience: t("preview.experience"),
+      inYears: t("preview.inYears"),
+      lastUsed: t("preview.lastUsed"),
+      unknown: t("common.unknown"),
+    }),
+    [t],
+  );
 
   const categoryMap = useMemo(() => {
     const map = new Map<string, string>();
@@ -65,7 +90,7 @@ export function CvPreviewClient({
 
   const handleExportPdf = useCallback(async () => {
     if (!initialCv) {
-      toast("No preview content to export");
+      toast(t("common.noPreviewContent"));
       return;
     }
 
@@ -82,6 +107,7 @@ export function CvPreviewClient({
         skillsByCategory={skillsByCategory}
         uniqueDomains={uniqueDomains}
         colors={colors}
+        labels={previewLabels}
       />,
     );
 
@@ -125,7 +151,7 @@ export function CvPreviewClient({
     .mt-2 { margin-top: 0.5rem; }
     .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
     .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
-    .md\:border-l-2 { border-left-width: 2px; }
+    .md\:border-l-2 { border-left-width: 2px; border-style: solid; }
     .md\:pl-8 { padding-left: 2rem; }
     .md\:pt-0 { padding-top: 0; }
     .pl-0 { padding-left: 0; }
@@ -170,12 +196,22 @@ export function CvPreviewClient({
         a.download = `${initialCv?.name ?? "cv"}.pdf`;
         a.click();
         URL.revokeObjectURL(url);
-        toast("PDF exported successfully");
+        toast(t("common.pdfExportSuccess"));
       }
     } catch {
-      toast("Failed to export PDF");
+      toast(t("common.pdfExportFailed"));
     }
-  }, [exportPdf, initialCv, years, lastUsed, categoryMap, skillsByCategory, uniqueDomains]);
+  }, [
+    exportPdf,
+    initialCv,
+    years,
+    lastUsed,
+    categoryMap,
+    skillsByCategory,
+    uniqueDomains,
+    t,
+    previewLabels,
+  ]);
 
   if (serverError) {
     return (
@@ -188,13 +224,13 @@ export function CvPreviewClient({
   if (!initialCv) {
     return (
       <div className="flex items-center justify-center py-20">
-        <p className="text-muted-foreground">Loading...</p>
+        <p className="text-muted-foreground">{t("common.loading")}</p>
       </div>
     );
   }
 
   const cv = initialCv;
-  const fullName = cv.user?.profile?.full_name ?? "Unknown";
+  const fullName = cv.user?.profile?.full_name ?? t("common.unknown");
   const positionName = cv.user?.position_name ?? "";
 
   const fgStyle = { color: "var(--foreground)" } as const;
@@ -223,30 +259,30 @@ export function CvPreviewClient({
             minWidth: 160,
           }}
         >
-          {exporting ? "Exporting..." : "Export PDF"}
+          {exporting ? t("buttons.exporting") : t("buttons.exportPdf")}
         </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-[260px_1fr] min-[1440px]:grid-cols-[260px_592px] gap-x-4 gap-y-0">
         <div className="space-y-6">
-          <CvSection label="Education">
+          <CvSection label={t("preview.education")}>
             <p className="text-base" style={fgStyle}>
               {cv.education || "—"}
             </p>
           </CvSection>
 
-          <CvSection label="Language proficiency">
-            <LanguageList languages={cv.languages ?? []} />
+          <CvSection label={t("preview.languageProficiency")}>
+            <LanguageList languages={cv.user?.profile?.languages ?? []} />
           </CvSection>
 
-          <CvSection label="Domains">
+          <CvSection label={t("preview.domains")}>
             <DomainList domains={uniqueDomains} />
           </CvSection>
         </div>
 
         <div className="md:border-l-2 pl-0 md:pl-8 pt-6 md:pt-0" style={{ borderColor: "#c63031" }}>
           <CvSection
-            label={`${positionName || "Professional"} with ${years ?? "N/A"} years of experience`}
+            label={`${positionName || t("preview.professional")} with ${years ?? t("common.na")} ${t("preview.inYears").toLowerCase()}`}
           >
             <p className="text-base leading-relaxed" style={fgStyle}>
               {cv.description}
@@ -274,12 +310,22 @@ export function CvPreviewClient({
             className="text-[34px] font-normal leading-10.5 tracking-[0.25px] mt-12 mb-6"
             style={fgStyle}
           >
-            Projects
+            {t("preview.projects")}
           </h3>
 
           <div className="space-y-8">
             {cv.projects.map((project) => (
-              <ProjectCard key={project.id} project={project} />
+              <ProjectCard
+                key={project.id}
+                project={project}
+                labels={{
+                  projectRoles: t("preview.projectRoles"),
+                  period: t("preview.period"),
+                  tillNow: t("common.tillNow"),
+                  responsibilities: t("preview.responsibilities"),
+                  environment: t("preview.environment"),
+                }}
+              />
             ))}
           </div>
         </>
@@ -289,7 +335,7 @@ export function CvPreviewClient({
         className="text-[34px] font-normal leading-10.5 tracking-[0.25px] mt-12 mb-6"
         style={fgStyle}
       >
-        Professional skills
+        {t("preview.professionalSkills")}
       </h3>
 
       <SkillsTable
@@ -297,6 +343,12 @@ export function CvPreviewClient({
         categoryMap={categoryMap}
         years={years}
         lastUsed={lastUsed}
+        labels={{
+          skills: t("preview.skills"),
+          experience: t("preview.experience"),
+          inYears: t("preview.inYears"),
+          lastUsed: t("preview.lastUsed"),
+        }}
       />
     </div>
   );

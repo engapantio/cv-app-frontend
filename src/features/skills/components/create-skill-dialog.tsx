@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import { useMutation } from "@apollo/client/react";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import { CreateSkillDocument, type SkillCategoriesQuery } from "@/gql/generated/graphql";
 import {
   Dialog,
@@ -37,6 +38,7 @@ export function CreateSkillDialog({
   categories,
   onCreated,
 }: CreateSkillDialogProps) {
+  const t = useTranslations();
   const [name, setName] = useState("");
   const [selectedCategoryName, setSelectedCategoryName] = useState<string | null>(null);
   const [categoryOpen, setCategoryOpen] = useState(false);
@@ -62,9 +64,9 @@ export function CreateSkillDialog({
       setSelectedCategoryName(null);
       onOpenChange(false);
     } catch {
-      toast.error("Failed to create skill");
+      toast.error(t("common.createSkillFailed"));
     }
-  }, [name, selectedCategoryName, categories, createSkill, onCreated, onOpenChange]);
+  }, [name, selectedCategoryName, categories, createSkill, onCreated, onOpenChange, t]);
 
   const inputClasses =
     "peer border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none h-12";
@@ -75,10 +77,12 @@ export function CreateSkillDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent showCloseButton className="sm:max-w-md bg-card border-border rounded-none">
         <DialogHeader>
-          <DialogTitle className="text-left text-base font-semibold">Create Skill</DialogTitle>
+          <DialogTitle className="text-left text-base font-semibold">
+            {t("dialogs.createSkill")}
+          </DialogTitle>
         </DialogHeader>
         <div className="space-y-6 py-4">
-          <FloatingField label="Name">
+          <FloatingField label={t("fields.name")}>
             <Input
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -88,7 +92,7 @@ export function CreateSkillDialog({
             />
           </FloatingField>
           <FloatingField
-            label="Category"
+            label={t("fields.category")}
             variant="select"
             active={!!selectedCategoryName || categoryOpen}
           >
@@ -98,7 +102,7 @@ export function CreateSkillDialog({
               onOpenChange={setCategoryOpen}
             >
               <SelectTrigger className={selectTriggerClasses}>
-                <SelectValue placeholder="Select category" />
+                <SelectValue placeholder={t("placeholders.selectCategory")} />
               </SelectTrigger>
               <SelectContent>
                 {categories.map((cat) => (
@@ -111,8 +115,8 @@ export function CreateSkillDialog({
           </FloatingField>
         </div>
         <DialogActions
-          submitLabel="CREATE"
-          loadingLabel="CREATING..."
+          submitLabel={t("buttons.create")}
+          loadingLabel={t("buttons.creating")}
           loading={creating}
           disabled={!name.trim()}
           onCancel={() => onOpenChange(false)}

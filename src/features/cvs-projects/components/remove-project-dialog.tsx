@@ -2,6 +2,7 @@
 
 import { useCallback } from "react";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import { Button, Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui";
 import type { CvProjectItem } from "../hooks/use-cv-projects-page";
 
@@ -18,24 +19,27 @@ export function RemoveProjectDialog({
   onConfirm,
   loading,
 }: RemoveProjectDialogProps) {
+  const t = useTranslations();
   const handleConfirm = useCallback(async () => {
     if (!target) return;
     try {
       await onConfirm(target.project.id);
       onClose();
     } catch {
-      toast.error("Failed to remove project");
+      toast.error(t("common.removeProjectFailed"));
     }
-  }, [target, onConfirm, onClose]);
+  }, [target, onConfirm, onClose, t]);
 
   return (
     <Dialog open={!!target} onOpenChange={(open) => !open && onClose()}>
       <DialogContent showCloseButton className="sm:max-w-sm bg-card border-border rounded-none">
         <DialogHeader>
-          <DialogTitle className="text-left text-base font-semibold">Remove project</DialogTitle>
+          <DialogTitle className="text-left text-base font-semibold">
+            {t("dialogs.removeProject")}
+          </DialogTitle>
         </DialogHeader>
         <p className="text-sm text-muted-foreground">
-          Are you sure you want to remove <strong>{target?.name}</strong> from this CV?
+          {t("dialogs.removeProjectConfirm", { name: target?.name ?? "" })}
         </p>
         <div
           className="flex flex-row justify-end items-center gap-3 mt-2 py-3"
@@ -46,7 +50,7 @@ export function RemoveProjectDialog({
             className="uppercase min-w-30 border border-border py-1.5"
             onClick={onClose}
           >
-            CANCEL
+            {t("buttons.cancel")}
           </Button>
           <Button
             type="submit"
@@ -59,7 +63,7 @@ export function RemoveProjectDialog({
             onClick={handleConfirm}
             disabled={loading}
           >
-            {loading ? "REMOVING..." : "CONFIRM"}
+            {loading ? t("buttons.removing") : t("buttons.confirm")}
           </Button>
         </div>
       </DialogContent>

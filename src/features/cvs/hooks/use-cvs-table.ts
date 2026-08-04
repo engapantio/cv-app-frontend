@@ -15,6 +15,7 @@ import {
 import { type UserQuery, type CreateCvMutation } from "@/gql/generated/graphql";
 import { usePermissions } from "@/lib/auth/permissions";
 import { createCvsColumns } from "@/features/cvs/columns";
+import { useTranslations } from "next-intl";
 
 type CvItem = NonNullable<UserQuery["user"]["cvs"]>[number];
 
@@ -36,6 +37,8 @@ export function useCvsTable({
   initialUserEmail,
 }: UseCvsTableParams) {
   const router = useRouter();
+  const tColumns = useTranslations("columns.cvs");
+  const tButtons = useTranslations("buttons");
 
   const { data, loading } = useQuery(query, {
     variables,
@@ -94,6 +97,8 @@ export function useCvsTable({
   const columns = useMemo(
     () =>
       createCvsColumns(
+        tColumns,
+        tButtons,
         currentUserId,
         isAdmin,
         {
@@ -103,7 +108,7 @@ export function useCvsTable({
         userEmail,
         userId,
       ),
-    [currentUserId, isAdmin, handleOpen, handleDelete, userEmail, userId],
+    [currentUserId, isAdmin, handleOpen, handleDelete, userEmail, userId, tColumns, tButtons],
   );
 
   // eslint-disable-next-line react-hooks/incompatible-library

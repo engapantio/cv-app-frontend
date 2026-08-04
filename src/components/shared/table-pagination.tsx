@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import {
   Pagination,
   PaginationContent,
@@ -18,6 +19,7 @@ interface TablePaginationProps<T> {
 }
 
 export function TablePagination<T>({ table, className }: TablePaginationProps<T>) {
+  const t = useTranslations("pagination");
   const currentPage = table.getState().pagination.pageIndex + 1;
   const pageNumbers = generatePagination(currentPage, table.getPageCount());
 
@@ -27,6 +29,8 @@ export function TablePagination<T>({ table, className }: TablePaginationProps<T>
         <PaginationContent>
           <PaginationPrevious
             onClick={() => table.previousPage()}
+            text={t("previous")}
+            aria-label={t("previous")}
             aria-disabled={!table.getCanPreviousPage()}
             className={!table.getCanPreviousPage() ? "pointer-events-none opacity-50" : ""}
           />
@@ -46,6 +50,8 @@ export function TablePagination<T>({ table, className }: TablePaginationProps<T>
           ))}
           <PaginationNext
             onClick={() => table.nextPage()}
+            text={t("next")}
+            aria-label={t("next")}
             aria-disabled={!table.getCanNextPage()}
             className={!table.getCanNextPage() ? "pointer-events-none opacity-50" : ""}
           />

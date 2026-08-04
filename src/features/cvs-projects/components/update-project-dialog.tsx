@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import { DialogActions, EnvPill } from "@/components/shared";
 import {
   Button,
@@ -46,6 +47,7 @@ function UpdateProjectForm({
   onOpenChange: (open: boolean) => void;
   loading: boolean;
 }) {
+  const t = useTranslations();
   const [startDate, setStartDate] = useState<Date | undefined>(
     project.start_date ? new Date(project.start_date) : undefined,
   );
@@ -77,7 +79,7 @@ function UpdateProjectForm({
         responsibilities,
       });
     } catch {
-      toast.error("Failed to update project");
+      toast.error(t("common.updateProjectFailed"));
     }
   }, [
     project.project.id,
@@ -87,18 +89,21 @@ function UpdateProjectForm({
     onConfirm,
     project.start_date,
     project.end_date,
+    t,
   ]);
 
   return (
     <>
       <DialogHeader>
-        <DialogTitle className="text-left text-base font-semibold">Update project</DialogTitle>
+        <DialogTitle className="text-left text-base font-semibold">
+          {t("dialogs.updateProject")}
+        </DialogTitle>
       </DialogHeader>
       <div className="space-y-5">
         <div className="grid grid-cols-2 gap-4">
           <div className="group relative rounded-none border border-border">
             <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground">
-              Project
+              {t("fields.project")}
             </span>
             <Input
               value={project.project?.name ?? project.name}
@@ -108,7 +113,7 @@ function UpdateProjectForm({
           </div>
           <div className="group relative rounded-none border border-border">
             <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground">
-              Domain
+              {t("fields.domain")}
             </span>
             <Input
               value={project.domain}
@@ -120,7 +125,7 @@ function UpdateProjectForm({
         <div className="grid grid-cols-2 gap-4">
           <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
             <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-foreground transition-colors group-focus-within:text-primary z-10">
-              Start Date
+              {t("fields.startDate")}
             </span>
             <Popover open={startDateOpen} onOpenChange={setStartDateOpen}>
               <PopoverTrigger
@@ -129,7 +134,7 @@ function UpdateProjectForm({
                     variant="ghost"
                     className="w-full border-0 bg-transparent shadow-none rounded-none h-12 justify-start text-left font-normal"
                   >
-                    {startDate ? format(startDate, "dd/MM/yyyy") : "Select date"}
+                    {startDate ? format(startDate, "dd/MM/yyyy") : t("placeholders.selectDate")}
                     <CalendarIcon className="ml-auto size-4 text-muted-foreground" />
                   </Button>
                 }
@@ -148,7 +153,7 @@ function UpdateProjectForm({
           </div>
           <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
             <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-foreground transition-colors group-focus-within:text-primary z-10">
-              End Date
+              {t("fields.endDate")}
             </span>
             <Popover open={endDateOpen} onOpenChange={setEndDateOpen}>
               <PopoverTrigger
@@ -157,7 +162,7 @@ function UpdateProjectForm({
                     variant="ghost"
                     className="w-full border-0 bg-transparent shadow-none rounded-none h-12 justify-start text-left font-normal"
                   >
-                    {endDate ? format(endDate, "dd/MM/yyyy") : "Select date"}
+                    {endDate ? format(endDate, "dd/MM/yyyy") : t("placeholders.selectDate")}
                     <CalendarIcon className="ml-auto size-4 text-muted-foreground" />
                   </Button>
                 }
@@ -177,7 +182,7 @@ function UpdateProjectForm({
         </div>
         <div className="group relative rounded-none border border-border">
           <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground">
-            Description
+            {t("fields.description")}
           </span>
           <Textarea
             value={project.description}
@@ -187,7 +192,7 @@ function UpdateProjectForm({
         </div>
         <div className="group relative rounded-none border border-border">
           <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground">
-            Environment
+            {t("fields.environment")}
           </span>
           <div className="flex flex-wrap gap-2 px-4 py-3 min-h-12">
             {project.environment?.length ? (
@@ -199,19 +204,19 @@ function UpdateProjectForm({
         </div>
         <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
           <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-foreground transition-colors group-focus-within:text-primary z-10">
-            Roles and responsibilities
+            {t("fields.rolesAndResponsibilities")}
           </span>
           <Textarea
             value={rolesInput}
             onChange={(e) => setRolesInput(e.target.value)}
-            placeholder="Enter roles and responsibilities (one per line)"
+            placeholder={t("placeholders.rolesAndResponsibilities")}
             className="border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none min-h-25 resize-none pt-6 placeholder:text-muted-foreground dark:placeholder:text-muted-foreground"
           />
         </div>
       </div>
       <DialogActions
-        submitLabel="UPDATE"
-        loadingLabel="UPDATING..."
+        submitLabel={t("buttons.update")}
+        loadingLabel={t("buttons.updating")}
         loading={loading}
         disabled={!isDirty}
         onCancel={() => onOpenChange(false)}

@@ -5,6 +5,7 @@ import { CvsTable } from "@/features/cvs/components/cvs-table";
 import { useCvsListPage } from "@/features/cvs/hooks";
 import { useSession } from "@/lib/auth/session";
 import { TablePageLayout } from "@/components/shared/table-page-layout";
+import { useTranslations } from "next-intl";
 
 type CvItem = NonNullable<UserQuery["user"]["cvs"]>[number];
 
@@ -17,9 +18,10 @@ export default function CvsListClient({
 }) {
   const { user: currentUser } = useSession();
   const tableData = useCvsListPage(initialCvs);
+  const t = useTranslations("nav");
 
   return (
-    <TablePageLayout title="CVs">
+    <TablePageLayout title={t("cvs")}>
       <CvsTable
         {...tableData}
         serverError={serverError}

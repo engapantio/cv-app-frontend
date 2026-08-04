@@ -3,8 +3,7 @@ import { getServerUserId } from "@/lib/auth/cookies";
 import { createServerApolloClientForRequest } from "@/lib/apollo/server-client";
 import { UserDocument } from "@/gql/generated/graphql";
 import { UserProfileClient } from "@/features/user-profile/ui/user-profile-client";
-import { ChevronRight, User } from "lucide-react";
-import Link from "next/link";
+import { UserProfileBreadcrumb } from "@/features/user-profile/ui/user-profile-breadcrumb";
 
 interface ProfilePageProps {
   params: Promise<{ userId: string }>;
@@ -35,19 +34,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
   return (
     <div className="flex min-h-screen w-full">
       <main className="flex-1">
-        <div className="flex items-center h-11 gap-4">
-          <Link
-            href="/users"
-            className="text-base text-foreground/70 hover:text-primary transition-colors"
-          >
-            Employees
-          </Link>
-          <ChevronRight className="text-icon w-5 h-5" />
-          <div className="text-primary flex gap-2">
-            <User className="w-5 h-5" />
-            {user.profile.full_name}
-          </div>
-        </div>
+        <UserProfileBreadcrumb userName={user.profile.full_name ?? ""} />
         <UserProfileClient user={user} isOwner={isOwner} />
       </main>
     </div>

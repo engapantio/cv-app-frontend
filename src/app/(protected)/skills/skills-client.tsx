@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import type { SkillsQuery, SkillCategoriesQuery } from "@/gql/generated/graphql";
 import { SkillsTable } from "@/features/skills/components/skills-table";
 import { useSkillsPage } from "@/features/skills/hooks/use-skills-page";
@@ -17,9 +18,10 @@ export default function SkillsClient({
   serverError?: string | null;
 }) {
   const tableData = useSkillsPage(initialSkills, serverError, initialCategories);
+  const t = useTranslations("nav");
 
   return (
-    <TablePageLayout title="Skills">
+    <TablePageLayout title={t("skills")}>
       <SkillsTable {...tableData} serverError={serverError} />
     </TablePageLayout>
   );

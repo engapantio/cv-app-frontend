@@ -13,6 +13,10 @@ query Cv($cvId: ID!) {
         id
         full_name
         avatar
+        languages {
+          name
+          proficiency
+        }
       }
     }
     projects {

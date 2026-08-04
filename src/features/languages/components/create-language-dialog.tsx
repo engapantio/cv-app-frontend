@@ -1,22 +1,21 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation } from "@apollo/client/react";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import { CreateLanguageDocument } from "@/gql/generated/graphql";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, Input } from "@/components/ui";
 import { DialogActions, FloatingField } from "@/components/shared";
 
-const createLanguageSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  iso2: z.string().min(1, "ISO2 is required").length(2, "ISO2 must be exactly 2 characters"),
-  nativeName: z.string().optional(),
-});
-
-type CreateLanguageFormData = z.infer<typeof createLanguageSchema>;
+type CreateLanguageFormData = {
+  name: string;
+  iso2: string;
+  nativeName?: string;
+};
 
 interface CreateLanguageDialogProps {
   open: boolean;
@@ -31,13 +30,33 @@ interface CreateLanguageDialogProps {
 }
 
 export function CreateLanguageDialog({ open, onOpenChange, onCreated }: CreateLanguageDialogProps) {
+  const t = useTranslations();
   const [createLanguage, { loading: creating }] = useMutation(CreateLanguageDocument);
+
+  const validation = useMemo(
+    () => ({
+      requiredName: t("validation.nameRequired"),
+      requiredIso2: t("validation.iso2Required"),
+      iso2Length: t("validation.iso2Length"),
+    }),
+    [t],
+  );
+
+  const createLanguageSchema = useMemo(
+    () =>
+      z.object({
+        name: z.string().min(1, validation.requiredName),
+        iso2: z.string().min(1, validation.requiredIso2).length(2, validation.iso2Length),
+        nativeName: z.string().optional(),
+      }),
+    [validation],
+  );
 
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, isDirty },
   } = useForm<CreateLanguageFormData>({
     resolver: zodResolver(createLanguageSchema),
     defaultValues: { name: "", iso2: "", nativeName: "" },
@@ -61,10 +80,10 @@ export function CreateLanguageDialog({ open, onOpenChange, onCreated }: CreateLa
         reset();
         onOpenChange(false);
       } catch {
-        toast.error("Failed to create language");
+        toast.error(t("common.createLanguageFailed"));
       }
     },
-    [createLanguage, onCreated, reset, onOpenChange],
+    [createLanguage, onCreated, reset, onOpenChange, t],
   );
 
   const inputClasses =
@@ -74,10 +93,12 @@ export function CreateLanguageDialog({ open, onOpenChange, onCreated }: CreateLa
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent showCloseButton className="sm:max-w-md bg-card border-border rounded-none">
         <DialogHeader>
-          <DialogTitle className="text-left text-base font-semibold">Create Language</DialogTitle>
+          <DialogTitle className="text-left text-base font-semibold">
+            {t("dialogs.createLanguage")}
+          </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 py-4">
-          <FloatingField label="Name" error={errors.name?.message}>
+          <FloatingField label={t("fields.name")} error={errors.name?.message}>
             <Input
               {...register("name")}
               placeholder=" "
@@ -85,7 +106,7 @@ export function CreateLanguageDialog({ open, onOpenChange, onCreated }: CreateLa
               className={inputClasses}
             />
           </FloatingField>
-          <FloatingField label="Native Name" error={errors.nativeName?.message}>
+          <FloatingField label={t("fields.nativeName")} error={errors.nativeName?.message}>
             <Input
               {...register("nativeName")}
               placeholder=" "
@@ -93,7 +114,7 @@ export function CreateLanguageDialog({ open, onOpenChange, onCreated }: CreateLa
               className={inputClasses}
             />
           </FloatingField>
-          <FloatingField label="ISO2" error={errors.iso2?.message}>
+          <FloatingField label={t("fields.iso2")} error={errors.iso2?.message}>
             <Input
               {...register("iso2")}
               placeholder=" "
@@ -103,10 +124,10 @@ export function CreateLanguageDialog({ open, onOpenChange, onCreated }: CreateLa
           </FloatingField>
           <DialogActions
             type="submit"
-            submitLabel="CREATE"
-            loadingLabel="CREATING..."
+            submitLabel={t("buttons.create")}
+            loadingLabel={t("buttons.creating")}
             loading={creating}
-            disabled={isSubmitting}
+            disabled={isSubmitting || !isDirty}
             onCancel={() => onOpenChange(false)}
             className="pt-1"
           />

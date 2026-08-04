@@ -2,13 +2,14 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { ChevronRight } from "lucide-react";
 
 const TABS = [
-  { label: "Details", href: "details" },
-  { label: "Skills", href: "skills" },
-  { label: "Projects", href: "projects" },
-  { label: "Preview", href: "preview" },
+  { key: "details", href: "details" },
+  { key: "skills", href: "skills" },
+  { key: "projects", href: "projects" },
+  { key: "preview", href: "preview" },
 ] as const;
 
 export function CvLayoutClient({
@@ -21,9 +22,17 @@ export function CvLayoutClient({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const t = useTranslations();
 
   const cvName = initialCvName ?? "CV";
   const currentTab = pathname.split("/").pop() ?? "details";
+
+  const tabLabels: Record<(typeof TABS)[number]["key"], string> = {
+    details: t("tabs.details"),
+    skills: t("tabs.skills"),
+    projects: t("tabs.projects"),
+    preview: t("tabs.preview"),
+  };
 
   return (
     <div className="flex w-full flex-col">
@@ -32,13 +41,15 @@ export function CvLayoutClient({
           href="/cvs"
           className="text-base text-foreground/70 hover:text-primary transition-colors"
         >
-          CVs
+          {t("breadcrumbs.cvs")}
         </Link>
         <ChevronRight className="size-5" />
         <span style={{ color: "#c63031" }}>{cvName}</span>
         <ChevronRight className="size-5" />
         <span className="text-base text-foreground/70">
-          {TABS.find((t) => t.href === currentTab)?.label ?? currentTab}
+          {TABS.find((tab) => tab.href === currentTab)
+            ? tabLabels[currentTab as (typeof TABS)[number]["key"]]
+            : currentTab}
         </span>
       </div>
 
@@ -56,7 +67,7 @@ export function CvLayoutClient({
                   : "text-foreground hover:text-primary")
               }
             >
-              {tab.label}
+              {tabLabels[tab.key]}
             </Link>
           );
         })}

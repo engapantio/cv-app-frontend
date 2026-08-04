@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import { useMutation } from "@apollo/client/react";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import { UpdateSkillDocument, type SkillCategoriesQuery } from "@/gql/generated/graphql";
 import {
   Dialog,
@@ -38,6 +39,7 @@ export function UpdateSkillDialog({
   categories,
   onUpdated,
 }: UpdateSkillDialogProps) {
+  const t = useTranslations();
   const initialCategoryName = target
     ? (categories.find((c) => c.id === target.category?.id)?.name ?? null)
     : null;
@@ -70,10 +72,10 @@ export function UpdateSkillDialog({
       }
       onClose();
     } catch {
-      toast.error("Failed to update skill");
+      toast.error(t("common.updateSkillFailed"));
       onClose();
     }
-  }, [target, name, selectedCategoryName, categories, updateSkill, onUpdated, onClose]);
+  }, [target, name, selectedCategoryName, categories, updateSkill, onUpdated, onClose, t]);
 
   const inputClasses =
     "peer border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none h-12";
@@ -84,10 +86,12 @@ export function UpdateSkillDialog({
     <Dialog open={!!target} onOpenChange={(open) => !open && onClose()}>
       <DialogContent showCloseButton className="sm:max-w-md bg-card border-border rounded-none">
         <DialogHeader>
-          <DialogTitle className="text-left text-base font-semibold">Update Skill</DialogTitle>
+          <DialogTitle className="text-left text-base font-semibold">
+            {t("dialogs.updateSkill")}
+          </DialogTitle>
         </DialogHeader>
         <div className="space-y-6 py-4">
-          <FloatingField label="Name">
+          <FloatingField label={t("fields.name")}>
             <Input
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -97,7 +101,7 @@ export function UpdateSkillDialog({
             />
           </FloatingField>
           <FloatingField
-            label="Category"
+            label={t("fields.category")}
             variant="select"
             active={!!selectedCategoryName || categoryOpen}
           >
@@ -107,7 +111,7 @@ export function UpdateSkillDialog({
               onOpenChange={setCategoryOpen}
             >
               <SelectTrigger className={selectTriggerClasses}>
-                <SelectValue placeholder="Select category" />
+                <SelectValue placeholder={t("placeholders.selectCategory")} />
               </SelectTrigger>
               <SelectContent>
                 {categories.map((cat) => (
@@ -120,8 +124,8 @@ export function UpdateSkillDialog({
           </FloatingField>
         </div>
         <DialogActions
-          submitLabel="UPDATE"
-          loadingLabel="UPDATING..."
+          submitLabel={t("buttons.update")}
+          loadingLabel={t("buttons.updating")}
           loading={updating}
           disabled={!name.trim() || !isDirty}
           onCancel={onClose}

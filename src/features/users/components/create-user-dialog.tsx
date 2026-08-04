@@ -16,6 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui";
 import { DialogActions, FloatingField } from "@/components/shared";
+import { useTranslations } from "next-intl";
 
 interface DepartmentOption {
   id: string;
@@ -48,6 +49,7 @@ export function CreateUserDialog({
   onConfirm,
   loading,
 }: CreateUserDialogProps) {
+  const t = useTranslations();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -86,7 +88,7 @@ export function CreateUserDialog({
       reset();
       onOpenChange(false);
     } catch {
-      toast.error("Failed to create user");
+      toast.error(t("common.createUserFailed"));
     }
   }, [
     canSubmit,
@@ -100,6 +102,7 @@ export function CreateUserDialog({
     onConfirm,
     reset,
     onOpenChange,
+    t,
   ]);
 
   return (
@@ -112,11 +115,13 @@ export function CreateUserDialog({
     >
       <DialogContent showCloseButton className="sm:max-w-xl bg-card border-border rounded-none">
         <DialogHeader>
-          <DialogTitle className="text-left text-base font-semibold">Create User</DialogTitle>
+          <DialogTitle className="text-left text-base font-semibold">
+            {t("dialogs.createUser")}
+          </DialogTitle>
         </DialogHeader>
         <div className="space-y-5">
           <div className="grid grid-cols-2 gap-4">
-            <FloatingField label="Email">
+            <FloatingField label={t("fields.email")}>
               <Input
                 id="email"
                 value={email}
@@ -127,7 +132,7 @@ export function CreateUserDialog({
                 className={inputClasses}
               />
             </FloatingField>
-            <FloatingField label="Password">
+            <FloatingField label={t("fields.password")}>
               <Input
                 id="password"
                 value={password}
@@ -141,7 +146,7 @@ export function CreateUserDialog({
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <FloatingField label="First Name">
+            <FloatingField label={t("fields.firstName")}>
               <Input
                 id="first_name"
                 value={firstName}
@@ -151,7 +156,7 @@ export function CreateUserDialog({
                 className={inputClasses}
               />
             </FloatingField>
-            <FloatingField label="Last Name">
+            <FloatingField label={t("fields.lastName")}>
               <Input
                 id="last_name"
                 value={lastName}
@@ -165,7 +170,7 @@ export function CreateUserDialog({
 
           <div className="grid grid-cols-2 gap-4">
             <FloatingField
-              label="Department"
+              label={t("fields.department")}
               variant="select"
               labelClassName="bg-background"
               active={!!departmentId || departmentOpen}
@@ -177,8 +182,8 @@ export function CreateUserDialog({
                 disabled={loading}
               >
                 <SelectTrigger className={selectClassName}>
-                  <SelectValue placeholder="Department">
-                    {departments.find((d) => d.id === departmentId)?.name ?? "Department"}
+                  <SelectValue placeholder={t("fields.department")}>
+                    {departments.find((d) => d.id === departmentId)?.name ?? t("fields.department")}
                   </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
@@ -191,7 +196,7 @@ export function CreateUserDialog({
               </Select>
             </FloatingField>
             <FloatingField
-              label="Position"
+              label={t("fields.position")}
               variant="select"
               labelClassName="bg-background"
               active={!!positionId || positionOpen}
@@ -203,8 +208,8 @@ export function CreateUserDialog({
                 disabled={loading}
               >
                 <SelectTrigger className={selectClassName}>
-                  <SelectValue placeholder="Position">
-                    {positions.find((p) => p.id === positionId)?.name ?? "Position"}
+                  <SelectValue placeholder={t("fields.position")}>
+                    {positions.find((p) => p.id === positionId)?.name ?? t("fields.position")}
                   </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
@@ -219,7 +224,7 @@ export function CreateUserDialog({
           </div>
 
           <FloatingField
-            label="Role"
+            label={t("fields.role")}
             variant="select"
             labelClassName="bg-background"
             active={!!role || roleOpen}
@@ -231,19 +236,19 @@ export function CreateUserDialog({
               disabled={loading}
             >
               <SelectTrigger className={selectClassName}>
-                <SelectValue placeholder="Role" />
+                <SelectValue placeholder={t("fields.role")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Employee">Employee</SelectItem>
-                <SelectItem value="Admin">Admin</SelectItem>
+                <SelectItem value="Employee">{t("roles.employee")}</SelectItem>
+                <SelectItem value="Admin">{t("roles.admin")}</SelectItem>
               </SelectContent>
             </Select>
           </FloatingField>
         </div>
 
         <DialogActions
-          submitLabel="CREATE"
-          loadingLabel="CREATING..."
+          submitLabel={t("buttons.create")}
+          loadingLabel={t("buttons.creating")}
           loading={loading}
           disabled={!canSubmit}
           onCancel={() => onOpenChange(false)}

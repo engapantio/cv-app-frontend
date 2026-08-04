@@ -5,6 +5,7 @@ import { useMutation } from "@apollo/client/react";
 import { DeleteUserDocument } from "@/gql/generated/graphql";
 import { Button, Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui";
 import type { UserItem } from "@/features/users/types";
+import { useTranslations } from "next-intl";
 
 interface DeleteUserDialogProps {
   target: UserItem | null;
@@ -13,6 +14,7 @@ interface DeleteUserDialogProps {
 }
 
 export function DeleteUserDialog({ target, onClose, onDeleted }: DeleteUserDialogProps) {
+  const t = useTranslations();
   const [deleteUser, { loading: deleting }] = useMutation(DeleteUserDocument);
 
   const handleConfirm = useCallback(async () => {
@@ -28,11 +30,14 @@ export function DeleteUserDialog({ target, onClose, onDeleted }: DeleteUserDialo
     <Dialog open={!!target} onOpenChange={(open) => !open && onClose()}>
       <DialogContent showCloseButton className="sm:max-w-lg bg-card border-border rounded-none">
         <DialogHeader>
-          <DialogTitle className="text-left text-base font-semibold">Delete User</DialogTitle>
+          <DialogTitle className="text-left text-base font-semibold">
+            {t("dialogs.deleteUser")}
+          </DialogTitle>
         </DialogHeader>
         <p className="text-sm text-muted-foreground">
-          Are you sure you want to delete user{" "}
-          <strong>{target?.profile?.full_name || target?.email || ""}</strong>?
+          {t("dialogs.deleteUserConfirm", {
+            name: target?.profile?.full_name || target?.email || "",
+          })}
         </p>
         <div
           className="flex flex-row items-center justify-end gap-3 mt-2 py-3"
@@ -44,7 +49,7 @@ export function DeleteUserDialog({ target, onClose, onDeleted }: DeleteUserDialo
               className="uppercase flex-1 border border-border py-1.5"
               onClick={onClose}
             >
-              CANCEL
+              {t("buttons.cancel")}
             </Button>
             <Button
               type="submit"
@@ -56,7 +61,7 @@ export function DeleteUserDialog({ target, onClose, onDeleted }: DeleteUserDialo
               onClick={handleConfirm}
               disabled={deleting}
             >
-              {deleting ? "DELETING..." : "CONFIRM"}
+              {deleting ? t("buttons.deleting") : t("buttons.confirm")}
             </Button>
           </div>
         </div>

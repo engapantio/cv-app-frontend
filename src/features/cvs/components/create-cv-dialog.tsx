@@ -1,21 +1,20 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation } from "@apollo/client/react";
+import { useTranslations } from "next-intl";
 import { CreateCvDocument, type CreateCvMutation } from "@/gql/generated/graphql";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, Input } from "@/components/ui";
 import { DialogActions, FloatingField } from "@/components/shared";
 
-const createCvSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  description: z.string().min(1, "Description is required"),
-  education: z.string().optional(),
-});
-
-type CreateCvFormData = z.infer<typeof createCvSchema>;
+type CreateCvFormData = {
+  name: string;
+  description: string;
+  education?: string;
+};
 
 const inputClasses =
   "peer border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none py-3";
@@ -31,13 +30,32 @@ export function CreateCvDialog({
   userId: string;
   onCreated: (newCv: CreateCvMutation["createCv"]) => void;
 }) {
+  const t = useTranslations();
   const [createCv, { loading: creating }] = useMutation(CreateCvDocument);
+
+  const validation = useMemo(
+    () => ({
+      nameRequired: t("validation.nameRequired"),
+      descriptionRequired: t("validation.descriptionRequired"),
+    }),
+    [t],
+  );
+
+  const createCvSchema = useMemo(
+    () =>
+      z.object({
+        name: z.string().min(1, validation.nameRequired),
+        description: z.string().min(1, validation.descriptionRequired),
+        education: z.string().optional(),
+      }),
+    [validation],
+  );
 
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, isDirty },
   } = useForm<CreateCvFormData>({
     resolver: zodResolver(createCvSchema),
     defaultValues: { name: "", description: "", education: "" },
@@ -70,11 +88,13 @@ export function CreateCvDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent showCloseButton className="sm:max-w-md bg-card border-border rounded-none">
         <DialogHeader>
-          <DialogTitle className="text-left text-base font-semibold">Create CV</DialogTitle>
+          <DialogTitle className="text-left text-base font-semibold">
+            {t("dialogs.createCv")}
+          </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-5">
-            <FloatingField label="Name" error={errors.name?.message}>
+            <FloatingField label={t("fields.name")} error={errors.name?.message}>
               <Input
                 {...register("name")}
                 placeholder=" "
@@ -84,7 +104,7 @@ export function CreateCvDialog({
             </FloatingField>
           </div>
           <div className="mb-5">
-            <FloatingField label="Education" error={errors.education?.message}>
+            <FloatingField label={t("fields.education")} error={errors.education?.message}>
               <Input
                 {...register("education")}
                 placeholder=" "
@@ -95,7 +115,7 @@ export function CreateCvDialog({
           </div>
           <div className="mb-3">
             <FloatingField
-              label="Description"
+              label={t("fields.description")}
               variant="textarea"
               error={errors.description?.message}
             >
@@ -109,10 +129,10 @@ export function CreateCvDialog({
           </div>
           <DialogActions
             type="submit"
-            submitLabel="CREATE"
-            loadingLabel="CREATING..."
+            submitLabel={t("buttons.create")}
+            loadingLabel={t("buttons.creating")}
             loading={creating}
-            disabled={isSubmitting}
+            disabled={isSubmitting || !isDirty}
             onCancel={() => onOpenChange(false)}
           />
         </form>

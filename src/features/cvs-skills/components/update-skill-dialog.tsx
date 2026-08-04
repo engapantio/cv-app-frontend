@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import { toast } from "sonner";
 import { ChevronDown } from "lucide-react";
+import { useTranslations } from "next-intl";
 import {
   Button,
   Dialog,
@@ -37,6 +38,7 @@ export function UpdateSkillDialog({
   onConfirm,
   loading,
 }: UpdateSkillDialogProps) {
+  const t = useTranslations();
   const [selectedMastery, setSelectedMastery] = useState<Mastery>(currentMastery);
 
   const isDirty = selectedMastery !== currentMastery;
@@ -46,20 +48,22 @@ export function UpdateSkillDialog({
       await onConfirm(skillName, selectedMastery);
       onOpenChange(false);
     } catch {
-      toast.error("Failed to update skill");
+      toast.error(t("common.updateAssignedSkillFailed"));
     }
-  }, [skillName, selectedMastery, onConfirm, onOpenChange]);
+  }, [skillName, selectedMastery, onConfirm, onOpenChange, t]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent showCloseButton className="sm:max-w-md bg-card border-border rounded-none">
         <DialogHeader>
-          <DialogTitle className="text-left text-base font-semibold">Update skill</DialogTitle>
+          <DialogTitle className="text-left text-base font-semibold">
+            {t("dialogs.updateAssignedSkill")}
+          </DialogTitle>
         </DialogHeader>
         <div className="space-y-6 py-4">
           <div className="group relative rounded-none border border-border transition-colors">
             <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-foreground">
-              Skill
+              {t("fields.name")}
             </span>
             <Input
               value={skillName}
@@ -70,14 +74,14 @@ export function UpdateSkillDialog({
           </div>
           <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
             <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-foreground transition-colors group-focus-within:text-primary">
-              Mastery
+              {t("fields.mastery")}
             </span>
             <Select
               value={selectedMastery}
               onValueChange={(v) => v && setSelectedMastery(v as Mastery)}
             >
               <SelectTrigger className="w-full border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none h-12 py-1 text-lg">
-                <SelectValue placeholder="Select mastery" />
+                <SelectValue placeholder={t("placeholders.selectMastery")} />
               </SelectTrigger>
               <SelectContent>
                 {MASTERY_OPTIONS.map((m) => (
@@ -96,7 +100,7 @@ export function UpdateSkillDialog({
             className="uppercase min-w-30 border border-border py-1.5"
             onClick={() => onOpenChange(false)}
           >
-            CANCEL
+            {t("buttons.cancel")}
           </Button>
           <Button
             type="button"
@@ -105,7 +109,7 @@ export function UpdateSkillDialog({
             disabled={!isDirty || loading}
             onClick={handleConfirm}
           >
-            {loading ? "CONFIRMING..." : "CONFIRM"}
+            {loading ? t("buttons.confirming") : t("buttons.confirm")}
           </Button>
         </DialogFooter>
       </DialogContent>

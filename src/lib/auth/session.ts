@@ -3,7 +3,13 @@ import { makeVar } from "@apollo/client";
 import { useReactiveVar } from "@apollo/client/react";
 import { useEffect } from "react";
 import type { SessionUser } from "@/lib/auth/cookies";
-import { setTokens, clearTokens, resolveBootstrap } from "@/lib/auth/token-store";
+import {
+  setTokens,
+  clearTokens,
+  resolveBootstrap,
+  getAccessToken,
+  isTokenExpired,
+} from "@/lib/auth/token-store";
 
 export type SessionState = {
   status: "loading" | "authenticated" | "anonymous";
@@ -21,9 +27,12 @@ let proactiveRefreshTimer: ReturnType<typeof setInterval> | null = null;
 
 const PROACTIVE_REFRESH_INTERVAL_MS = 8 * 60 * 1000;
 
-function startProactiveRefresh() {
-  stopProactiveRefresh();
-  proactiveRefreshTimer = setInterval(async () => {
+let refreshInFlight: Promise<void> | null = null;
+
+function refreshSessionTokens(): Promise<void> {
+  if (refreshInFlight) return refreshInFlight;
+
+  refreshInFlight = (async () => {
     try {
       const res = await fetch("/api/auth/refresh", {
         method: "POST",
@@ -39,8 +48,33 @@ function startProactiveRefresh() {
       }
     } catch {
       clearSession();
+    } finally {
+      refreshInFlight = null;
     }
+  })();
+
+  return refreshInFlight;
+}
+
+function refreshTokensIfStale() {
+  const token = getAccessToken();
+  if (token && !isTokenExpired(token)) return;
+  refreshSessionTokens();
+}
+
+function handleVisibilityChange() {
+  if (document.visibilityState !== "visible") return;
+  refreshTokensIfStale();
+}
+
+function startProactiveRefresh() {
+  stopProactiveRefresh();
+  proactiveRefreshTimer = setInterval(() => {
+    refreshSessionTokens();
   }, PROACTIVE_REFRESH_INTERVAL_MS);
+
+  document.addEventListener("visibilitychange", handleVisibilityChange);
+  window.addEventListener("focus", handleVisibilityChange);
 }
 
 function stopProactiveRefresh() {
@@ -48,6 +82,8 @@ function stopProactiveRefresh() {
     clearInterval(proactiveRefreshTimer);
     proactiveRefreshTimer = null;
   }
+  document.removeEventListener("visibilitychange", handleVisibilityChange);
+  window.removeEventListener("focus", handleVisibilityChange);
 }
 
 export function markUserVerified() {

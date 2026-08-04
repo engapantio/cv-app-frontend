@@ -20,6 +20,8 @@ interface SkillActions {
 }
 
 export function createSkillsColumns(
+  t: (key: string) => string,
+  tb: (key: string) => string,
   isAdmin: boolean,
   actions: SkillActions,
 ): ColumnDef<SkillItem>[] {
@@ -36,20 +38,20 @@ export function createSkillsColumns(
     },
     {
       id: "name",
-      header: ({ column }) => <SortableHeader column={column} label="Name" />,
+      header: ({ column }) => <SortableHeader column={column} label={t("name")} />,
       accessorKey: "name",
       enableGlobalFilter: true,
     },
     {
       id: "type",
-      header: ({ column }) => <SortableHeader column={column} label="Type" />,
+      header: ({ column }) => <SortableHeader column={column} label={t("type")} />,
       accessorFn: (row) => row.category_parent_name ?? "",
       enableGlobalFilter: true,
       meta: { className: "max-md:hidden" },
     },
     {
       id: "category",
-      header: ({ column }) => <SortableHeader column={column} label="Category" />,
+      header: ({ column }) => <SortableHeader column={column} label={t("category")} />,
       accessorFn: (row) => row.category_name ?? "",
       enableGlobalFilter: true,
       meta: { className: "max-md:hidden" },
@@ -76,14 +78,14 @@ export function createSkillsColumns(
                   onClick={() => actions.onOpen(skill)}
                   className="justify-center cursor-pointer"
                 >
-                  Open
+                  {tb("open")}
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => actions.onUpdate(skill)}
                   disabled={!isAdmin}
                   className="justify-center cursor-pointer"
                 >
-                  Update
+                  {tb("update")}
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => actions.onDelete(skill)}
@@ -91,7 +93,7 @@ export function createSkillsColumns(
                   variant="destructive"
                   className="justify-center cursor-pointer"
                 >
-                  Delete
+                  {tb("delete")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

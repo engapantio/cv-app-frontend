@@ -20,6 +20,8 @@ interface LanguageActions {
 }
 
 export function createLanguagesColumns(
+  t: (key: string) => string,
+  tb: (key: string) => string,
   isAdmin: boolean,
   actions: LanguageActions,
 ): ColumnDef<LanguageItem>[] {
@@ -36,20 +38,20 @@ export function createLanguagesColumns(
     },
     {
       id: "name",
-      header: ({ column }) => <SortableHeader column={column} label="Name" />,
+      header: ({ column }) => <SortableHeader column={column} label={t("name")} />,
       accessorKey: "name",
       enableGlobalFilter: true,
     },
     {
       id: "native_name",
-      header: ({ column }) => <SortableHeader column={column} label="Native Name" />,
+      header: ({ column }) => <SortableHeader column={column} label={t("nativeName")} />,
       accessorFn: (row) => row.native_name ?? "",
       enableGlobalFilter: false,
       meta: { className: "max-md:hidden" },
     },
     {
       id: "iso2",
-      header: ({ column }) => <SortableHeader column={column} label="ISO2" />,
+      header: ({ column }) => <SortableHeader column={column} label={t("iso2")} />,
       accessorKey: "iso2",
       enableGlobalFilter: false,
       meta: { className: "max-md:hidden" },
@@ -76,14 +78,14 @@ export function createLanguagesColumns(
                   onClick={() => actions.onOpen(language)}
                   className="justify-center cursor-pointer"
                 >
-                  Open
+                  {tb("open")}
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => actions.onUpdate(language)}
                   disabled={!isAdmin}
                   className="justify-center cursor-pointer"
                 >
-                  Update
+                  {tb("update")}
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => actions.onDelete(language)}
@@ -91,7 +93,7 @@ export function createLanguagesColumns(
                   variant="destructive"
                   className="justify-center cursor-pointer"
                 >
-                  Delete
+                  {tb("delete")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

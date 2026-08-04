@@ -1,23 +1,22 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation } from "@apollo/client/react";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import { UpdateLanguageDocument } from "@/gql/generated/graphql";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, Input } from "@/components/ui";
 import { DialogActions, FloatingField } from "@/components/shared";
 import type { LanguageItem } from "@/features/languages/types";
 
-const updateLanguageSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  iso2: z.string().min(1, "ISO2 is required").length(2, "ISO2 must be exactly 2 characters"),
-  nativeName: z.string().optional(),
-});
-
-type UpdateLanguageFormData = z.infer<typeof updateLanguageSchema>;
+type UpdateLanguageFormData = {
+  name: string;
+  iso2: string;
+  nativeName?: string;
+};
 
 interface UpdateLanguageDialogProps {
   target: LanguageItem | null;
@@ -32,7 +31,27 @@ interface UpdateLanguageDialogProps {
 }
 
 export function UpdateLanguageDialog({ target, onClose, onUpdated }: UpdateLanguageDialogProps) {
+  const t = useTranslations();
   const [updateLanguage, { loading: updating }] = useMutation(UpdateLanguageDocument);
+
+  const validation = useMemo(
+    () => ({
+      requiredName: t("validation.nameRequired"),
+      requiredIso2: t("validation.iso2Required"),
+      iso2Length: t("validation.iso2Length"),
+    }),
+    [t],
+  );
+
+  const updateLanguageSchema = useMemo(
+    () =>
+      z.object({
+        name: z.string().min(1, validation.requiredName),
+        iso2: z.string().min(1, validation.requiredIso2).length(2, validation.iso2Length),
+        nativeName: z.string().optional(),
+      }),
+    [validation],
+  );
 
   const {
     register,
@@ -66,11 +85,11 @@ export function UpdateLanguageDialog({ target, onClose, onUpdated }: UpdateLangu
         }
         onClose();
       } catch {
-        toast.error("Failed to update language");
+        toast.error(t("common.updateLanguageFailed"));
         onClose();
       }
     },
-    [target, updateLanguage, onUpdated, onClose],
+    [target, updateLanguage, onUpdated, onClose, t],
   );
 
   const inputClasses =
@@ -80,10 +99,12 @@ export function UpdateLanguageDialog({ target, onClose, onUpdated }: UpdateLangu
     <Dialog open={!!target} onOpenChange={(open) => !open && onClose()}>
       <DialogContent showCloseButton className="sm:max-w-md bg-card border-border rounded-none">
         <DialogHeader>
-          <DialogTitle className="text-left text-base font-semibold">Update Language</DialogTitle>
+          <DialogTitle className="text-left text-base font-semibold">
+            {t("dialogs.updateLanguage")}
+          </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 py-4">
-          <FloatingField label="Name" error={errors.name?.message}>
+          <FloatingField label={t("fields.name")} error={errors.name?.message}>
             <Input
               {...register("name")}
               placeholder=" "
@@ -91,7 +112,7 @@ export function UpdateLanguageDialog({ target, onClose, onUpdated }: UpdateLangu
               className={inputClasses}
             />
           </FloatingField>
-          <FloatingField label="Native Name" error={errors.nativeName?.message}>
+          <FloatingField label={t("fields.nativeName")} error={errors.nativeName?.message}>
             <Input
               {...register("nativeName")}
               placeholder=" "
@@ -99,7 +120,7 @@ export function UpdateLanguageDialog({ target, onClose, onUpdated }: UpdateLangu
               className={inputClasses}
             />
           </FloatingField>
-          <FloatingField label="ISO2" error={errors.iso2?.message}>
+          <FloatingField label={t("fields.iso2")} error={errors.iso2?.message}>
             <Input
               {...register("iso2")}
               placeholder=" "
@@ -109,8 +130,8 @@ export function UpdateLanguageDialog({ target, onClose, onUpdated }: UpdateLangu
           </FloatingField>
           <DialogActions
             type="submit"
-            submitLabel="UPDATE"
-            loadingLabel="UPDATING..."
+            submitLabel={t("buttons.update")}
+            loadingLabel={t("buttons.updating")}
             loading={updating}
             disabled={!isDirty || isSubmitting}
             onCancel={onClose}

@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { useTranslations } from "next-intl";
 import { useProjectsPage, type ProjectItem } from "@/features/projects/hooks/use-projects-page";
 import { ProjectsTable } from "@/features/projects/components/projects-table";
 import { TablePageLayout } from "@/components/shared/table-page-layout";
@@ -39,6 +40,7 @@ export default function ProjectsClient({
   initialProjects: ProjectItem[];
   serverError?: string | null;
 }) {
+  const t = useTranslations("nav");
   const {
     loading,
     projects,
@@ -63,7 +65,7 @@ export default function ProjectsClient({
   } = useProjectsPage(initialProjects);
 
   return (
-    <TablePageLayout title="Projects">
+    <TablePageLayout title={t("projects")}>
       <ProjectsTable
         loading={loading}
         projects={projects}

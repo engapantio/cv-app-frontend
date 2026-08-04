@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import {
   Button,
   Dialog,
@@ -33,6 +34,7 @@ export function AddLanguageDialog({
   onConfirm,
   loading,
 }: AddLanguageDialogProps) {
+  const t = useTranslations();
   const [selectedLanguage, setSelectedLanguage] = useState<string | null>(null);
   const [selectedProficiency, setSelectedProficiency] = useState<Proficiency>("A1");
 
@@ -44,20 +46,22 @@ export function AddLanguageDialog({
       setSelectedProficiency("A1");
       onOpenChange(false);
     } catch {
-      toast.error("Failed to add language");
+      toast.error(t("common.addLanguageFailed"));
     }
-  }, [selectedLanguage, selectedProficiency, onConfirm, onOpenChange]);
+  }, [selectedLanguage, selectedProficiency, onConfirm, onOpenChange, t]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent showCloseButton className="sm:max-w-md bg-card border-border rounded-none">
         <DialogHeader>
-          <DialogTitle className="text-left text-base font-semibold">Add language</DialogTitle>
+          <DialogTitle className="text-left text-base font-semibold">
+            {t("dialogs.addLanguage")}
+          </DialogTitle>
         </DialogHeader>
         <div className="space-y-6 py-4">
           <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
             <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-foreground transition-colors group-focus-within:text-primary">
-              Language
+              {t("fields.name")}
             </span>
             <Select value={selectedLanguage} onValueChange={(v) => setSelectedLanguage(v)}>
               <SelectTrigger
@@ -66,7 +70,9 @@ export function AddLanguageDialog({
               >
                 <SelectValue
                   placeholder={
-                    availableLanguages.length === 0 ? "No available languages" : "Select language"
+                    availableLanguages.length === 0
+                      ? t("common.noAvailableLanguages")
+                      : t("placeholders.selectLanguage")
                   }
                 />
               </SelectTrigger>
@@ -81,14 +87,14 @@ export function AddLanguageDialog({
           </div>
           <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
             <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-foreground transition-colors group-focus-within:text-primary">
-              Language proficiency
+              {t("fields.proficiency")}
             </span>
             <Select
               value={selectedProficiency}
               onValueChange={(v) => v && setSelectedProficiency(v as Proficiency)}
             >
               <SelectTrigger className="w-full border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none h-12 py-1 text-lg">
-                <SelectValue placeholder="Select proficiency" />
+                <SelectValue placeholder={t("placeholders.selectProficiency")} />
               </SelectTrigger>
               <SelectContent>
                 {PROFICIENCY_OPTIONS.map((level) => (
@@ -107,7 +113,7 @@ export function AddLanguageDialog({
             className="uppercase min-w-30 border border-border py-1.5"
             onClick={() => onOpenChange(false)}
           >
-            CANCEL
+            {t("buttons.cancel")}
           </Button>
           <Button
             type="button"
@@ -116,7 +122,7 @@ export function AddLanguageDialog({
             disabled={!selectedLanguage || loading}
             onClick={handleConfirm}
           >
-            {loading ? "CONFIRMING..." : "CONFIRM"}
+            {loading ? t("buttons.confirming") : t("buttons.confirm")}
           </Button>
         </DialogFooter>
       </DialogContent>

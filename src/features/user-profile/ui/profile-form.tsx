@@ -23,6 +23,7 @@ import {
   UserDocument,
 } from "@/gql/generated/graphql";
 import { useMutation, useQuery } from "@apollo/client/react";
+import { useTranslations } from "next-intl";
 
 const profileSchema = z.object({
   first_name: z.string().optional(),
@@ -53,6 +54,7 @@ export function ProfileForm({
   userPositionName,
   isOwner,
 }: ProfileFormProps) {
+  const t = useTranslations();
   const {
     control,
     handleSubmit,
@@ -163,7 +165,7 @@ export function ProfileForm({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="relative">
           <div className={fieldGroupClasses}>
-            <span className={fieldLabelClasses}>First Name</span>
+            <span className={fieldLabelClasses}>{t("fields.firstName")}</span>
             <Controller
               name="first_name"
               control={control}
@@ -181,7 +183,7 @@ export function ProfileForm({
         </div>
         <div className="relative">
           <div className={fieldGroupClasses}>
-            <span className={fieldLabelClasses}>Last Name</span>
+            <span className={fieldLabelClasses}>{t("fields.lastName")}</span>
             <Controller
               name="last_name"
               control={control}
@@ -202,7 +204,7 @@ export function ProfileForm({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="relative">
           <div className={fieldGroupClasses}>
-            <span className={fieldLabelClasses}>Department</span>
+            <span className={fieldLabelClasses}>{t("fields.department")}</span>
             <Controller
               name="departmentId"
               control={control}
@@ -236,7 +238,7 @@ export function ProfileForm({
         </div>
         <div className="relative">
           <div className={fieldGroupClasses}>
-            <span className={fieldLabelClasses}>Position</span>
+            <span className={fieldLabelClasses}>{t("fields.position")}</span>
             <Controller
               name="positionId"
               control={control}
@@ -278,7 +280,7 @@ export function ProfileForm({
               disabled={!isDirty || isSubmitting}
               className="w-full uppercase"
             >
-              {isSubmitting ? "Updating..." : "Update"}
+              {isSubmitting ? t("common.loading") : t("buttons.save")}
             </Button>
           </div>
         </div>

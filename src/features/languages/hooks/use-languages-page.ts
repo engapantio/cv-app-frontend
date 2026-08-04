@@ -21,9 +21,12 @@ import {
   type SortingState,
 } from "@tanstack/react-table";
 import type { LanguageItem } from "@/features/languages/types";
+import { useTranslations } from "next-intl";
 
 export function useLanguagesPage(initialLanguages: LanguageItem[]) {
   const { isAdmin } = usePermissions();
+  const tColumns = useTranslations("columns.languages");
+  const tButtons = useTranslations("buttons");
 
   const { data: languagesData, loading } = useQuery(LanguagesDocument, {
     fetchPolicy: "network-only",
@@ -85,12 +88,12 @@ export function useLanguagesPage(initialLanguages: LanguageItem[]) {
 
   const columns = useMemo(
     () =>
-      createLanguagesColumns(isAdmin, {
+      createLanguagesColumns(tColumns, tButtons, isAdmin, {
         onOpen: handleOpen,
         onUpdate: handleUpdate,
         onDelete: handleDelete,
       }),
-    [isAdmin, handleOpen, handleUpdate, handleDelete],
+    [isAdmin, handleOpen, handleUpdate, handleDelete, tColumns, tButtons],
   );
 
   // eslint-disable-next-line react-hooks/incompatible-library

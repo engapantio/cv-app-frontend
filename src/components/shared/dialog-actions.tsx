@@ -1,6 +1,7 @@
 "use client";
 
 import { Button, DialogFooter } from "@/components/ui";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
 interface DialogActionsProps {
@@ -19,7 +20,7 @@ interface DialogActionsProps {
 const RED = "#e53935";
 
 export function DialogActions({
-  cancelLabel = "CANCEL",
+  cancelLabel,
   submitLabel,
   loadingLabel,
   loading = false,
@@ -30,6 +31,9 @@ export function DialogActions({
   className,
   submitClassName,
 }: DialogActionsProps) {
+  const t = useTranslations("buttons");
+  const resolvedCancel = cancelLabel ?? t("cancel");
+
   return (
     <DialogFooter className={cn("gap-3 border-t-0 bg-transparent mx-0 mb-0 py-0", className)}>
       <Button
@@ -38,7 +42,7 @@ export function DialogActions({
         className="uppercase min-w-30 border border-border py-1.5"
         onClick={onCancel}
       >
-        {cancelLabel}
+        {resolvedCancel}
       </Button>
       <Button
         type={type}
