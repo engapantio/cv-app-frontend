@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useCallback } from "react";
+import { useMemo, useState, useCallback, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@apollo/client/react";
 import type { DocumentNode } from "graphql";
@@ -15,13 +15,13 @@ import {
 import { type UserQuery, type CreateCvMutation } from "@/gql/generated/graphql";
 import { usePermissions } from "@/lib/auth/permissions";
 import { createCvsColumns } from "@/features/cvs/columns";
-import { generatePagination } from "@/lib/utils/pagination";
 
 type CvItem = NonNullable<UserQuery["user"]["cvs"]>[number];
 
 interface UseCvsTableParams {
   query: DocumentNode;
   variables?: Record<string, unknown>;
+  getData?: (data: { cvs?: CvItem[]; user?: { cvs?: CvItem[] } }) => CvItem[];
   initialCvs: CvItem[];
   userId?: string;
   initialUserEmail?: string | null;
@@ -30,13 +30,14 @@ interface UseCvsTableParams {
 export function useCvsTable({
   query,
   variables,
+  getData,
   initialCvs,
   userId,
   initialUserEmail,
 }: UseCvsTableParams) {
   const router = useRouter();
 
-  const { loading } = useQuery(query, {
+  const { data, loading } = useQuery(query, {
     variables,
     fetchPolicy: "network-only",
     errorPolicy: "all",
@@ -45,6 +46,18 @@ export function useCvsTable({
   const { currentUserId, isAdmin, user: currentUser } = usePermissions();
 
   const [cvsList, setCvsList] = useState<CvItem[]>(initialCvs);
+
+  const hydratedRef = useRef(false);
+
+  useEffect(() => {
+    if (data && !hydratedRef.current && getData) {
+      const fetched = getData(data);
+      if (fetched.length > 0) {
+        hydratedRef.current = true;
+        setCvsList(fetched);
+      }
+    }
+  }, [data, getData]);
 
   const [deleteTarget, setDeleteTarget] = useState<CvItem | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
@@ -80,8 +93,9 @@ export function useCvsTable({
           onDelete: handleDelete,
         },
         userEmail,
+        userId,
       ),
-    [currentUserId, isAdmin, handleOpen, handleDelete, userEmail],
+    [currentUserId, isAdmin, handleOpen, handleDelete, userEmail, userId],
   );
 
   // eslint-disable-next-line react-hooks/incompatible-library
@@ -97,22 +111,13 @@ export function useCvsTable({
     getPaginationRowModel: getPaginationRowModel(),
   });
 
-  const currentPage = table.getState().pagination.pageIndex + 1;
-  const totalPages = table.getPageCount();
-  const pageNumbers = useMemo(
-    () => generatePagination(currentPage, totalPages),
-    [currentPage, totalPages],
-  );
   const columnCount = columns.length;
 
   return {
-    loading,
+    loading: loading && cvsList.length === 0,
     table,
     rows: table.getRowModel().rows,
     columnCount,
-    currentPage,
-    totalPages,
-    pageNumbers,
     canCreate,
     createOpen,
     setCreateOpen,

@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Inbox } from "lucide-react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -18,17 +17,10 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  Button,
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui";
-import { SearchBar } from "@/components/shared/search-bar";
-import { generatePagination } from "@/lib/utils/pagination";
+} from "@/components/ui/table";
+import { TableEmptyState } from "@/components/shared/table-empty-state";
+import { TablePagination } from "@/components/shared/table-pagination";
+import { TableToolbar } from "@/components/shared/table-toolbar";
 import { ProjectRow } from "./project-row";
 import { createProjectColumns } from "../columns";
 import type { ProjectItem } from "../hooks/use-projects-page";
@@ -58,7 +50,7 @@ export function ProjectsTable({
   onDelete,
   serverError,
 }: ProjectsTableProps) {
-  const [sorting, setSorting] = useState<SortingState>([{ id: "id", desc: true }]);
+  const [sorting, setSorting] = useState<SortingState>([]);
 
   const columns = useMemo(() => createProjectColumns(), []);
 
@@ -66,7 +58,6 @@ export function ProjectsTable({
   const table = useReactTable({
     data: projects,
     columns,
-    initialState: { columnVisibility: { id: false } },
     state: { sorting, globalFilter },
     onSortingChange: setSorting,
     onGlobalFilterChange: setGlobalFilter,
@@ -77,36 +68,25 @@ export function ProjectsTable({
   });
 
   const columnCount = columns.length;
-  const currentPage = table.getState().pagination.pageIndex + 1;
-  const totalPages = table.getPageCount();
-  const pageNumbers = useMemo(
-    () => generatePagination(currentPage, totalPages),
-    [currentPage, totalPages],
-  );
   const rows = table.getRowModel().rows;
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between gap-3">
-        <SearchBar value={globalFilter} onChange={setGlobalFilter} />
-        {canMutate && (
-          <Button
-            variant="ghost"
-            className="uppercase text-primary hover:text-primary text-sm font-medium cursor-pointer"
-            onClick={onCreate}
-          >
-            +<span className="hidden md:inline">&nbsp;CREATE PROJECT</span>
-          </Button>
-        )}
-      </div>
+      <TableToolbar
+        value={globalFilter}
+        onChange={setGlobalFilter}
+        actionLabel="CREATE PROJECT"
+        onAction={onCreate}
+        showAction={canMutate}
+      />
 
       <div className="overflow-x-hidden">
-        <UITable className="w-full">
+        <UITable className="table-fixed w-full">
           <colgroup>
             <col />
-            <col />
-            <col />
-            <col />
+            <col className="hidden max-md:hidden md:table-column" />
+            <col className="hidden xl:table-column" />
+            <col className="hidden xl:table-column" />
             <col className="w-12" />
           </colgroup>
           <TableHeader className="[&_tr]:border-b">
@@ -143,10 +123,7 @@ export function ProjectsTable({
                   {loading ? (
                     <span className="text-muted-foreground">Loading...</span>
                   ) : (
-                    <div className="flex flex-col items-center text-muted-foreground">
-                      <Inbox className="h-16 w-16 mb-2" />
-                      <p className="text-lg">No projects found.</p>
-                    </div>
+                    <TableEmptyState message="No projects found." />
                   )}
                 </TableCell>
               </TableRow>
@@ -169,36 +146,10 @@ export function ProjectsTable({
       </div>
 
       {rows.length > 0 && (
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4 mt-8">
-          <Pagination>
-            <PaginationContent>
-              <PaginationPrevious
-                onClick={() => table.previousPage()}
-                aria-disabled={!table.getCanPreviousPage()}
-                className={!table.getCanPreviousPage() ? "pointer-events-none opacity-50" : ""}
-              />
-              {pageNumbers.map((page, i) => (
-                <PaginationItem key={i}>
-                  {page === "..." ? (
-                    <PaginationEllipsis />
-                  ) : (
-                    <PaginationLink
-                      isActive={page === currentPage}
-                      onClick={() => table.setPageIndex((page as number) - 1)}
-                    >
-                      {page}
-                    </PaginationLink>
-                  )}
-                </PaginationItem>
-              ))}
-              <PaginationNext
-                onClick={() => table.nextPage()}
-                aria-disabled={!table.getCanNextPage()}
-                className={!table.getCanNextPage() ? "pointer-events-none opacity-50" : ""}
-              />
-            </PaginationContent>
-          </Pagination>
-        </div>
+        <TablePagination
+          table={table}
+          className="flex flex-col md:flex-row items-center justify-between gap-4 mt-8"
+        />
       )}
     </div>
   );

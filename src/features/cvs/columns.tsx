@@ -1,14 +1,16 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { MoreVertical, ArrowUp, ArrowDown } from "lucide-react";
+import { MoreVertical } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
-  Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui";
+} from "@/components/ui/dropdown-menu";
+import { RowActions } from "@/components/shared/row-actions";
+import { SortableHeader } from "@/components/shared/sortable-header";
 import type { UserQuery } from "@/gql/generated/graphql";
 
 type CvItem = NonNullable<UserQuery["user"]["cvs"]>[number];
@@ -23,51 +25,25 @@ export function createCvsColumns(
   isAdmin: boolean,
   actions: CvActions,
   userEmail?: string | null,
+  pageOwnerId?: string | null,
 ): ColumnDef<CvItem>[] {
   return [
     {
       id: "name",
-      header: ({ column }) => (
-        <button
-          onClick={column.getToggleSortingHandler()}
-          className="flex items-center gap-1 cursor-pointer font-medium"
-        >
-          Name
-          {column.getIsSorted() === "asc" && <ArrowUp className="size-4" />}
-          {column.getIsSorted() === "desc" && <ArrowDown className="size-4" />}
-        </button>
-      ),
+      header: ({ column }) => <SortableHeader column={column} label="Name" />,
       accessorKey: "name",
       enableGlobalFilter: true,
     },
     {
       id: "education",
-      header: ({ column }) => (
-        <button
-          onClick={column.getToggleSortingHandler()}
-          className="flex items-center gap-1 cursor-pointer font-medium"
-        >
-          Education
-          {column.getIsSorted() === "asc" && <ArrowUp className="size-4" />}
-          {column.getIsSorted() === "desc" && <ArrowDown className="size-4" />}
-        </button>
-      ),
+      header: ({ column }) => <SortableHeader column={column} label="Education" />,
       accessorFn: (row) => row.education ?? "",
       enableGlobalFilter: true,
       meta: { className: "max-md:hidden" },
     },
     {
       id: "employee",
-      header: ({ column }) => (
-        <button
-          onClick={column.getToggleSortingHandler()}
-          className="flex items-center gap-1 cursor-pointer font-medium"
-        >
-          Employee
-          {column.getIsSorted() === "asc" && <ArrowUp className="size-4" />}
-          {column.getIsSorted() === "desc" && <ArrowDown className="size-4" />}
-        </button>
-      ),
+      header: ({ column }) => <SortableHeader column={column} label="Employee" />,
       accessorFn: (row) => row.user?.email ?? userEmail ?? "",
       enableGlobalFilter: true,
     },
@@ -78,11 +54,12 @@ export function createCvsColumns(
       enableGlobalFilter: false,
       cell: ({ row }) => {
         const cv = row.original;
-        const isOwn = currentUserId === cv.user?.id;
+        const isOwn =
+          currentUserId === cv.user?.id || (pageOwnerId != null && currentUserId === pageOwnerId);
         const canMutate = isOwn || isAdmin;
 
         return (
-          <div className="flex justify-end" onClick={(e) => e.stopPropagation()}>
+          <RowActions canMutate={canMutate} onOpen={() => actions.onOpen(cv.id)}>
             <DropdownMenu>
               <DropdownMenuTrigger
                 render={
@@ -115,7 +92,7 @@ export function createCvsColumns(
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          </div>
+          </RowActions>
         );
       },
     },

@@ -9,14 +9,5 @@ query Cvs {
       id
       email
     }
-    projects {
-      __typename
-    }
-    skills {
-      __typename
-    }
-    languages {
-      __typename
-    }
   }
 }

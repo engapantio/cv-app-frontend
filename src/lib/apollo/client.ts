@@ -5,13 +5,8 @@ import { ApolloClient, InMemoryCache } from "@apollo/client-integration-nextjs";
 import { ErrorLink } from "@apollo/client/link/error";
 import { CombinedGraphQLErrors } from "@apollo/client/errors";
 import { typePolicies } from "@/lib/apollo/cache";
-import {
-  getAccessToken,
-  setTokens,
-  isTokenExpired,
-  clearTokens,
-  onBootstrapComplete,
-} from "@/lib/auth/token-store";
+import { GRAPHQL_PROXY_PATH } from "@/lib/apollo/endpoint";
+import { getAccessToken, setTokens, isTokenExpired, clearTokens } from "@/lib/auth/token-store";
 
 let refreshPromise: Promise<void> | null = null;
 let refreshFailed = false;
@@ -68,12 +63,7 @@ const authLink = new ApolloLink((operation, forward) => {
 
       (async () => {
         try {
-          let token = getAccessToken();
-
-          if (!token) {
-            await onBootstrapComplete;
-            token = getAccessToken();
-          }
+          const token = getAccessToken();
 
           if (token && isTokenExpired(token)) {
             try {
@@ -189,13 +179,9 @@ const errorLink = new ErrorLink(({ error, operation }) => {
   }
 });
 
-function getGraphqlUri() {
-  return "/api/graphql";
-}
-
 export function createBrowserApolloClient() {
   const httpLink = new HttpLink({
-    uri: getGraphqlUri(),
+    uri: GRAPHQL_PROXY_PATH,
     credentials: "include",
     fetchOptions: { cache: "no-store" },
   });

@@ -1,28 +1,9 @@
-import { Column, ColumnDef } from "@tanstack/react-table";
+import { ColumnDef } from "@tanstack/react-table";
 import { User } from "cv-graphql";
-import { Avatar, AvatarFallback, AvatarImage, Button } from "@/components/ui";
-import { ArrowDown, ArrowUp, ChevronRight } from "lucide-react";
-
-const SortableHeader = ({ column, label }: { column: Column<User, unknown>; label: string }) => {
-  const sorted = column.getIsSorted();
-  let icon = null;
-  if (sorted === "asc") {
-    icon = <ArrowDown className="ml-2  h-[18px] w-[18px]" />;
-  } else if (sorted === "desc") {
-    icon = <ArrowUp className="ml-2  h-[18px] w-[18px]" />;
-  }
-
-  return (
-    <Button
-      variant="ghost"
-      onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-      className="px-0 hover:bg-transparent"
-    >
-      {label}
-      {icon}
-    </Button>
-  );
-};
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { ChevronRight } from "lucide-react";
+import { SortableHeader } from "@/components/shared/sortable-header";
 
 export const usersColumns: ColumnDef<User, unknown>[] = [
   {
@@ -38,6 +19,7 @@ export const usersColumns: ColumnDef<User, unknown>[] = [
     header: "",
     enableSorting: false,
     enableGlobalFilter: false,
+    meta: { className: "w-14" },
     cell: ({ row }) => {
       const user = row.original;
       return (
@@ -85,6 +67,7 @@ export const usersColumns: ColumnDef<User, unknown>[] = [
     header: () => <span className="sr-only">Actions</span>,
     enableSorting: false,
     enableGlobalFilter: false,
+    meta: { className: "w-12" },
     cell: () => (
       <div className="flex items-center gap-2">
         <Button variant="ghost" size="icon" className="rounded-[20px]">

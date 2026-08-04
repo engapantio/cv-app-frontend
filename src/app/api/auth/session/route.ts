@@ -43,39 +43,43 @@ export async function GET() {
   const accessToken = await getServerAccessToken();
   const userId = await getServerUserId();
 
-  if (!accessToken || !userId) {
+  if (!userId) {
+    return NextResponse.json({ authenticated: false, user: null });
+  }
+
+  if (accessToken) {
+    try {
+      const user = await fetchUser(accessToken, userId);
+      return NextResponse.json({
+        authenticated: !!user,
+        user,
+        accessToken,
+        refreshToken: await getServerRefreshToken(),
+      });
+    } catch {
+      // access token invalid/expired; fall through to refresh
+    }
+  }
+
+  const refreshed = await refreshTokens();
+  if (!refreshed) {
     return NextResponse.json({ authenticated: false, user: null });
   }
 
   try {
-    const user = await fetchUser(accessToken, userId);
-    return NextResponse.json({
+    const user = await fetchUser(refreshed.accessToken, userId);
+    const res = NextResponse.json({
       authenticated: !!user,
       user,
-      accessToken,
-      refreshToken: await getServerRefreshToken(),
+      accessToken: refreshed.accessToken,
+      refreshToken: refreshed.refreshToken,
     });
+    return setAuthCookies(res, refreshed, refreshed.userId);
   } catch {
-    const refreshed = await refreshTokens();
-    if (!refreshed) {
-      return NextResponse.json({ authenticated: false, user: null });
-    }
-
-    try {
-      const user = await fetchUser(refreshed.accessToken, userId);
-      const res = NextResponse.json({
-        authenticated: !!user,
-        user,
-        accessToken: refreshed.accessToken,
-        refreshToken: refreshed.refreshToken,
-      });
-      return setAuthCookies(res, refreshed, refreshed.userId);
-    } catch {
-      return setAuthCookies(
-        NextResponse.json({ authenticated: false, user: null }),
-        refreshed,
-        refreshed.userId,
-      );
-    }
+    return setAuthCookies(
+      NextResponse.json({ authenticated: false, user: null }),
+      refreshed,
+      refreshed.userId,
+    );
   }
 }

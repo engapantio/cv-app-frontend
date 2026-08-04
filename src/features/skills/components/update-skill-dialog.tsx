@@ -47,6 +47,9 @@ export function UpdateSkillDialog({
     initialCategoryName,
   );
 
+  const isDirty =
+    name.trim() !== (target?.name ?? "").trim() || selectedCategoryName !== initialCategoryName;
+
   const [updateSkill, { loading: updating }] = useMutation(UpdateSkillDocument);
 
   const handleUpdate = useCallback(async () => {
@@ -125,7 +128,7 @@ export function UpdateSkillDialog({
             type="button"
             className="uppercase text-white min-w-30 py-1.5"
             style={{ backgroundColor: "#e53935" }}
-            disabled={!name.trim() || updating}
+            disabled={!name.trim() || !isDirty || updating}
             onClick={handleUpdate}
           >
             {updating ? "UPDATING..." : "UPDATE"}

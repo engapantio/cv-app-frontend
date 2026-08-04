@@ -7,6 +7,7 @@ import { ProfileForm } from "./profile-form";
 import { usePathname, useRouter } from "next/navigation";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui";
 import { useSession } from "@/lib/auth/session";
+import { VerifiedBadge } from "@/components/shared";
 
 type User = NonNullable<UserQuery["user"]>;
 
@@ -98,7 +99,10 @@ export function UserProfileClient({ user, isOwner }: UserProfileClientProps) {
           />
           <div className="flex flex-col items-center mb-16">
             <h2 className="mb-2 font-normal text-2xl">{fullName}</h2>
-            <p className="text-muted-foreground text-base">{user.email}</p>
+            <div className="flex items-center gap-1.5">
+              <p className="text-muted-foreground text-base">{user.email}</p>
+              <VerifiedBadge verified={user.is_verified} />
+            </div>
             <p className="text-base text-foreground">A member since {formattedDate}</p>
           </div>
         </div>

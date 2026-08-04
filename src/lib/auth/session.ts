@@ -50,6 +50,15 @@ function stopProactiveRefresh() {
   }
 }
 
+export function markUserVerified() {
+  const current = sessionStateVar();
+  if (current.status !== "authenticated" || !current.user) return;
+  sessionStateVar({
+    status: "authenticated",
+    user: { ...current.user, is_verified: true },
+  });
+}
+
 export function setAuthenticatedSession(user: SessionUser) {
   bootstrapAbortController?.abort();
   bootstrapped = false;

@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { toast } from "sonner";
+import { EnvPill } from "@/components/shared";
 import {
   Button,
   Dialog,
@@ -58,6 +59,13 @@ function UpdateProjectForm({
 
   const [startDateOpen, setStartDateOpen] = useState(false);
   const [endDateOpen, setEndDateOpen] = useState(false);
+
+  const isDirty =
+    (startDate ? startDate.toISOString() : null) !==
+      (project.start_date ? new Date(project.start_date).toISOString() : null) ||
+    (endDate ? endDate.toISOString() : null) !==
+      (project.end_date ? new Date(project.end_date).toISOString() : null) ||
+    rolesInput !== [...project.roles, ...project.responsibilities].join("\n");
 
   const handleConfirm = useCallback(async () => {
     try {
@@ -184,14 +192,7 @@ function UpdateProjectForm({
           </span>
           <div className="flex flex-wrap gap-2 px-4 py-3 min-h-12">
             {project.environment?.length ? (
-              project.environment.map((env) => (
-                <span
-                  key={env}
-                  className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-muted text-muted-foreground"
-                >
-                  {env}
-                </span>
-              ))
+              project.environment.map((env) => <EnvPill key={env} env={env} />)
             ) : (
               <span className="text-sm text-muted-foreground">—</span>
             )}
@@ -222,7 +223,7 @@ function UpdateProjectForm({
           type="submit"
           className="uppercase text-white min-w-30 py-1.5 hover:brightness-90"
           style={{ backgroundColor: "#e53935" }}
-          disabled={loading}
+          disabled={!isDirty || loading}
           onClick={handleConfirm}
         >
           {loading ? "UPDATING..." : "UPDATE"}

@@ -56,7 +56,7 @@ export function SignupForm() {
         setTokens(payload.accessToken, payload.refreshToken ?? null);
       }
       setAuthenticatedSession(payload.user);
-      router.replace("/users");
+      router.replace("/verify-email");
       router.refresh();
     } catch {
       setError("root", { message: "Unexpected error. Please try again." });

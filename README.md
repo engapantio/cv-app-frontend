@@ -39,8 +39,7 @@ cp .env.example .env.local
 
 Required variables:
 
-- `GRAPHQL_API_URL` — server-side GraphQL endpoint
-- `NEXT_PUBLIC_GRAPHQL_API_URL` — browser-side GraphQL endpoint
+- `GRAPHQL_API_URL` — backend GraphQL endpoint (server-side only). Browser requests go through the same-origin `/api/graphql` proxy, so no `NEXT_PUBLIC_*` variant is needed.
 
 ## Deploy on Vercel
 

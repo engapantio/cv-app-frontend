@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { getServerAccessToken, getServerRefreshToken } from "@/lib/auth/cookies";
 import { ProtectedShell } from "@/components/layout/protected-shell";
-import { SidebarProvider } from "@/components/ui";
+import { SidebarProvider } from "@/components/ui/sidebar";
 
 export default async function ProtectedLayout({ children }: { children: React.ReactNode }) {
   const accessToken = await getServerAccessToken();

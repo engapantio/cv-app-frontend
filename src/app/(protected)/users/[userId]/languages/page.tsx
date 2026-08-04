@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
-import { getServerAccessToken, getServerUserId } from "@/lib/auth/cookies";
-import { createServerApolloClient } from "@/lib/apollo/server-client";
+import { getServerUserId } from "@/lib/auth/cookies";
+import { createServerApolloClientForRequest } from "@/lib/apollo/server-client";
 import { UserDocument } from "@/gql/generated/graphql";
 import { UserLanguagesClient } from "@/features/user-languages/components/user-languages-client";
 
@@ -10,12 +10,11 @@ interface LanguagesPageProps {
 
 export default async function LanguagesPage({ params }: LanguagesPageProps) {
   const { userId } = await params;
-  const token = await getServerAccessToken();
+  const { client, accessToken: token } = await createServerApolloClientForRequest();
   const currentUserId = await getServerUserId();
 
   if (!token) return notFound();
 
-  const client = createServerApolloClient(token);
   const { data } = await client.query({
     query: UserDocument,
     variables: { userId },

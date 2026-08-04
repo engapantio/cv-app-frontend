@@ -1,6 +1,6 @@
 "use client";
 
-import { Inbox } from "lucide-react";
+import dynamic from "next/dynamic";
 import { type Table, flexRender } from "@tanstack/react-table";
 import {
   Table as UITable,
@@ -9,29 +9,35 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  Button,
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui";
+} from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import type { SkillItem } from "@/features/skills/types";
 import type { SkillCategoriesQuery } from "@/gql/generated/graphql";
-import { OpenSkillOverlay } from "./open-skill-overlay";
-import { SearchBar } from "@/components/shared/search-bar";
-import { CreateSkillDialog } from "./create-skill-dialog";
-import { UpdateSkillDialog } from "./update-skill-dialog";
-import { DeleteSkillDialog } from "./delete-skill-dialog";
+import { TableEmptyState } from "@/components/shared/table-empty-state";
+import { TablePagination } from "@/components/shared/table-pagination";
+import { TableToolbar } from "@/components/shared/table-toolbar";
+
+const OpenSkillOverlay = dynamic(
+  () => import("./open-skill-overlay").then((m) => m.OpenSkillOverlay),
+  { loading: () => null },
+);
+const CreateSkillDialog = dynamic(
+  () => import("./create-skill-dialog").then((m) => m.CreateSkillDialog),
+  { loading: () => null },
+);
+const UpdateSkillDialog = dynamic(
+  () => import("./update-skill-dialog").then((m) => m.UpdateSkillDialog),
+  { loading: () => null },
+);
+const DeleteSkillDialog = dynamic(
+  () => import("./delete-skill-dialog").then((m) => m.DeleteSkillDialog),
+  { loading: () => null },
+);
 
 interface SkillsTableProps {
   loading: boolean;
   table: Table<SkillItem>;
   columnCount: number;
-  pageNumbers: (number | "...")[];
   isAdmin: boolean;
   createOpen: boolean;
   setCreateOpen: (open: boolean) => void;
@@ -58,7 +64,6 @@ interface SkillsTableProps {
   handleDeleted: (skillId: string) => void;
   globalFilter: string;
   setGlobalFilter: (value: string) => void;
-  currentPage: number;
   serverError?: string | null;
   categories: SkillCategoriesQuery["skillCategories"];
 }
@@ -67,7 +72,6 @@ export function SkillsTable({
   loading,
   table,
   columnCount,
-  pageNumbers,
   isAdmin,
   createOpen,
   setCreateOpen,
@@ -82,7 +86,6 @@ export function SkillsTable({
   handleDeleted,
   globalFilter,
   setGlobalFilter,
-  currentPage,
   serverError,
   categories,
 }: SkillsTableProps) {
@@ -91,21 +94,17 @@ export function SkillsTable({
   return (
     <>
       <div className="space-y-4">
-        <div className="flex items-center justify-between gap-3">
-          <SearchBar value={globalFilter} onChange={setGlobalFilter} />
-          {isAdmin && (
-            <Button
-              variant="ghost"
-              className="uppercase text-primary hover:text-primary hover:bg-transparent text-sm font-medium cursor-pointer"
-              onClick={() => setCreateOpen(true)}
-            >
-              +<span className="hidden md:inline">&nbsp;CREATE SKILL</span>
-            </Button>
-          )}
-        </div>
+        <TableToolbar
+          value={globalFilter}
+          onChange={setGlobalFilter}
+          actionLabel="CREATE SKILL"
+          onAction={() => setCreateOpen(true)}
+          showAction={isAdmin}
+          actionClassName="hover:bg-transparent"
+        />
 
         <div className="overflow-x-hidden">
-          <UITable className="[&_tr]:border-b-border">
+          <UITable className="table-fixed [&_tr]:border-b-border">
             <colgroup>
               <col />
               <col />
@@ -150,12 +149,7 @@ export function SkillsTable({
                 ) : (
                   <TableRow>
                     <TableCell colSpan={columnCount}>
-                      <div className="flex flex-col items-center max-md:py-8 md:max-[1439px]:py-12 min-[1440px]:py-16 text-muted-foreground">
-                        <Inbox className="max-md:h-10 max-md:w-10 md:max-[1439px]:h-12 md:max-[1439px]:w-12 min-[1440px]:h-16 min-[1440px]:w-16 mb-2" />
-                        <p className="max-md:text-sm md:max-[1439px]:text-base min-[1440px]:text-lg">
-                          No skills found.
-                        </p>
-                      </div>
+                      <TableEmptyState message="No skills found." responsive />
                     </TableCell>
                   </TableRow>
                 )}
@@ -164,7 +158,11 @@ export function SkillsTable({
               rows.map((row, idx) => (
                 <TableBody
                   key={row.id}
-                  className={cn("group", idx < rows.length - 1 && "[&_tr:last-child]:border-b")}
+                  className={cn(
+                    "group",
+                    idx < rows.length - 1 &&
+                      "[&_tr:last-child]:border-b [&_tr:last-child]:border-b-table-border",
+                  )}
                 >
                   <TableRow
                     className="cursor-pointer border-b-0 group-hover:bg-muted/50 dark:group-hover:bg-white/15"
@@ -193,61 +191,41 @@ export function SkillsTable({
         </div>
 
         {rows.length > 0 && (
-          <div className="flex max-md:flex-col md:max-[1439px]:flex-row min-[1440px]:flex-row items-center justify-between max-md:gap-3 md:max-[1439px]:gap-4 min-[1440px]:gap-6 max-md:mt-4 md:max-[1439px]:mt-6 min-[1440px]:mt-8">
-            <Pagination>
-              <PaginationContent>
-                <PaginationPrevious
-                  onClick={() => table.previousPage()}
-                  aria-disabled={!table.getCanPreviousPage()}
-                  className={!table.getCanPreviousPage() ? "pointer-events-none opacity-50" : ""}
-                />
-                {pageNumbers.map((page, i) => (
-                  <PaginationItem key={i}>
-                    {page === "..." ? (
-                      <PaginationEllipsis />
-                    ) : (
-                      <PaginationLink
-                        isActive={page === currentPage}
-                        onClick={() => table.setPageIndex((page as number) - 1)}
-                      >
-                        {page}
-                      </PaginationLink>
-                    )}
-                  </PaginationItem>
-                ))}
-                <PaginationNext
-                  onClick={() => table.nextPage()}
-                  aria-disabled={!table.getCanNextPage()}
-                  className={!table.getCanNextPage() ? "pointer-events-none opacity-50" : ""}
-                />
-              </PaginationContent>
-            </Pagination>
-          </div>
+          <TablePagination
+            table={table}
+            className="flex max-md:flex-col md:max-[1439px]:flex-row min-[1440px]:flex-row items-center justify-between max-md:gap-3 md:max-[1439px]:gap-4 min-[1440px]:gap-6 max-md:mt-4 md:max-[1439px]:mt-6 min-[1440px]:mt-8"
+          />
         )}
       </div>
 
-      <OpenSkillOverlay target={openTarget} onClose={() => setOpenTarget(null)} />
+      {openTarget && <OpenSkillOverlay target={openTarget} onClose={() => setOpenTarget(null)} />}
 
-      <CreateSkillDialog
-        open={createOpen}
-        onOpenChange={setCreateOpen}
-        categories={categories}
-        onCreated={handleCreated}
-      />
+      {createOpen && (
+        <CreateSkillDialog
+          open={createOpen}
+          onOpenChange={setCreateOpen}
+          categories={categories}
+          onCreated={handleCreated}
+        />
+      )}
 
-      <UpdateSkillDialog
-        key={updateTarget ? "update-" + updateTarget.id : "update-closed"}
-        target={updateTarget}
-        onClose={() => setUpdateTarget(null)}
-        categories={categories}
-        onUpdated={handleUpdated}
-      />
+      {updateTarget && (
+        <UpdateSkillDialog
+          key={"update-" + updateTarget.id}
+          target={updateTarget}
+          onClose={() => setUpdateTarget(null)}
+          categories={categories}
+          onUpdated={handleUpdated}
+        />
+      )}
 
-      <DeleteSkillDialog
-        target={deleteTarget}
-        onClose={() => setDeleteTarget(null)}
-        onDeleted={handleDeleted}
-      />
+      {deleteTarget && (
+        <DeleteSkillDialog
+          target={deleteTarget}
+          onClose={() => setDeleteTarget(null)}
+          onDeleted={handleDeleted}
+        />
+      )}
     </>
   );
 }

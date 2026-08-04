@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import { useQuery, useMutation } from "@apollo/client/react";
 import {
   LanguagesDocument,
@@ -11,14 +12,21 @@ import {
   type UserQuery,
   type Proficiency,
 } from "@/gql/generated/graphql";
-import { Checkbox } from "@/components/ui";
+import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { Trash2 } from "lucide-react";
 import { usePermissions } from "@/lib/auth/permissions";
-import { UpdateLanguageDialog } from "./update-language-dialog";
 import { cn } from "@/lib/utils";
 import { PROFICIENCY_MAP } from "../utils/proficiency-mapping";
-import { AddLanguageDialog } from "./add-language-dialog";
+
+const AddLanguageDialog = dynamic(
+  () => import("./add-language-dialog").then((m) => m.AddLanguageDialog),
+  { loading: () => null },
+);
+const UpdateLanguageDialog = dynamic(
+  () => import("./update-language-dialog").then((m) => m.UpdateLanguageDialog),
+  { loading: () => null },
+);
 
 type User = NonNullable<UserQuery["user"]>;
 type Language = NonNullable<User["profile"]["languages"]>[number];
@@ -224,21 +232,25 @@ export function UserLanguagesClient({ userId, isOwner }: UserLanguagesClientProp
         </div>
       )}
 
-      <AddLanguageDialog
-        open={addDialogOpen}
-        onOpenChange={setAddDialogOpen}
-        availableLanguages={availableLanguages}
-        onConfirm={handleAddLanguage}
-        loading={adding}
-      />
+      {addDialogOpen && (
+        <AddLanguageDialog
+          open={addDialogOpen}
+          onOpenChange={setAddDialogOpen}
+          availableLanguages={availableLanguages}
+          onConfirm={handleAddLanguage}
+          loading={adding}
+        />
+      )}
 
-      <UpdateLanguageDialog
-        open={updateDialogOpen}
-        onOpenChange={setUpdateDialogOpen}
-        currentLanguage={currentLanguage}
-        onConfirm={handleUpdateLanguage}
-        loading={updating}
-      />
+      {updateDialogOpen && currentLanguage && (
+        <UpdateLanguageDialog
+          open={updateDialogOpen}
+          onOpenChange={setUpdateDialogOpen}
+          currentLanguage={currentLanguage}
+          onConfirm={handleUpdateLanguage}
+          loading={updating}
+        />
+      )}
     </div>
   );
 }

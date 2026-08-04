@@ -11,10 +11,13 @@ export async function POST(request: NextRequest) {
 
   const bearerToken = existingAuth ?? (cookieToken ? `Bearer ${cookieToken}` : null);
 
+  const origin = request.headers.get("origin") ?? request.nextUrl.origin;
+
   const res = await fetch(process.env.GRAPHQL_API_URL!, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      Origin: origin,
       ...(bearerToken ? { Authorization: bearerToken } : {}),
     },
     body,

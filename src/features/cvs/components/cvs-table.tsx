@@ -1,6 +1,6 @@
 "use client";
 
-import { Inbox } from "lucide-react";
+import dynamic from "next/dynamic";
 import { type Table, flexRender } from "@tanstack/react-table";
 import {
   Table as UITable,
@@ -9,27 +9,27 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  Button,
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui";
+} from "@/components/ui/table";
 import { type CreateCvMutation } from "@/gql/generated/graphql";
-import { SearchBar } from "@/components/shared/search-bar";
-import { CreateCvDialog } from "@/features/cvs/components/create-cv-dialog";
-import { DeleteCvDialog } from "@/features/cvs/components/delete-cv-dialog";
+import { TableEmptyState } from "@/components/shared/table-empty-state";
+import { TablePagination } from "@/components/shared/table-pagination";
+import { TableToolbar } from "@/components/shared/table-toolbar";
 import { cn } from "@/lib/utils";
 import type { CvItem } from "@/features/cvs/types";
+
+const CreateCvDialog = dynamic(
+  () => import("@/features/cvs/components/create-cv-dialog").then((m) => m.CreateCvDialog),
+  { loading: () => null },
+);
+const DeleteCvDialog = dynamic(
+  () => import("@/features/cvs/components/delete-cv-dialog").then((m) => m.DeleteCvDialog),
+  { loading: () => null },
+);
 
 interface CvsTableProps {
   loading: boolean;
   table: Table<CvItem>;
   columnCount: number;
-  pageNumbers: (number | "...")[];
   canCreate: boolean;
   createOpen: boolean;
   setCreateOpen: (open: boolean) => void;
@@ -38,7 +38,6 @@ interface CvsTableProps {
   handleDeleted: (cvId: string) => void;
   globalFilter: string;
   setGlobalFilter: (value: string) => void;
-  currentPage: number;
   handleOpen: (cvId: string) => void;
   setDeleteTarget: (target: CvItem | null) => void;
   serverError?: string | null;
@@ -50,7 +49,6 @@ export function CvsTable({
   loading,
   table,
   columnCount,
-  pageNumbers,
   canCreate,
   createOpen,
   setCreateOpen,
@@ -59,7 +57,6 @@ export function CvsTable({
   handleDeleted,
   globalFilter,
   setGlobalFilter,
-  currentPage,
   handleOpen,
   setDeleteTarget,
   serverError,
@@ -71,18 +68,13 @@ export function CvsTable({
   return (
     <>
       <div className="space-y-4">
-        <div className="flex items-center justify-between gap-3">
-          <SearchBar value={globalFilter} onChange={setGlobalFilter} />
-          {canCreate && (
-            <Button
-              variant="ghost"
-              className="uppercase text-primary hover:text-primary text-sm font-medium cursor-pointer"
-              onClick={() => setCreateOpen(true)}
-            >
-              +<span className="hidden md:inline">&nbsp;CREATE CV</span>
-            </Button>
-          )}
-        </div>
+        <TableToolbar
+          value={globalFilter}
+          onChange={setGlobalFilter}
+          actionLabel="CREATE CV"
+          onAction={() => setCreateOpen(true)}
+          showAction={canCreate}
+        />
 
         <div className="overflow-x-hidden">
           <UITable className={tableClassName}>
@@ -130,12 +122,7 @@ export function CvsTable({
                 ) : (
                   <TableRow>
                     <TableCell colSpan={columnCount}>
-                      <div className="flex flex-col items-center max-md:py-8 md:max-[1439px]:py-12 min-[1440px]:py-16 text-muted-foreground">
-                        <Inbox className="max-md:h-10 max-md:w-10 md:max-[1439px]:h-12 md:max-[1439px]:w-12 min-[1440px]:h-16 min-[1440px]:w-16 mb-2" />
-                        <p className="max-md:text-sm md:max-[1439px]:text-base min-[1440px]:text-lg">
-                          No CVs found.
-                        </p>
-                      </div>
+                      <TableEmptyState message="No CVs found." responsive />
                     </TableCell>
                   </TableRow>
                 )}
@@ -144,7 +131,11 @@ export function CvsTable({
               rows.map((row, idx) => (
                 <TableBody
                   key={row.id}
-                  className={cn("group", idx < rows.length - 1 && "[&_tr:last-child]:border-b")}
+                  className={cn(
+                    "group",
+                    idx < rows.length - 1 &&
+                      "[&_tr:last-child]:border-b [&_tr:last-child]:border-b-table-border",
+                  )}
                 >
                   <TableRow
                     className="cursor-pointer border-b-0 group-hover:bg-muted/50 dark:group-hover:bg-white/15"
@@ -181,51 +172,29 @@ export function CvsTable({
         </div>
 
         {rows.length > 0 && (
-          <div className="flex max-md:flex-col md:max-[1439px]:flex-row min-[1440px]:flex-row items-center justify-between max-md:gap-3 md:max-[1439px]:gap-4 min-[1440px]:gap-6 max-md:mt-4 md:max-[1439px]:mt-6 min-[1440px]:mt-8">
-            <Pagination>
-              <PaginationContent>
-                <PaginationPrevious
-                  onClick={() => table.previousPage()}
-                  aria-disabled={!table.getCanPreviousPage()}
-                  className={!table.getCanPreviousPage() ? "pointer-events-none opacity-50" : ""}
-                />
-                {pageNumbers.map((page, i) => (
-                  <PaginationItem key={i}>
-                    {page === "..." ? (
-                      <PaginationEllipsis />
-                    ) : (
-                      <PaginationLink
-                        isActive={page === currentPage}
-                        onClick={() => table.setPageIndex((page as number) - 1)}
-                      >
-                        {page}
-                      </PaginationLink>
-                    )}
-                  </PaginationItem>
-                ))}
-                <PaginationNext
-                  onClick={() => table.nextPage()}
-                  aria-disabled={!table.getCanNextPage()}
-                  className={!table.getCanNextPage() ? "pointer-events-none opacity-50" : ""}
-                />
-              </PaginationContent>
-            </Pagination>
-          </div>
+          <TablePagination
+            table={table}
+            className="flex max-md:flex-col md:max-[1439px]:flex-row min-[1440px]:flex-row items-center justify-between max-md:gap-3 md:max-[1439px]:gap-4 min-[1440px]:gap-6 max-md:mt-4 md:max-[1439px]:mt-6 min-[1440px]:mt-8"
+          />
         )}
       </div>
 
-      <CreateCvDialog
-        open={createOpen}
-        onOpenChange={setCreateOpen}
-        userId={createUserId}
-        onCreated={handleCreated}
-      />
+      {createOpen && (
+        <CreateCvDialog
+          open={createOpen}
+          onOpenChange={setCreateOpen}
+          userId={createUserId}
+          onCreated={handleCreated}
+        />
+      )}
 
-      <DeleteCvDialog
-        target={deleteTarget}
-        onClose={() => setDeleteTarget(null)}
-        onDeleted={handleDeleted}
-      />
+      {deleteTarget && (
+        <DeleteCvDialog
+          target={deleteTarget}
+          onClose={() => setDeleteTarget(null)}
+          onDeleted={handleDeleted}
+        />
+      )}
     </>
   );
 }

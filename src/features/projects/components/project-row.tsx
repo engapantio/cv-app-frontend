@@ -4,13 +4,14 @@ import { MoreVertical } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatDate } from "@/lib/utils/date";
 import { Pill } from "@/components/shared/pill";
+import { Button } from "@/components/ui/button";
+import { RowActions } from "@/components/shared/row-actions";
 import {
-  Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui";
+} from "@/components/ui/dropdown-menu";
 import type { ProjectItem } from "../hooks/use-projects-page";
 
 interface ProjectRowProps {
@@ -33,11 +34,13 @@ export function ProjectRow({
   onDelete,
 }: ProjectRowProps) {
   return (
-    <tbody className={cn("group", !isLast && "border-b border-border")}>
-      <tr
-        className="cursor-pointer group-hover:bg-muted/50 dark:group-hover:bg-white/15"
-        onClick={() => onOpen(project)}
-      >
+    <tbody
+      className={cn(
+        "hover:bg-muted/50 dark:hover:bg-white/15",
+        !isLast && "border-b border-b-table-border",
+      )}
+    >
+      <tr className="cursor-pointer" onClick={() => onOpen(project)}>
         <td className="py-3 px-4 text-sm font-medium align-middle">{project.name}</td>
         <td className="py-3 px-4 text-sm font-medium hidden max-md:hidden md:table-cell align-middle">
           {project.domain}
@@ -49,7 +52,7 @@ export function ProjectRow({
           {formatDate(project.end_date, "Till now")}
         </td>
         <td className="py-3 px-4 w-12 align-middle">
-          <div className="flex justify-end" onClick={(e) => e.stopPropagation()}>
+          <RowActions canMutate={canMutate} onOpen={() => onOpen(project)}>
             <DropdownMenu>
               <DropdownMenuTrigger
                 render={
@@ -82,13 +85,10 @@ export function ProjectRow({
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          </div>
+          </RowActions>
         </td>
       </tr>
-      <tr
-        className="cursor-pointer group-hover:bg-muted/50 dark:group-hover:bg-white/15"
-        onClick={() => onOpen(project)}
-      >
+      <tr className="cursor-pointer" onClick={() => onOpen(project)}>
         <td
           colSpan={columnCount}
           className="px-4 pb-2 pt-0 text-sm text-muted-foreground whitespace-normal wrap-break-word"
@@ -96,10 +96,7 @@ export function ProjectRow({
           {project.description}
         </td>
       </tr>
-      <tr
-        className="cursor-pointer group-hover:bg-muted/50 dark:group-hover:bg-white/15"
-        onClick={() => onOpen(project)}
-      >
+      <tr className="cursor-pointer" onClick={() => onOpen(project)}>
         <td colSpan={columnCount} className="px-4 pb-3 pt-0">
           <div className="flex flex-wrap gap-1">
             {project.environment.map((env, index) => (

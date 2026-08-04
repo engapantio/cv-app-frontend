@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
-import { getServerAccessToken, getServerRefreshToken, getServerUserId } from "@/lib/auth/cookies";
-import { createServerApolloClient } from "@/lib/apollo/server-client";
-import { UserDocument, UpdateTokenDocument } from "@/gql/generated/graphql";
+import { getServerUserId } from "@/lib/auth/cookies";
+import { createServerApolloClientForRequest } from "@/lib/apollo/server-client";
+import { UserDocument } from "@/gql/generated/graphql";
 import { UserProfileClient } from "@/features/user-profile/ui/user-profile-client";
 import { ChevronRight, User } from "lucide-react";
 import Link from "next/link";
@@ -12,27 +12,13 @@ interface ProfilePageProps {
 
 export default async function ProfilePage({ params }: ProfilePageProps) {
   const { userId } = await params;
-  let token = await getServerAccessToken();
-  const refreshToken = await getServerRefreshToken();
+  const { client, accessToken: token } = await createServerApolloClientForRequest();
   const currentUserId = await getServerUserId();
-
-  if (!token && refreshToken) {
-    try {
-      const refreshClient = createServerApolloClient(refreshToken);
-      const { data } = await refreshClient.mutate({
-        mutation: UpdateTokenDocument,
-      });
-      if (data?.updateToken) {
-        token = data.updateToken.access_token;
-      }
-    } catch {}
-  }
 
   if (!token) {
     return notFound();
   }
 
-  const client = createServerApolloClient(token);
   const { data } = await client.query({
     query: UserDocument,
     variables: { userId },

@@ -4,23 +4,23 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useSyncExternalStore } from "react";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
-  Button,
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-  Skeleton,
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarMenu,
   SidebarMenuButton,
-} from "@/components/ui";
+} from "@/components/ui/sidebar";
 import {
   Users,
   Languages,
@@ -39,11 +39,9 @@ import { Container } from "../container";
 import { useTheme } from "next-themes";
 import { useSession, logout } from "@/lib/auth/session";
 import { usePermissions } from "@/lib/auth/permissions";
-
 interface AppSidebarProps {
   isSidebarOpen: boolean;
   setIsSidebarOpen: (open: boolean) => void;
-  isTablet: boolean;
 }
 
 const adminMenuItems = [
@@ -53,13 +51,13 @@ const adminMenuItems = [
   { href: "/departments", label: "Departments", icon: Building },
   { href: "/positions", label: "Positions", icon: Briefcase },
   { href: "/skills", label: "Skills", icon: TrendingUp },
-  { href: "/languages", label: "Languages", icon: Languages },
+  { href: "/users/languages", label: "Languages", icon: Languages, prefetch: false },
 ];
 
 const employeeMenuItems = [
   { href: "/users", label: "Employees", icon: Users },
   { href: "/skills", label: "Skills", icon: TrendingUp },
-  { href: "/languages", label: "Languages", icon: Languages },
+  { href: "/users/languages", label: "Languages", icon: Languages, prefetch: false },
   { href: "/cvs", label: "CVs", icon: FileUser },
 ];
 
@@ -207,13 +205,15 @@ function ProfileSection({
           <DropdownMenuContent align="end" side={menuSide} className="min-w-36">
             <DropdownMenuItem
               onClick={() => router.push(`/users/${userId}/profile`)}
-              className="cursor-pointer"
+              className="justify-center cursor-pointer"
             >
               Profile
             </DropdownMenuItem>
-            <DropdownMenuItem disabled>Settings</DropdownMenuItem>
+            <DropdownMenuItem disabled className="justify-center">
+              Settings
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
+            <DropdownMenuItem onClick={handleLogout} className="justify-center cursor-pointer">
               Logout
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -229,6 +229,7 @@ interface MenuItemData {
   href: string;
   label: string;
   icon: React.ComponentType<{ className?: string }>;
+  prefetch?: boolean;
 }
 
 function MenuItem({
@@ -244,7 +245,7 @@ function MenuItem({
 }) {
   const baseClasses = cn(
     "w-full text-icon",
-    isMobile ? "p-5 w-auto" : "py-8",
+    isMobile ? "p-5 w-auto! shrink-0" : "py-8",
     isActive &&
       (isMobile
         ? "bg-sidebar-accent rounded-full text-foreground"
@@ -253,16 +254,24 @@ function MenuItem({
   );
 
   return (
-    <SidebarMenuButton className={baseClasses}>
-      <Link href={item.href} onClick={onClick} className="flex items-center gap-4 w-full h-full">
-        <item.icon className="h-4 w-4" />
-        <span>{item.label}</span>
-      </Link>
+    <SidebarMenuButton
+      className={baseClasses}
+      render={
+        <Link
+          href={item.href}
+          prefetch={item.prefetch ?? true}
+          onClick={onClick}
+          className="flex items-center gap-4 w-full h-full"
+        />
+      }
+    >
+      <item.icon className="h-4 w-4" />
+      <span>{item.label}</span>
     </SidebarMenuButton>
   );
 }
 
-export function AppSidebar({ isSidebarOpen, setIsSidebarOpen, isTablet }: AppSidebarProps) {
+export function AppSidebar({ isSidebarOpen, setIsSidebarOpen }: AppSidebarProps) {
   const pathname = usePathname();
   const { user, loading } = useSession();
   const { isAdmin } = usePermissions();
@@ -276,13 +285,9 @@ export function AppSidebar({ isSidebarOpen, setIsSidebarOpen, isTablet }: AppSid
   const initial = fullName ? fullName[0].toUpperCase() : "";
   const closeSidebar = () => setIsSidebarOpen(false);
 
-  const menuItems: MenuItemData[] = isAdmin
-    ? adminMenuItems
-    : employeeMenuItems.map((item) =>
-        item.label === "Skills"
-          ? { ...item, href: userId ? `/users/${userId}/skills` : item.href }
-          : item,
-      );
+  const menuItems: MenuItemData[] = (isAdmin ? adminMenuItems : employeeMenuItems).map((item) =>
+    item.label === "Languages" && userId ? { ...item, href: `/users/${userId}/languages` } : item,
+  );
 
   const renderMenuItems = (isMobile: boolean, showDivider = false) => {
     const items = menuItems.map((item) => (
@@ -311,9 +316,9 @@ export function AppSidebar({ isSidebarOpen, setIsSidebarOpen, isTablet }: AppSid
   };
 
   const renderDesktopHeader = () => {
-    if (isTablet || isSidebarOpen) return null;
+    if (isSidebarOpen) return null;
     return (
-      <header className="sticky top-0 z-40 px-4 py-3 border-b bg-background border-border shadow-sm">
+      <header className="sticky top-0 z-40 px-4 py-3 border-b bg-background border-border shadow-sm hidden min-[1440px]:flex">
         <Container className="flex items-center justify-between">
           <Button
             variant="ghost"
@@ -342,11 +347,10 @@ export function AppSidebar({ isSidebarOpen, setIsSidebarOpen, isTablet }: AppSid
   };
 
   const renderDesktopSidebar = () => {
-    if (isTablet) return null;
     return (
       <Sidebar
         collapsible="none"
-        className="fixed top-0 left-0 h-full bg-background transition-transform duration-300 ease-in-out z-50"
+        className="fixed top-0 left-0 h-full bg-background transition-transform duration-300 ease-in-out z-50 hidden min-[1440px]:flex"
         style={{
           borderRight: "none",
           width: "12rem",
@@ -354,7 +358,7 @@ export function AppSidebar({ isSidebarOpen, setIsSidebarOpen, isTablet }: AppSid
         }}
       >
         <SidebarContent>
-          <SidebarMenu className="mt-10">{renderMenuItems(false, true)}</SidebarMenu>
+          <SidebarMenu className="mt-10 gap-2">{renderMenuItems(false, true)}</SidebarMenu>
         </SidebarContent>
         <SidebarFooter>
           <ProfileSection
@@ -376,9 +380,8 @@ export function AppSidebar({ isSidebarOpen, setIsSidebarOpen, isTablet }: AppSid
   };
 
   const renderMobileFooter = () => {
-    if (!isTablet) return null;
     return (
-      <footer className="fixed bottom-0 left-0 right-0 z-40 bg-background border-t border-border px-2 py-2 flex flex-col items-center gap-1">
+      <footer className="fixed bottom-0 left-0 right-0 z-40 bg-background border-t border-border px-2 py-2 flex flex-col items-center gap-1 min-[1440px]:hidden">
         <div className="flex flex-wrap justify-center items-center gap-1">
           {renderMenuItems(true)}
         </div>

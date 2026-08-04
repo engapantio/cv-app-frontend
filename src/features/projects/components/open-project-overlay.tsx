@@ -2,7 +2,7 @@
 
 import { format } from "date-fns";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, Input } from "@/components/ui";
-import { Pill } from "@/components/shared/pill";
+import { EnvPill } from "@/components/shared";
 import type { ProjectItem } from "../hooks/use-projects-page";
 
 interface OpenProjectOverlayProps {
@@ -93,7 +93,7 @@ export function OpenProjectOverlay({ open, onOpenChange, project }: OpenProjectO
             </span>
             <div className="flex flex-wrap gap-2 px-4 py-3 min-h-12">
               {project.environment.map((env) => (
-                <Pill key={env} text={env} variant="transparent" />
+                <EnvPill key={env} env={env} />
               ))}
             </div>
           </div>
