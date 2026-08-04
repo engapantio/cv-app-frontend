@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { useTranslations } from "next-intl";
 import { Button, Avatar, AvatarFallback, AvatarImage } from "@/components/ui";
 import { Camera, Trash2, Upload } from "lucide-react";
 import { toast } from "sonner";
@@ -15,6 +16,7 @@ interface AvatarUploadProps {
 }
 
 export function AvatarUpload({ userId, currentAvatar, fullName, isOwner }: AvatarUploadProps) {
+  const t = useTranslations();
   const [uploadAvatar] = useMutation(UploadAvatarDocument, {
     refetchQueries: [{ query: UserDocument, variables: { userId } }],
   });
@@ -29,12 +31,12 @@ export function AvatarUpload({ userId, currentAvatar, fullName, isOwner }: Avata
     const file = e.target.files?.[0];
     if (!file) return;
     if (file.size > 500 * 1024) {
-      toast.error("File size must be less than 500KB");
+      toast.error(t("common.avatarTooLarge"));
       return;
     }
     const allowedTypes = ["image/png", "image/jpeg", "image/gif"];
     if (!allowedTypes.includes(file.type)) {
-      toast.error("Only PNG, JPG, and GIF are allowed");
+      toast.error(t("common.avatarInvalidType"));
       return;
     }
 
@@ -51,9 +53,9 @@ export function AvatarUpload({ userId, currentAvatar, fullName, isOwner }: Avata
           avatar: { userId, base64, size: file.size, type: file.type },
         },
       });
-      toast.success("Avatar uploaded successfully");
+      toast.success(t("common.avatarUploadedSuccess"));
     } catch {
-      toast.error("Failed to upload avatar");
+      toast.error(t("common.avatarUploadFailed"));
       setIsUploading(false);
     } finally {
       setIsUploading(false);
@@ -64,9 +66,9 @@ export function AvatarUpload({ userId, currentAvatar, fullName, isOwner }: Avata
     if (!currentAvatar) return;
     try {
       await deleteAvatar({ variables: { avatar: { userId } } });
-      toast.success("Avatar deleted");
+      toast.success(t("common.avatarDeletedSuccess"));
     } catch {
-      toast.error("Failed to delete avatar");
+      toast.error(t("common.avatarDeletedFailed"));
     }
   };
 
@@ -109,11 +111,11 @@ export function AvatarUpload({ userId, currentAvatar, fullName, isOwner }: Avata
                 <Trash2 className="h-4 w-4" />
               </Button>
             )}
-            <div>Upload avatar image</div>
+            <div>{t("fields.avatar.upload")}</div>
           </div>
         )}
         <p className="text-base text-muted-foreground text-center max-w-50">
-          {isOwner ? "png, jpg or gif no more than 0.5MB" : ""}
+          {isOwner ? t("fields.avatar.sizeHint") : ""}
         </p>
       </div>
     </div>

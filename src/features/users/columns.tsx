@@ -20,6 +20,8 @@ interface UsersActions {
 }
 
 export function createUsersColumns(
+  t: (key: string) => string,
+  tb: (key: string) => string,
   isAdmin: boolean,
   currentUserId: string | undefined,
   actions: UsersActions,
@@ -55,14 +57,14 @@ export function createUsersColumns(
     },
     {
       id: "first_name",
-      header: ({ column }) => <SortableHeader column={column} label="First Name" />,
+      header: ({ column }) => <SortableHeader column={column} label={t("firstName")} />,
       cell: ({ row }) => row.original.profile?.first_name || "",
       accessorFn: (row) => row.profile?.first_name,
       enableSorting: true,
     },
     {
       id: "last_name",
-      header: ({ column }) => <SortableHeader column={column} label="Last Name" />,
+      header: ({ column }) => <SortableHeader column={column} label={t("lastName")} />,
       cell: ({ row }) => row.original.profile?.last_name || "",
       accessorFn: (row) => row.profile?.last_name,
       enableSorting: true,
@@ -70,14 +72,14 @@ export function createUsersColumns(
     },
     {
       id: "email",
-      header: ({ column }) => <SortableHeader column={column} label="Email" />,
+      header: ({ column }) => <SortableHeader column={column} label={t("email")} />,
       accessorKey: "email",
       enableSorting: true,
       meta: { className: "max-[1439px]:hidden" },
     },
     {
       id: "department_name",
-      header: ({ column }) => <SortableHeader column={column} label="Department" />,
+      header: ({ column }) => <SortableHeader column={column} label={t("department")} />,
       cell: ({ row }) => row.original.department_name || "",
       accessorKey: "department_name",
       enableSorting: true,
@@ -85,14 +87,14 @@ export function createUsersColumns(
     },
     {
       id: "position_name",
-      header: ({ column }) => <SortableHeader column={column} label="Position" />,
+      header: ({ column }) => <SortableHeader column={column} label={t("position")} />,
       cell: ({ row }) => row.original.position_name || "",
       accessorKey: "position_name",
       enableSorting: true,
     },
     {
       id: "actions",
-      header: () => <span className="sr-only">Actions</span>,
+      header: () => <span className="sr-only">{t("actions")}</span>,
       enableSorting: false,
       enableGlobalFilter: false,
       meta: { className: "w-12" },
@@ -116,7 +118,7 @@ export function createUsersColumns(
                   onClick={() => actions.onNavigate(user)}
                   className="justify-center cursor-pointer"
                 >
-                  Update
+                  {tb("update")}
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => actions.onDelete(user)}
@@ -124,7 +126,7 @@ export function createUsersColumns(
                   variant="destructive"
                   className="justify-center cursor-pointer"
                 >
-                  Delete
+                  {tb("delete")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

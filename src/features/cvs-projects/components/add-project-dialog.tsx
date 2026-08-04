@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import { DialogActions, EnvPill, FloatingField } from "@/components/shared";
 import { cn } from "@/lib/utils";
 import {
@@ -58,6 +59,7 @@ export function AddProjectDialog({
   onConfirm,
   loading,
 }: AddProjectDialogProps) {
+  const t = useTranslations();
   const [selectedProject, setSelectedProject] = useState<ProjectOption | null>(null);
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
@@ -104,9 +106,9 @@ export function AddProjectDialog({
       });
       reset();
     } catch {
-      toast.error("Failed to add project");
+      toast.error(t("common.addProjectFailed"));
     }
-  }, [selectedProject, startDate, endDate, rolesInput, onConfirm, reset]);
+  }, [selectedProject, startDate, endDate, rolesInput, onConfirm, reset, t]);
 
   return (
     <Dialog
@@ -118,12 +120,14 @@ export function AddProjectDialog({
     >
       <DialogContent showCloseButton className="sm:max-w-xl bg-card border-border rounded-none">
         <DialogHeader>
-          <DialogTitle className="text-left text-base font-semibold">Add project</DialogTitle>
+          <DialogTitle className="text-left text-base font-semibold">
+            {t("dialogs.addProject")}
+          </DialogTitle>
         </DialogHeader>
         <div className="space-y-5">
           <div className="grid grid-cols-2 gap-4">
             <FloatingField
-              label="Project"
+              label={t("fields.project")}
               variant="select"
               active={!!selectedProject || projectOpen}
             >
@@ -133,7 +137,7 @@ export function AddProjectDialog({
                 onOpenChange={setProjectOpen}
               >
                 <SelectTrigger className="w-full border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none text-sm data-[size=default]:h-12">
-                  <SelectValue placeholder="Select project" />
+                  <SelectValue placeholder={t("placeholders.selectProject")} />
                 </SelectTrigger>
                 <SelectContent>
                   {allProjects.map((proj) => (
@@ -146,7 +150,7 @@ export function AddProjectDialog({
             </FloatingField>
             <div className="group relative rounded-none border border-border">
               <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground">
-                Domain
+                {t("fields.domain")}
               </span>
               <Input
                 value={selectedProject?.domain ?? ""}
@@ -165,7 +169,7 @@ export function AddProjectDialog({
                     : "top-1/2 -translate-y-1/2 text-sm text-muted-foreground",
                 )}
               >
-                Start Date
+                {t("fields.startDate")}
               </span>
               <Popover open={startDateOpen} onOpenChange={setStartDateOpen}>
                 <PopoverTrigger
@@ -200,7 +204,7 @@ export function AddProjectDialog({
                     : "top-1/2 -translate-y-1/2 text-sm text-muted-foreground",
                 )}
               >
-                End Date
+                {t("fields.endDate")}
               </span>
               <Popover open={endDateOpen} onOpenChange={setEndDateOpen}>
                 <PopoverTrigger
@@ -229,7 +233,7 @@ export function AddProjectDialog({
           </div>
           <div className="group relative rounded-none border border-border">
             <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground">
-              Description
+              {t("fields.description")}
             </span>
             <Textarea
               value={selectedProject?.description ?? ""}
@@ -239,7 +243,7 @@ export function AddProjectDialog({
           </div>
           <div className="group relative rounded-none border border-border">
             <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground">
-              Environment
+              {t("fields.environment")}
             </span>
             <div className="flex flex-wrap gap-2 px-4 py-3 min-h-12">
               {selectedProject?.environment?.length ? (
@@ -251,19 +255,19 @@ export function AddProjectDialog({
           </div>
           <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
             <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-foreground transition-colors group-focus-within:text-primary z-10">
-              Roles and responsibilities
+              {t("fields.rolesAndResponsibilities")}
             </span>
             <Textarea
               value={rolesInput}
               onChange={(e) => setRolesInput(e.target.value)}
-              placeholder="Enter roles and responsibilities (one per line)"
+              placeholder={t("placeholders.rolesAndResponsibilities")}
               className="border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none min-h-[100px] resize-none pt-6 placeholder:text-muted-foreground dark:placeholder:text-muted-foreground"
             />
           </div>
         </div>
         <DialogActions
-          submitLabel="ADD"
-          loadingLabel="ADDING..."
+          submitLabel={t("buttons.add")}
+          loadingLabel={t("buttons.adding")}
           loading={loading}
           disabled={!selectedProject}
           onCancel={() => onOpenChange(false)}

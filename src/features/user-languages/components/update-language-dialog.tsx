@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import {
   Button,
   Dialog,
@@ -32,9 +33,11 @@ export function UpdateLanguageDialog({
   onConfirm,
   loading,
 }: UpdateLanguageDialogProps) {
-  const [selectedProficiency, setSelectedProficiency] = useState<Proficiency>(
-    currentLanguage?.proficiency || "A1",
-  );
+  const t = useTranslations();
+  const initialProficiency = currentLanguage?.proficiency || "A1";
+  const [selectedProficiency, setSelectedProficiency] = useState<Proficiency>(initialProficiency);
+
+  const isDirty = selectedProficiency !== initialProficiency;
 
   const handleOpenChange = useCallback(
     (newOpen: boolean) => {
@@ -60,12 +63,14 @@ export function UpdateLanguageDialog({
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent showCloseButton className="sm:max-w-md bg-card border-border rounded-none">
         <DialogHeader>
-          <DialogTitle className="text-left text-base font-semibold">Update language</DialogTitle>
+          <DialogTitle className="text-left text-base font-semibold">
+            {t("dialogs.updateAssignedLanguage")}
+          </DialogTitle>
         </DialogHeader>
         <div className="space-y-6 py-4">
           <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
             <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-foreground transition-colors group-focus-within:text-primary">
-              Language
+              {t("fields.name")}
             </span>
             <div className="w-full border-0 bg-transparent px-3 h-12 py-1 text-lg text-muted-foreground flex items-center">
               {currentLanguage?.name || ""}
@@ -73,14 +78,14 @@ export function UpdateLanguageDialog({
           </div>
           <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
             <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-foreground transition-colors group-focus-within:text-primary">
-              Language proficiency
+              {t("fields.proficiency")}
             </span>
             <Select
               value={selectedProficiency}
               onValueChange={(v) => v && setSelectedProficiency(v as Proficiency)}
             >
               <SelectTrigger className="w-full border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none h-12 py-1 text-lg">
-                <SelectValue placeholder="Select proficiency" />
+                <SelectValue placeholder={t("placeholders.selectProficiency")} />
               </SelectTrigger>
               <SelectContent>
                 {PROFICIENCY_OPTIONS.map((level) => (
@@ -99,16 +104,16 @@ export function UpdateLanguageDialog({
             className="uppercase min-w-30 border border-border py-1.5"
             onClick={() => onOpenChange(false)}
           >
-            CANCEL
+            {t("buttons.cancel")}
           </Button>
           <Button
             type="button"
             className="uppercase text-white min-w-30 py-1.5"
             style={{ backgroundColor: "#e53935" }}
-            disabled={loading}
+            disabled={loading || !isDirty}
             onClick={handleConfirm}
           >
-            {loading ? "UPDATING..." : "CONFIRM"}
+            {loading ? t("buttons.updating") : t("buttons.confirm")}
           </Button>
         </DialogFooter>
       </DialogContent>

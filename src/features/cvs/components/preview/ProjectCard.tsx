@@ -7,14 +7,28 @@ interface Props {
   project: Project;
   color?: string;
   primary?: string;
+  labels?: {
+    projectRoles?: string;
+    period?: string;
+    tillNow?: string;
+    responsibilities?: string;
+    environment?: string;
+  };
 }
 
-export function ProjectCard({ project, color, primary }: Props) {
+export function ProjectCard({ project, color, primary, labels }: Props) {
   const fg = color ?? "var(--foreground)";
   const red = primary ?? "#c63031";
+  const l = labels ?? {};
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-[260px_1fr] min-[1440px]:grid-cols-[260px_592px] gap-x-4 gap-y-2">
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "260px 1fr",
+        gap: "0 1rem",
+      }}
+    >
       <div>
         <p className="text-base font-bold" style={{ color: red }}>
           {project.name.toUpperCase()}
@@ -26,11 +40,11 @@ export function ProjectCard({ project, color, primary }: Props) {
         )}
       </div>
 
-      <div className="md:border-l-2 pl-0 md:pl-8 pt-4 md:pt-0" style={{ borderColor: red }}>
+      <div style={{ borderLeft: `2px solid ${red}`, paddingLeft: "2rem" }}>
         {project.roles && project.roles.length > 0 && (
           <div className="mb-3">
             <span className="text-base font-bold block" style={{ color: fg }}>
-              Project roles
+              {l.projectRoles ?? "Project roles"}
             </span>
             <p className="text-base" style={{ color: fg }}>
               {project.roles.join(", ")}
@@ -40,18 +54,18 @@ export function ProjectCard({ project, color, primary }: Props) {
 
         <div className="mb-3">
           <span className="text-base font-bold block" style={{ color: fg }}>
-            Period
+            {l.period ?? "Period"}
           </span>
           <p className="text-base" style={{ color: fg }}>
             {project.start_date ? formatDate(project.start_date) : "—"} &ndash;{" "}
-            {project.end_date ? formatDate(project.end_date) : "Till now"}
+            {project.end_date ? formatDate(project.end_date) : (l.tillNow ?? "Till now")}
           </p>
         </div>
 
         {project.responsibilities && project.responsibilities.length > 0 && (
           <div className="mb-3">
             <span className="text-base font-bold block" style={{ color: fg }}>
-              Responsibilities
+              {l.responsibilities ?? "Responsibilities"}
             </span>
             <ul className="list-disc pl-5 mt-1 space-y-1">
               {project.responsibilities.map((resp, i) => (
@@ -66,7 +80,7 @@ export function ProjectCard({ project, color, primary }: Props) {
         {project.environment && project.environment.length > 0 && (
           <div className="mb-3">
             <span className="text-base font-bold block" style={{ color: fg }}>
-              Environment
+              {l.environment ?? "Environment"}
             </span>
             <p className="text-base" style={{ color: fg }}>
               {project.environment.join(", ")}.

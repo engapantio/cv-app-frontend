@@ -15,6 +15,7 @@ import {
 import { usePermissions } from "@/lib/auth/permissions";
 import { createUsersColumns } from "@/features/users/columns";
 import { orderUsers } from "@/features/users/order-users";
+import { useTranslations } from "next-intl";
 import {
   useReactTable,
   getCoreRowModel,
@@ -41,6 +42,8 @@ export function useUsersPage(
   initialIsAdmin: boolean = false,
 ) {
   const router = useRouter();
+  const tColumns = useTranslations("columns.users");
+  const tButtons = useTranslations("buttons");
   const { isAdmin: sessionIsAdmin, currentUserId: sessionUserId } = usePermissions();
 
   const effectiveUserId = sessionUserId ?? initialUserId ?? null;
@@ -131,11 +134,11 @@ export function useUsersPage(
 
   const columns = useMemo(
     () =>
-      createUsersColumns(effectiveIsAdmin, effectiveUserId ?? undefined, {
+      createUsersColumns(tColumns, tButtons, effectiveIsAdmin, effectiveUserId ?? undefined, {
         onNavigate: handleNavigate,
         onDelete: handleDelete,
       }),
-    [effectiveIsAdmin, effectiveUserId, handleNavigate, handleDelete],
+    [effectiveIsAdmin, effectiveUserId, handleNavigate, handleDelete, tColumns, tButtons],
   );
 
   // eslint-disable-next-line react-hooks/incompatible-library

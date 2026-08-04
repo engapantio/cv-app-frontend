@@ -16,6 +16,7 @@ import type { SkillCategoriesQuery } from "@/gql/generated/graphql";
 import { TableEmptyState } from "@/components/shared/table-empty-state";
 import { TablePagination } from "@/components/shared/table-pagination";
 import { TableToolbar } from "@/components/shared/table-toolbar";
+import { useTranslations } from "next-intl";
 
 const OpenSkillOverlay = dynamic(
   () => import("./open-skill-overlay").then((m) => m.OpenSkillOverlay),
@@ -90,6 +91,8 @@ export function SkillsTable({
   categories,
 }: SkillsTableProps) {
   const rows = table.getRowModel().rows;
+  const tButtons = useTranslations("buttons");
+  const tCommon = useTranslations("common");
 
   return (
     <>
@@ -97,7 +100,7 @@ export function SkillsTable({
         <TableToolbar
           value={globalFilter}
           onChange={setGlobalFilter}
-          actionLabel="CREATE SKILL"
+          actionLabel={tButtons("createSkill")}
           onAction={() => setCreateOpen(true)}
           showAction={isAdmin}
           actionClassName="hover:bg-transparent"
@@ -143,13 +146,13 @@ export function SkillsTable({
                 {loading ? (
                   <TableRow>
                     <TableCell colSpan={columnCount} className="text-center">
-                      Loading...
+                      {tCommon("loading")}
                     </TableCell>
                   </TableRow>
                 ) : (
                   <TableRow>
                     <TableCell colSpan={columnCount}>
-                      <TableEmptyState message="No skills found." responsive />
+                      <TableEmptyState message={tCommon("noSkillsFound")} responsive />
                     </TableCell>
                   </TableRow>
                 )}

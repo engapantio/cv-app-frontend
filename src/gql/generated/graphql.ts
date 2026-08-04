@@ -431,7 +431,12 @@ export type CvQuery = {
       id: string;
       email: string;
       position_name: string | null;
-      profile: { id: string; full_name: string | null; avatar: string | null };
+      profile: {
+        id: string;
+        full_name: string | null;
+        avatar: string | null;
+        languages: Array<{ name: string; proficiency: Proficiency }>;
+      };
     } | null;
     projects: Array<{
       id: string;
@@ -1732,6 +1737,17 @@ export const CvDocument = {
                             { kind: "Field", name: { kind: "Name", value: "id" } },
                             { kind: "Field", name: { kind: "Name", value: "full_name" } },
                             { kind: "Field", name: { kind: "Name", value: "avatar" } },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "languages" },
+                              selectionSet: {
+                                kind: "SelectionSet",
+                                selections: [
+                                  { kind: "Field", name: { kind: "Name", value: "name" } },
+                                  { kind: "Field", name: { kind: "Name", value: "proficiency" } },
+                                ],
+                              },
+                            },
                           ],
                         },
                       },

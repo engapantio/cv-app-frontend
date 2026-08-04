@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState, useSyncExternalStore } from "react";
+import { useSyncExternalStore } from "react";
 import { cn, buildFullName } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -39,45 +39,47 @@ import { Container } from "../container";
 import { useTheme } from "next-themes";
 import { useSession, logout } from "@/lib/auth/session";
 import { usePermissions } from "@/lib/auth/permissions";
+import { useTranslations } from "next-intl";
+import { locales } from "@/i18n/locales";
+import { useLocalePref, setLocale } from "@/lib/preferences/locale";
 interface AppSidebarProps {
   isSidebarOpen: boolean;
   setIsSidebarOpen: (open: boolean) => void;
 }
 
 const adminMenuItems = [
-  { href: "/users", label: "Employees", icon: Users },
-  { href: "/projects", label: "Projects", icon: Folders },
-  { href: "/cvs", label: "CVs", icon: FileUser },
-  { href: "/departments", label: "Departments", icon: Building },
-  { href: "/positions", label: "Positions", icon: Briefcase },
-  { href: "/skills", label: "Skills", icon: TrendingUp },
-  { href: "/languages", label: "Languages", icon: Languages, prefetch: false },
+  { href: "/users", labelKey: "nav.employees", icon: Users },
+  { href: "/projects", labelKey: "nav.projects", icon: Folders },
+  { href: "/cvs", labelKey: "nav.cvs", icon: FileUser },
+  { href: "/departments", labelKey: "nav.departments", icon: Building },
+  { href: "/positions", labelKey: "nav.positions", icon: Briefcase },
+  { href: "/skills", labelKey: "nav.skills", icon: TrendingUp },
+  { href: "/languages", labelKey: "nav.languages", icon: Languages, prefetch: false },
 ];
 
 const employeeMenuItems = [
-  { href: "/users", label: "Employees", icon: Users },
-  { href: "/skills", label: "Skills", icon: TrendingUp },
-  { href: "/languages", label: "Languages", icon: Languages, prefetch: false },
-  { href: "/cvs", label: "CVs", icon: FileUser },
+  { href: "/users", labelKey: "nav.employees", icon: Users },
+  { href: "/skills", labelKey: "nav.skills", icon: TrendingUp },
+  { href: "/languages", labelKey: "nav.languages", icon: Languages, prefetch: false },
+  { href: "/cvs", labelKey: "nav.cvs", icon: FileUser },
 ];
 
-const LANGUAGES = ["EN", "PL", "RU"];
-
 function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
+  const t = useTranslations();
+  const { resolvedTheme, setTheme } = useTheme();
   const mounted = useSyncExternalStore(
     () => () => {},
     () => true,
     () => false,
   );
-  const isDark = theme === "dark";
+  const isDark = resolvedTheme === "dark";
 
   return (
     <Button
       variant="ghost"
       size="icon"
       onClick={() => setTheme(isDark ? "light" : "dark")}
-      aria-label="Toggle theme"
+      aria-label={t("header.toggleTheme")}
       className="rounded-full"
     >
       {!mounted ? (
@@ -96,7 +98,13 @@ const isActivePath = (pathname: string, href: string): boolean => {
     return true;
   }
   if (pathname.startsWith(href + "/")) {
-    if (href === "/users" && (pathname.endsWith("/cvs") || pathname.includes("/cvs/"))) {
+    if (
+      href === "/users" &&
+      (pathname.endsWith("/cvs") ||
+        pathname.includes("/cvs/") ||
+        pathname.endsWith("/languages") ||
+        pathname.includes("/languages/"))
+    ) {
       return false;
     }
     return true;
@@ -108,21 +116,27 @@ const isActivePath = (pathname: string, href: string): boolean => {
 };
 
 function LanguageSwitcher() {
-  const [language, setLanguage] = useState("EN");
+  const t = useTranslations();
+  const locale = useLocalePref();
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger render={<Button variant="ghost" size="icon" />}>
+      <DropdownMenuTrigger
+        render={<Button variant="ghost" size="icon" aria-label={t("header.selectLanguage")} />}
+      >
         <Globe className="text-icon" />
       </DropdownMenuTrigger>
       <DropdownMenuContent className={"flex justify-around"}>
-        {LANGUAGES.map((lang) => (
+        {locales.map((lang) => (
           <DropdownMenuItem
-            key={lang}
-            onClick={() => setLanguage(lang)}
-            className={cn(language === lang && "bg-sidebar-accent", "w-7 hover:bg-sidebar-accent")}
+            key={lang.code}
+            onClick={() => setLocale(lang.code)}
+            className={cn(
+              locale === lang.code && "bg-sidebar-accent",
+              "w-7 hover:bg-sidebar-accent",
+            )}
           >
-            {lang}
+            {lang.short}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>
@@ -152,6 +166,7 @@ function ProfileSection({
   menuSide?: "top" | "bottom";
 }) {
   const router = useRouter();
+  const t = useTranslations();
 
   if (loading) {
     return (
@@ -207,14 +222,17 @@ function ProfileSection({
               onClick={() => router.push(`/users/${userId}/profile`)}
               className="justify-center cursor-pointer"
             >
-              Profile
+              {t("profile.profile")}
             </DropdownMenuItem>
-            <DropdownMenuItem disabled className="justify-center">
-              Settings
+            <DropdownMenuItem
+              onClick={() => router.push("/settings")}
+              className="justify-center cursor-pointer"
+            >
+              {t("profile.settings")}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout} className="justify-center cursor-pointer">
-              Logout
+              {t("profile.logout")}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -227,18 +245,20 @@ function ProfileSection({
 
 interface MenuItemData {
   href: string;
-  label: string;
+  labelKey: string;
   icon: React.ComponentType<{ className?: string }>;
   prefetch?: boolean;
 }
 
 function MenuItem({
   item,
+  label,
   isActive,
   isMobile,
   onClick,
 }: {
   item: MenuItemData;
+  label: string;
   isActive: boolean;
   isMobile: boolean;
   onClick: () => void;
@@ -266,7 +286,7 @@ function MenuItem({
       }
     >
       <item.icon className="h-4 w-4" />
-      <span>{item.label}</span>
+      <span>{label}</span>
     </SidebarMenuButton>
   );
 }
@@ -275,6 +295,7 @@ export function AppSidebar({ isSidebarOpen, setIsSidebarOpen }: AppSidebarProps)
   const pathname = usePathname();
   const { user, loading } = useSession();
   const { isAdmin } = usePermissions();
+  const t = useTranslations();
 
   const userId = user?.id ?? null;
   const fullName =
@@ -284,12 +305,12 @@ export function AppSidebar({ isSidebarOpen, setIsSidebarOpen }: AppSidebarProps)
   const closeSidebar = () => setIsSidebarOpen(false);
 
   const employeePersonalLinks: Record<string, string> = {
-    Skills: `/users/${userId}/skills`,
-    Languages: `/users/${userId}/languages`,
+    "nav.skills": `/users/${userId}/skills`,
+    "nav.languages": `/users/${userId}/languages`,
   };
 
   const menuItems: MenuItemData[] = (isAdmin ? adminMenuItems : employeeMenuItems).map((item) => {
-    const personalHref = !isAdmin && userId ? employeePersonalLinks[item.label] : undefined;
+    const personalHref = !isAdmin && userId ? employeePersonalLinks[item.labelKey] : undefined;
     return personalHref ? { ...item, href: personalHref } : item;
   });
 
@@ -298,6 +319,7 @@ export function AppSidebar({ isSidebarOpen, setIsSidebarOpen }: AppSidebarProps)
       <MenuItem
         key={item.href}
         item={item}
+        label={t(item.labelKey)}
         isActive={isActivePath(pathname, item.href)}
         isMobile={isMobile}
         onClick={() => {}}

@@ -1,6 +1,7 @@
 "use client";
 
 import { format } from "date-fns";
+import { useTranslations } from "next-intl";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, Input } from "@/components/ui";
 import { EnvPill } from "@/components/shared";
 import type { CvProjectItem } from "../hooks/use-cv-projects-page";
@@ -12,6 +13,7 @@ interface OpenProjectOverlayProps {
 }
 
 export function OpenProjectOverlay({ open, onOpenChange, project }: OpenProjectOverlayProps) {
+  const t = useTranslations();
   if (!project) return null;
 
   return (
@@ -24,7 +26,7 @@ export function OpenProjectOverlay({ open, onOpenChange, project }: OpenProjectO
           <div className="grid grid-cols-2 gap-4">
             <div className="group relative rounded-none border border-border">
               <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground">
-                Project
+                {t("fields.project")}
               </span>
               <Input
                 value={project.project?.name ?? project.name}
@@ -34,7 +36,7 @@ export function OpenProjectOverlay({ open, onOpenChange, project }: OpenProjectO
             </div>
             <div className="group relative rounded-none border border-border">
               <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground">
-                Domain
+                {t("fields.domain")}
               </span>
               <Input
                 value={project.domain}
@@ -46,7 +48,7 @@ export function OpenProjectOverlay({ open, onOpenChange, project }: OpenProjectO
           <div className="grid grid-cols-2 gap-4">
             <div className="group relative rounded-none border border-border">
               <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground">
-                Start Date
+                {t("fields.startDate")}
               </span>
               <Input
                 value={format(new Date(project.start_date), "dd/MM/yyyy")}
@@ -56,7 +58,7 @@ export function OpenProjectOverlay({ open, onOpenChange, project }: OpenProjectO
             </div>
             <div className="group relative rounded-none border border-border">
               <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground">
-                End Date
+                {t("fields.endDate")}
               </span>
               <Input
                 value={project.end_date ? format(new Date(project.end_date), "dd/MM/yyyy") : "—"}
@@ -67,7 +69,7 @@ export function OpenProjectOverlay({ open, onOpenChange, project }: OpenProjectO
           </div>
           <div className="group relative rounded-none border border-border">
             <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground">
-              Description
+              {t("fields.description")}
             </span>
             <textarea
               value={project.description}
@@ -77,7 +79,7 @@ export function OpenProjectOverlay({ open, onOpenChange, project }: OpenProjectO
           </div>
           <div className="group relative rounded-none border border-border">
             <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground">
-              Environment
+              {t("fields.environment")}
             </span>
             <div className="flex flex-wrap gap-2 px-4 py-3 min-h-12">
               {project.environment.map((env) => (
@@ -87,7 +89,7 @@ export function OpenProjectOverlay({ open, onOpenChange, project }: OpenProjectO
           </div>
           <div className="group relative rounded-none border border-border">
             <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground">
-              Roles and responsibilities
+              {t("fields.rolesAndResponsibilities")}
             </span>
             <textarea
               value={[...project.roles, ...project.responsibilities].join("\n")}

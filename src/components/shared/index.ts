@@ -10,4 +10,5 @@ export { TablePagination } from "./table-pagination";
 export { TableToolbar } from "./table-toolbar";
 export { VerifiedBadge } from "./verified-badge";
 export { FloatingField } from "./floating-field";
+export { TablePageLayout } from "./table-page-layout";
 export { DialogActions } from "./dialog-actions";

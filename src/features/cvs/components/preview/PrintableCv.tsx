@@ -16,6 +16,25 @@ interface Props {
   skillsByCategory: Map<string, NonNullable<CvData["skills"]>>;
   uniqueDomains: string[];
   colors: ThemeColors;
+  labels: {
+    education: string;
+    languageProficiency: string;
+    domains: string;
+    professional: string;
+    na: string;
+    projects: string;
+    professionalSkills: string;
+    projectRoles: string;
+    period: string;
+    tillNow: string;
+    responsibilities: string;
+    environment: string;
+    skills: string;
+    experience: string;
+    inYears: string;
+    lastUsed: string;
+    unknown: string;
+  };
 }
 
 export function PrintableCv({
@@ -26,8 +45,9 @@ export function PrintableCv({
   skillsByCategory,
   uniqueDomains,
   colors,
+  labels: l,
 }: Props) {
-  const fullName = cv.user?.profile?.full_name ?? "Unknown";
+  const fullName = cv.user?.profile?.full_name ?? l.unknown;
   const positionName = cv.user?.position_name ?? "";
   const c = colors;
 
@@ -56,15 +76,15 @@ export function PrintableCv({
         }}
       >
         <div>
-          <CvSection label="Education" color={c.foreground}>
+          <CvSection label={l.education} color={c.foreground}>
             <p style={{ fontSize: 16, margin: 0, color: c.foreground }}>{cv.education || "—"}</p>
           </CvSection>
 
-          <CvSection label="Language proficiency" color={c.foreground}>
-            <LanguageList languages={cv.languages ?? []} color={c.foreground} />
+          <CvSection label={l.languageProficiency} color={c.foreground}>
+            <LanguageList languages={cv.user?.profile?.languages ?? []} color={c.foreground} />
           </CvSection>
 
-          <CvSection label="Domains" color={c.foreground}>
+          <CvSection label={l.domains} color={c.foreground}>
             <DomainList domains={uniqueDomains} color={c.foreground} />
           </CvSection>
         </div>
@@ -76,7 +96,7 @@ export function PrintableCv({
           }}
         >
           <CvSection
-            label={`${positionName || "Professional"} with ${years ?? "N/A"} years of experience`}
+            label={`${positionName || l.professional} with ${years ?? l.na} ${l.inYears.toLowerCase()}`}
             color={c.foreground}
           >
             <p
@@ -116,7 +136,7 @@ export function PrintableCv({
               color: c.foreground,
             }}
           >
-            Projects
+            {l.projects}
           </h3>
           <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
             {cv.projects.map((project) => (
@@ -125,6 +145,13 @@ export function PrintableCv({
                 project={project}
                 color={c.foreground}
                 primary={c.primary}
+                labels={{
+                  projectRoles: l.projectRoles,
+                  period: l.period,
+                  tillNow: l.tillNow,
+                  responsibilities: l.responsibilities,
+                  environment: l.environment,
+                }}
               />
             ))}
           </div>
@@ -139,7 +166,7 @@ export function PrintableCv({
           color: c.foreground,
         }}
       >
-        Professional skills
+        {l.professionalSkills}
       </h3>
       <SkillsTable
         skillsByCategory={skillsByCategory}
@@ -149,6 +176,12 @@ export function PrintableCv({
         color={c.foreground}
         primary={c.primary}
         muted={c.muted}
+        labels={{
+          skills: l.skills,
+          experience: l.experience,
+          inYears: l.inYears,
+          lastUsed: l.lastUsed,
+        }}
       />
     </>
   );

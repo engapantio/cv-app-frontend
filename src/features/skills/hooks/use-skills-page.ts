@@ -23,6 +23,7 @@ import {
   type SortingState,
 } from "@tanstack/react-table";
 import type { SkillItem } from "@/features/skills/types";
+import { useTranslations } from "next-intl";
 
 export function useSkillsPage(
   initialSkills: SkillItem[],
@@ -30,6 +31,8 @@ export function useSkillsPage(
   initialCategories: SkillCategoriesQuery["skillCategories"] = [],
 ) {
   const { isAdmin } = usePermissions();
+  const tColumns = useTranslations("columns.skills");
+  const tButtons = useTranslations("buttons");
 
   const { data: skillsData, loading } = useQuery(SkillsDocument, {
     fetchPolicy: "network-only",
@@ -121,12 +124,12 @@ export function useSkillsPage(
 
   const columns = useMemo(
     () =>
-      createSkillsColumns(isAdmin, {
+      createSkillsColumns(tColumns, tButtons, isAdmin, {
         onOpen: handleOpen,
         onUpdate: handleUpdate,
         onDelete: handleDelete,
       }),
-    [isAdmin, handleOpen, handleUpdate, handleDelete],
+    [isAdmin, handleOpen, handleUpdate, handleDelete, tColumns, tButtons],
   );
 
   // eslint-disable-next-line react-hooks/incompatible-library

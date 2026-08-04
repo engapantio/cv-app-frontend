@@ -4,7 +4,7 @@ import { ArrowUp, ArrowDown } from "lucide-react";
 import type { ColumnDef } from "@tanstack/react-table";
 import type { ProjectItem } from "./hooks/use-projects-page";
 
-export function createProjectColumns(): ColumnDef<ProjectItem>[] {
+export function createProjectColumns(t: (key: string) => string): ColumnDef<ProjectItem>[] {
   return [
     {
       id: "name",
@@ -13,7 +13,7 @@ export function createProjectColumns(): ColumnDef<ProjectItem>[] {
           onClick={column.getToggleSortingHandler()}
           className="flex items-center gap-1 cursor-pointer font-medium"
         >
-          Name
+          {t("name")}
           {column.getIsSorted() === "asc" && <ArrowUp className="size-4" />}
           {column.getIsSorted() === "desc" && <ArrowDown className="size-4" />}
         </button>
@@ -29,7 +29,7 @@ export function createProjectColumns(): ColumnDef<ProjectItem>[] {
           onClick={column.getToggleSortingHandler()}
           className="flex items-center gap-1 cursor-pointer font-medium"
         >
-          Domain
+          {t("domain")}
           {column.getIsSorted() === "asc" && <ArrowUp className="size-4" />}
           {column.getIsSorted() === "desc" && <ArrowDown className="size-4" />}
         </button>
@@ -45,7 +45,7 @@ export function createProjectColumns(): ColumnDef<ProjectItem>[] {
           onClick={column.getToggleSortingHandler()}
           className="flex items-center gap-1 cursor-pointer font-medium"
         >
-          Start Date
+          {t("startDate")}
           {column.getIsSorted() === "asc" && <ArrowUp className="size-4" />}
           {column.getIsSorted() === "desc" && <ArrowDown className="size-4" />}
         </button>
@@ -61,7 +61,7 @@ export function createProjectColumns(): ColumnDef<ProjectItem>[] {
           onClick={column.getToggleSortingHandler()}
           className="flex items-center gap-1 cursor-pointer font-medium"
         >
-          End Date
+          {t("endDate")}
           {column.getIsSorted() === "asc" && <ArrowUp className="size-4" />}
           {column.getIsSorted() === "desc" && <ArrowDown className="size-4" />}
         </button>

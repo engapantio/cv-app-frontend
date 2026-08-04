@@ -2,6 +2,7 @@
 
 import { useCallback } from "react";
 import { useMutation } from "@apollo/client/react";
+import { useTranslations } from "next-intl";
 import { DeleteLanguageDocument } from "@/gql/generated/graphql";
 import { Button, Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui";
 import type { LanguageItem } from "@/features/languages/types";
@@ -13,6 +14,7 @@ interface DeleteLanguageDialogProps {
 }
 
 export function DeleteLanguageDialog({ target, onClose, onDeleted }: DeleteLanguageDialogProps) {
+  const t = useTranslations();
   const [deleteLanguage, { loading: deleting }] = useMutation(DeleteLanguageDocument);
 
   const handleConfirm = useCallback(async () => {
@@ -28,10 +30,12 @@ export function DeleteLanguageDialog({ target, onClose, onDeleted }: DeleteLangu
     <Dialog open={!!target} onOpenChange={(open) => !open && onClose()}>
       <DialogContent showCloseButton className="sm:max-w-lg bg-card border-border rounded-none">
         <DialogHeader>
-          <DialogTitle className="text-left text-base font-semibold">Delete Language</DialogTitle>
+          <DialogTitle className="text-left text-base font-semibold">
+            {t("dialogs.deleteLanguage")}
+          </DialogTitle>
         </DialogHeader>
         <p className="text-sm text-muted-foreground">
-          Are you sure you want to delete language <strong>{target?.name}</strong>?
+          {t("dialogs.deleteLanguageConfirm", { name: target?.name ?? "" })}
         </p>
         <div
           className="flex flex-row items-center justify-end gap-3 mt-2 py-3"
@@ -43,7 +47,7 @@ export function DeleteLanguageDialog({ target, onClose, onDeleted }: DeleteLangu
               className="uppercase flex-1 border border-border py-1.5"
               onClick={onClose}
             >
-              CANCEL
+              {t("buttons.cancel")}
             </Button>
             <Button
               type="submit"
@@ -55,7 +59,7 @@ export function DeleteLanguageDialog({ target, onClose, onDeleted }: DeleteLangu
               onClick={handleConfirm}
               disabled={deleting}
             >
-              {deleting ? "DELETING..." : "CONFIRM"}
+              {deleting ? t("buttons.deleting") : t("buttons.confirm")}
             </Button>
           </div>
         </div>

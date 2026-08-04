@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import { format } from "date-fns";
 import { CalendarIcon, ChevronDown, ChevronUp } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import { DialogActions, EnvPill, FloatingField } from "@/components/shared";
 import {
   Button,
@@ -50,6 +51,7 @@ function UpdateProjectForm({
   onOpenChange: (open: boolean) => void;
   loading: boolean;
 }) {
+  const t = useTranslations();
   const [name, setName] = useState(project.name);
   const [domain, setDomain] = useState(project.domain);
   const [startDate, setStartDate] = useState<Date | undefined>(
@@ -99,7 +101,7 @@ function UpdateProjectForm({
         environment: selectedEnv,
       });
     } catch {
-      toast.error("Failed to update project");
+      toast.error(t("common.updateProjectFailed"));
     }
   }, [
     project.id,
@@ -112,16 +114,19 @@ function UpdateProjectForm({
     onConfirm,
     project.start_date,
     project.end_date,
+    t,
   ]);
 
   return (
     <>
       <DialogHeader>
-        <DialogTitle className="text-left text-base font-semibold">Update project</DialogTitle>
+        <DialogTitle className="text-left text-base font-semibold">
+          {t("dialogs.updateProject")}
+        </DialogTitle>
       </DialogHeader>
       <div className="space-y-5">
         <div className="grid grid-cols-2 gap-4">
-          <FloatingField label="Project">
+          <FloatingField label={t("fields.project")}>
             <Input
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -129,7 +134,7 @@ function UpdateProjectForm({
               className="peer border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none h-12"
             />
           </FloatingField>
-          <FloatingField label="Domain">
+          <FloatingField label={t("fields.domain")}>
             <Input
               value={domain}
               onChange={(e) => setDomain(e.target.value)}
@@ -141,7 +146,7 @@ function UpdateProjectForm({
         <div className="grid grid-cols-2 gap-4">
           <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
             <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-foreground transition-colors group-focus-within:text-primary z-10">
-              Start Date
+              {t("fields.startDate")}
             </span>
             <Popover open={startDateOpen} onOpenChange={setStartDateOpen}>
               <PopoverTrigger
@@ -150,7 +155,7 @@ function UpdateProjectForm({
                     variant="ghost"
                     className="w-full border-0 bg-transparent shadow-none rounded-none h-12 justify-start text-left font-normal"
                   >
-                    {startDate ? format(startDate, "dd/MM/yyyy") : ""}
+                    {startDate ? format(startDate, "dd/MM/yyyy") : t("placeholders.selectDate")}
                     <CalendarIcon className="ml-auto size-4 text-muted-foreground" />
                   </Button>
                 }
@@ -169,7 +174,7 @@ function UpdateProjectForm({
           </div>
           <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
             <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-foreground transition-colors group-focus-within:text-primary z-10">
-              End Date
+              {t("fields.endDate")}
             </span>
             <Popover open={endDateOpen} onOpenChange={setEndDateOpen}>
               <PopoverTrigger
@@ -178,7 +183,7 @@ function UpdateProjectForm({
                     variant="ghost"
                     className="w-full border-0 bg-transparent shadow-none rounded-none h-12 justify-start text-left font-normal"
                   >
-                    {endDate ? format(endDate, "dd/MM/yyyy") : ""}
+                    {endDate ? format(endDate, "dd/MM/yyyy") : t("placeholders.selectDate")}
                     <CalendarIcon className="ml-auto size-4 text-muted-foreground" />
                   </Button>
                 }
@@ -196,7 +201,7 @@ function UpdateProjectForm({
             </Popover>
           </div>
         </div>
-        <FloatingField label="Description" variant="textarea">
+        <FloatingField label={t("fields.description")} variant="textarea">
           <Textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
@@ -206,7 +211,7 @@ function UpdateProjectForm({
         </FloatingField>
         <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
           <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-foreground transition-colors group-focus-within:text-primary z-10">
-            Environment
+            {t("fields.environment")}
           </span>
           <Popover open={envOpen} onOpenChange={setEnvOpen}>
             <PopoverTrigger
@@ -248,7 +253,9 @@ function UpdateProjectForm({
                   </label>
                 ))}
                 {allSkills.length === 0 && (
-                  <p className="text-sm text-muted-foreground px-2 py-2">No skills available</p>
+                  <p className="text-sm text-muted-foreground px-2 py-2">
+                    {t("common.noSkillsAvailable")}
+                  </p>
                 )}
               </div>
             </PopoverContent>
@@ -256,8 +263,8 @@ function UpdateProjectForm({
         </div>
       </div>
       <DialogActions
-        submitLabel="UPDATE"
-        loadingLabel="UPDATING..."
+        submitLabel={t("buttons.update")}
+        loadingLabel={t("buttons.updating")}
         loading={loading}
         disabled={!isDirty}
         onCancel={() => onOpenChange(false)}

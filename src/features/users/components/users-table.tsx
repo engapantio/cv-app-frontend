@@ -11,6 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 import type { UserItem } from "@/features/users/types";
 import type { CreateUserPayload } from "@/features/users/hooks/use-users-page";
 import { TableEmptyState } from "@/components/shared/table-empty-state";
@@ -66,6 +67,7 @@ export function UsersTable({
   creating,
 }: UsersTableProps) {
   const rows = table.getRowModel().rows;
+  const t = useTranslations();
 
   return (
     <>
@@ -73,11 +75,10 @@ export function UsersTable({
         <TableToolbar
           value={globalFilter}
           onChange={setGlobalFilter}
-          actionLabel="CREATE USER"
+          actionLabel={t("buttons.createUser")}
           onAction={() => setCreateOpen(true)}
           showAction={isAdmin}
           actionClassName="hover:bg-transparent"
-          searchInputClassName="placeholder:text-white/70"
         />
 
         <div className="overflow-x-hidden">
@@ -126,13 +127,13 @@ export function UsersTable({
                 {loading ? (
                   <TableRow>
                     <TableCell colSpan={columnCount} className="text-center">
-                      Loading...
+                      {t("common.loading")}
                     </TableCell>
                   </TableRow>
                 ) : (
                   <TableRow>
                     <TableCell colSpan={columnCount}>
-                      <TableEmptyState message="No users found." responsive />
+                      <TableEmptyState message={t("common.noUsersFound")} responsive />
                     </TableCell>
                   </TableRow>
                 )}

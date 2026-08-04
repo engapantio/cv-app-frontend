@@ -2,11 +2,50 @@
 
 import { ApolloLink, HttpLink, Observable } from "@apollo/client";
 import { ApolloClient, InMemoryCache } from "@apollo/client-integration-nextjs";
-import { ErrorLink } from "@apollo/client/link/error";
 import { CombinedGraphQLErrors } from "@apollo/client/errors";
 import { typePolicies } from "@/lib/apollo/cache";
 import { GRAPHQL_PROXY_PATH } from "@/lib/apollo/endpoint";
 import { getAccessToken, setTokens, isTokenExpired, clearTokens } from "@/lib/auth/token-store";
+
+const AUTH_ERROR_PATTERN = /unauthorized|forbidden|expired/i;
+
+function isAuthErrorMessage(message: string): boolean {
+  return AUTH_ERROR_PATTERN.test(message);
+}
+
+function extractGraphQLErrors(error: unknown): Array<{ message: string }> | null {
+  if (CombinedGraphQLErrors.is(error)) {
+    return error.errors.map(({ message }) => ({ message }));
+  }
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "graphQLErrors" in error &&
+    Array.isArray((error as { graphQLErrors?: unknown }).graphQLErrors)
+  ) {
+    return (error as { graphQLErrors: Array<{ message: string }> }).graphQLErrors;
+  }
+  return null;
+}
+
+function isAuthErrorFromErrors(errors: Array<{ message: string }> | null | undefined): boolean {
+  return errors?.some(({ message }) => isAuthErrorMessage(message)) ?? false;
+}
+
+function logGraphQLErrors(operationName: string | undefined, errors: Array<{ message: string }>) {
+  for (const { message } of errors) {
+    console.error(`[GraphQL error] ${operationName}: ${message}`);
+  }
+}
+
+function logOperationError(operationName: string | undefined, error: unknown) {
+  const graphQLErrors = extractGraphQLErrors(error);
+  if (graphQLErrors) {
+    logGraphQLErrors(operationName, graphQLErrors);
+  } else {
+    console.error(`[Network error] ${operationName}:`, error);
+  }
+}
 
 let refreshPromise: Promise<void> | null = null;
 let refreshFailed = false;
@@ -91,10 +130,12 @@ const authLink = new ApolloLink((operation, forward) => {
           }
           innerSubscription = forward(operation).subscribe({
             next(value) {
-              const response = value as { data?: unknown; errors?: Array<{ message: string }> };
-              const isAuthError = response.errors?.some(({ message }) =>
-                /unauthorized|forbidden|expired/i.test(message),
-              );
+              const response = value as {
+                data?: unknown;
+                errors?: Array<{ message: string }>;
+              };
+              const errors = response.errors ?? null;
+              const isAuthError = isAuthErrorFromErrors(errors);
 
               if (isAuthError && retriesLeft > 0) {
                 const doRetry = () => {
@@ -103,30 +144,34 @@ const authLink = new ApolloLink((operation, forward) => {
                 if (isRefreshing()) {
                   waitForRefresh()
                     ?.then(doRetry)
-                    .catch(() => observer.next(value));
+                    .catch(() => {
+                      if (errors) logGraphQLErrors(operation.operationName, errors);
+                      observer.next(value);
+                    });
                 } else {
                   refreshAuthSession()
                     .then(() => {
                       resetFailedFlag();
                       doRetry();
                     })
-                    .catch(() => observer.next(value));
+                    .catch(() => {
+                      if (errors) logGraphQLErrors(operation.operationName, errors);
+                      observer.next(value);
+                    });
                 }
                 return;
+              }
+
+              if (errors && errors.length > 0) {
+                logGraphQLErrors(operation.operationName, errors);
               }
               observer.next(value);
             },
             error(err) {
               if (retriesLeft > 0) {
-                const graphQLErrors = CombinedGraphQLErrors.is(err)
-                  ? err.errors
-                  : "graphQLErrors" in err
-                    ? (err as { graphQLErrors: Array<{ message: string }> }).graphQLErrors
-                    : null;
+                const graphQLErrors = extractGraphQLErrors(err);
                 const isAuthError =
-                  graphQLErrors?.some(({ message }: { message: string }) =>
-                    /unauthorized|forbidden|expired/i.test(message),
-                  ) ?? /unauthorized|forbidden|expired/i.test(err?.message ?? "");
+                  isAuthErrorFromErrors(graphQLErrors) ?? isAuthErrorMessage(err?.message ?? "");
 
                 if (isAuthError) {
                   if (isRefreshing()) {
@@ -135,18 +180,25 @@ const authLink = new ApolloLink((operation, forward) => {
                         resetFailedFlag();
                         execute(retriesLeft - 1);
                       })
-                      .catch(() => observer.error(err));
+                      .catch(() => {
+                        logOperationError(operation.operationName, err);
+                        observer.error(err);
+                      });
                   } else {
                     refreshAuthSession()
                       .then(() => {
                         resetFailedFlag();
                         execute(retriesLeft - 1);
                       })
-                      .catch(() => observer.error(err));
+                      .catch(() => {
+                        logOperationError(operation.operationName, err);
+                        observer.error(err);
+                      });
                   }
                   return;
                 }
               }
+              logOperationError(operation.operationName, err);
               observer.error(err);
             },
             complete() {
@@ -154,6 +206,7 @@ const authLink = new ApolloLink((operation, forward) => {
             },
           });
         } catch (err) {
+          logOperationError(operation.operationName, err);
           observer.error(err);
         }
       })().catch(() => {
@@ -169,16 +222,6 @@ const authLink = new ApolloLink((operation, forward) => {
   });
 });
 
-const errorLink = new ErrorLink(({ error, operation }) => {
-  if (CombinedGraphQLErrors.is(error)) {
-    for (const { message } of error.errors) {
-      console.error(`[GraphQL error] ${operation.operationName}: ${message}`);
-    }
-  } else {
-    console.error(`[Network error] ${operation.operationName}:`, error);
-  }
-});
-
 export function createBrowserApolloClient() {
   const httpLink = new HttpLink({
     uri: GRAPHQL_PROXY_PATH,
@@ -190,6 +233,6 @@ export function createBrowserApolloClient() {
     cache: new InMemoryCache({
       typePolicies,
     }),
-    link: authLink.concat(errorLink.concat(httpLink)),
+    link: authLink.concat(httpLink),
   });
 }

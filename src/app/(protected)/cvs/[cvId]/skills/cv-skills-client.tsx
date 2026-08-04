@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { Trash2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useCvSkillsPage } from "@/features/cvs-skills/hooks/use-cv-skills-page";
 import { MASTERY_MAP } from "@/features/cvs-skills/utils/mastery-mapping";
 import { Button } from "@/components/ui/button";
@@ -26,6 +27,7 @@ export function CvSkillsClient({
   initialCv: CvQuery["cv"] | null;
   serverError?: string | null;
 }) {
+  const t = useTranslations();
   const {
     loading,
     hasCv,
@@ -50,7 +52,7 @@ export function CvSkillsClient({
   } = useCvSkillsPage(cvId, initialCv);
 
   if (loading) {
-    return <div className="text-center text-muted-foreground py-8">Loading...</div>;
+    return <div className="text-center text-muted-foreground py-8">{t("common.loading")}</div>;
   }
 
   if (serverError && !hasCv) {
@@ -60,7 +62,7 @@ export function CvSkillsClient({
   if (skillsByCategory.length === 0) {
     return (
       <div className="mx-auto w-full max-w-225">
-        <div className="text-center text-muted-foreground py-8">No skills assigned yet.</div>
+        <div className="text-center text-muted-foreground py-8">{t("common.noSkillsAssigned")}</div>
         {canMutate && (
           <div className="flex justify-end items-center gap-6 pl-10 pr-6 py-4">
             <button
@@ -69,7 +71,7 @@ export function CvSkillsClient({
               className="uppercase text-base font-medium bg-transparent border-none cursor-pointer"
               style={{ color: "#767676" }}
             >
-              + ADD SKILL
+              + {t("buttons.addSkill")}
             </button>
           </div>
         )}
@@ -164,7 +166,7 @@ export function CvSkillsClient({
                 className="uppercase text-base font-medium bg-transparent border-none cursor-pointer"
                 style={{ color: "#767676" }}
               >
-                + ADD SKILL
+                + {t("buttons.addSkill")}
               </button>
               <button
                 type="button"
@@ -173,7 +175,7 @@ export function CvSkillsClient({
                 style={{ color: "#C63031" }}
               >
                 <Trash2 className="h-4 w-4" />
-                REMOVE SKILLS
+                {t("buttons.removeSkills")}
               </button>
             </>
           ) : (
@@ -183,7 +185,7 @@ export function CvSkillsClient({
                 onClick={cancelRemove}
                 className="uppercase text-base font-medium text-foreground bg-transparent border border-border rounded-[40px] min-w-30 py-2 cursor-pointer"
               >
-                CANCEL
+                {t("buttons.cancel")}
               </button>
               <Button
                 type="button"
@@ -192,7 +194,7 @@ export function CvSkillsClient({
                 className="uppercase text-white min-w-30 py-1.5"
                 style={{ backgroundColor: "#e53935" }}
               >
-                DELETE
+                {t("buttons.delete")}
                 {selectedSkills.size > 0 && (
                   <span className="inline-flex items-center justify-center w-5 h-5 rounded-full text-xs font-bold text-[#e53935] bg-white border border-white">
                     {selectedSkills.size}

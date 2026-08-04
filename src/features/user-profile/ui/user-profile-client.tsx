@@ -8,6 +8,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui";
 import { useSession } from "@/lib/auth/session";
 import { VerifiedBadge } from "@/components/shared";
+import { useTranslations } from "next-intl";
 
 type User = NonNullable<UserQuery["user"]>;
 
@@ -19,6 +20,7 @@ interface UserProfileClientProps {
 export function UserProfileClient({ user, isOwner }: UserProfileClientProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const t = useTranslations();
   const { user: currentUser } = useSession();
   const isAdmin = currentUser?.role === "Admin";
   const [canEdit, setCanEdit] = useState(isOwner);
@@ -29,6 +31,13 @@ export function UserProfileClient({ user, isOwner }: UserProfileClientProps) {
       setCanEdit(true);
     }
   }, [isAdmin]);
+
+  const tabLabels: Record<string, string> = {
+    profile: t("tabs.profile"),
+    skills: t("tabs.skills"),
+    languages: t("tabs.languages"),
+    cvs: t("tabs.cvs"),
+  };
 
   const tabs = [
     { name: "profile", href: `/users/${user.id}/profile` },
@@ -70,11 +79,11 @@ export function UserProfileClient({ user, isOwner }: UserProfileClientProps) {
     : user.position_name;
 
   const formatDate = (value: string | number | null | undefined) => {
-    if (!value) return "N/A";
+    if (!value) return t("common.na");
     const timestamp = typeof value === "string" ? parseFloat(value) : value;
-    if (isNaN(timestamp)) return "N/A";
+    if (isNaN(timestamp)) return t("common.na");
     const date = new Date(timestamp);
-    if (isNaN(date.getTime())) return "N/A";
+    if (isNaN(date.getTime())) return t("common.na");
     return date.toDateString();
   };
 
@@ -100,7 +109,7 @@ export function UserProfileClient({ user, isOwner }: UserProfileClientProps) {
                 }
               `}
               >
-                {tab.name}
+                {tabLabels[tab.name]}
               </TabsTrigger>
             );
           })}
@@ -121,7 +130,9 @@ export function UserProfileClient({ user, isOwner }: UserProfileClientProps) {
               <p className="text-muted-foreground text-base">{user.email}</p>
               <VerifiedBadge verified={user.is_verified} />
             </div>
-            <p className="text-base text-foreground">A member since {formattedDate}</p>
+            <p className="text-base text-foreground">
+              {t("common.memberSince", { date: formattedDate })}
+            </p>
           </div>
         </div>
 

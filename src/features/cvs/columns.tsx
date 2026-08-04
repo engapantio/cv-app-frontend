@@ -21,6 +21,8 @@ interface CvActions {
 }
 
 export function createCvsColumns(
+  t: (key: string) => string,
+  tb: (key: string) => string,
   currentUserId: string | undefined,
   isAdmin: boolean,
   actions: CvActions,
@@ -30,20 +32,20 @@ export function createCvsColumns(
   return [
     {
       id: "name",
-      header: ({ column }) => <SortableHeader column={column} label="Name" />,
+      header: ({ column }) => <SortableHeader column={column} label={t("name")} />,
       accessorKey: "name",
       enableGlobalFilter: true,
     },
     {
       id: "education",
-      header: ({ column }) => <SortableHeader column={column} label="Education" />,
+      header: ({ column }) => <SortableHeader column={column} label={t("education")} />,
       accessorFn: (row) => row.education ?? "",
       enableGlobalFilter: true,
       meta: { className: "max-md:hidden" },
     },
     {
       id: "employee",
-      header: ({ column }) => <SortableHeader column={column} label="Employee" />,
+      header: ({ column }) => <SortableHeader column={column} label={t("employee")} />,
       accessorFn: (row) => row.user?.email ?? userEmail ?? "",
       enableGlobalFilter: true,
     },
@@ -73,14 +75,14 @@ export function createCvsColumns(
                   onClick={() => actions.onOpen(cv.id)}
                   className="justify-center cursor-pointer"
                 >
-                  Open
+                  {tb("open")}
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => actions.onOpen(cv.id)}
                   disabled={!canMutate}
                   className="justify-center cursor-pointer"
                 >
-                  Update
+                  {tb("update")}
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => actions.onDelete(cv)}
@@ -88,7 +90,7 @@ export function createCvsColumns(
                   variant="destructive"
                   className="justify-center cursor-pointer"
                 >
-                  Delete
+                  {tb("delete")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

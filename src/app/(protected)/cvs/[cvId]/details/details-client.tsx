@@ -1,9 +1,11 @@
 "use client";
 
+import { useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation } from "@apollo/client/react";
+import { useTranslations } from "next-intl";
 import { UpdateCvDocument, type CvQuery } from "@/gql/generated/graphql";
 import { usePermissions } from "@/lib/auth/permissions";
 import { Button } from "@/components/ui/button";
@@ -12,13 +14,11 @@ import { toast } from "sonner";
 
 type CvData = CvQuery["cv"];
 
-const cvDetailsSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  education: z.string().optional(),
-  description: z.string().min(1, "Description is required"),
-});
-
-type CvDetailsFormData = z.infer<typeof cvDetailsSchema>;
+type CvDetailsFormData = {
+  name: string;
+  education?: string;
+  description: string;
+};
 
 export default function CvDetailsClient({
   cvId,
@@ -29,6 +29,8 @@ export default function CvDetailsClient({
   initialCv: CvData | null;
   serverError: string | null;
 }) {
+  const t = useTranslations("common");
+
   if (serverError) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -40,7 +42,7 @@ export default function CvDetailsClient({
   if (!initialCv) {
     return (
       <div className="flex items-center justify-center py-20">
-        <p className="text-muted-foreground">Loading...</p>
+        <p className="text-muted-foreground">{t("loading")}</p>
       </div>
     );
   }
@@ -49,8 +51,27 @@ export default function CvDetailsClient({
 }
 
 function CvDetailsForm({ cv, cvId }: { cv: NonNullable<CvData>; cvId: string }) {
+  const t = useTranslations();
   const { canEdit } = usePermissions(cv.user?.id);
   const [updateCv, { loading: updating }] = useMutation(UpdateCvDocument);
+
+  const validation = useMemo(
+    () => ({
+      nameRequired: t("validation.nameRequired"),
+      descriptionRequired: t("validation.descriptionRequired"),
+    }),
+    [t],
+  );
+
+  const cvDetailsSchema = useMemo(
+    () =>
+      z.object({
+        name: z.string().min(1, validation.nameRequired),
+        education: z.string().optional(),
+        description: z.string().min(1, validation.descriptionRequired),
+      }),
+    [validation],
+  );
 
   const {
     register,
@@ -79,9 +100,9 @@ function CvDetailsForm({ cv, cvId }: { cv: NonNullable<CvData>; cvId: string }) 
         },
       });
       reset(formData);
-      toast("CV updated successfully");
+      toast(t("common.updateCvSuccess"));
     } catch {
-      toast("Failed to update CV");
+      toast(t("common.updateCvFailed"));
     }
   };
 
@@ -90,7 +111,7 @@ function CvDetailsForm({ cv, cvId }: { cv: NonNullable<CvData>; cvId: string }) 
       <div className="relative">
         <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
           <span className="absolute -top-2.5 left-3 bg-background px-1 text-xs text-foreground transition-colors group-focus-within:text-primary">
-            Name
+            {t("fields.name")}
           </span>
           <Input
             {...register("name")}
@@ -105,7 +126,7 @@ function CvDetailsForm({ cv, cvId }: { cv: NonNullable<CvData>; cvId: string }) 
       <div className="relative">
         <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
           <span className="absolute -top-2.5 left-3 bg-background px-1 text-xs text-foreground transition-colors group-focus-within:text-primary">
-            Education
+            {t("fields.education")}
           </span>
           <Input
             {...register("education")}
@@ -122,7 +143,7 @@ function CvDetailsForm({ cv, cvId }: { cv: NonNullable<CvData>; cvId: string }) 
       <div className="relative">
         <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
           <span className="absolute -top-2.5 left-3 bg-background px-1 text-xs text-foreground transition-colors group-focus-within:text-primary">
-            Description
+            {t("fields.description")}
           </span>
           <textarea
             {...register("description")}
@@ -143,7 +164,7 @@ function CvDetailsForm({ cv, cvId }: { cv: NonNullable<CvData>; cvId: string }) 
           style={{ backgroundColor: "#e53935" }}
           disabled={!canEdit || isSubmitting || updating || !isDirty}
         >
-          {updating ? "UPDATING..." : "UPDATE"}
+          {updating ? t("buttons.updating") : t("buttons.update")}
         </Button>
       </div>
     </form>

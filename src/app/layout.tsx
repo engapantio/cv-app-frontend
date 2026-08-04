@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import { ApolloWrapper } from "@/lib/apollo/apollo-wrapper";
 import { ThemeProvider } from "next-themes";
+import { IntlProvider } from "@/components/providers/intl-provider";
 import "./globals.css";
 
 const roboto = Roboto({
@@ -21,8 +22,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning className={roboto.variable}>
       <body>
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
-          <ApolloWrapper>{children}</ApolloWrapper>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <IntlProvider>
+            <ApolloWrapper>{children}</ApolloWrapper>
+          </IntlProvider>
         </ThemeProvider>
       </body>
     </html>

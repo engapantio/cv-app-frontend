@@ -1,6 +1,7 @@
 "use client";
 
 import { Search } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
@@ -15,15 +16,18 @@ interface SearchBarProps {
 export function SearchBar({
   value,
   onChange,
-  placeholder = "Search",
+  placeholder,
   wrapperClassName,
   inputClassName,
 }: SearchBarProps) {
+  const t = useTranslations("placeholders");
+  const resolvedPlaceholder = placeholder ?? t("search");
+
   return (
     <div className={cn("relative w-sm", wrapperClassName)}>
       <Search className="absolute left-3 top-3.5 h-5 w-5 text-icon" />
       <Input
-        placeholder={placeholder}
+        placeholder={resolvedPlaceholder}
         value={value ?? ""}
         onChange={(e) => onChange(e.target.value)}
         className={cn(

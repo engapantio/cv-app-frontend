@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import {
   Button,
   Dialog,
@@ -37,6 +38,7 @@ export function AddSkillDialog({
   onConfirm,
   loading,
 }: AddSkillDialogProps) {
+  const t = useTranslations();
   const [selectedSkill, setSelectedSkill] = useState<string | null>(null);
   const [selectedMastery, setSelectedMastery] = useState<Mastery>("Novice");
 
@@ -50,20 +52,22 @@ export function AddSkillDialog({
       setSelectedMastery("Novice");
       onOpenChange(false);
     } catch {
-      toast.error("Failed to add skill");
+      toast.error(t("common.addSkillFailed"));
     }
-  }, [selectedSkill, selectedMastery, onConfirm, onOpenChange]);
+  }, [selectedSkill, selectedMastery, onConfirm, onOpenChange, t]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent showCloseButton className="sm:max-w-md bg-card border-border rounded-none">
         <DialogHeader>
-          <DialogTitle className="text-left text-base font-semibold">Add skill</DialogTitle>
+          <DialogTitle className="text-left text-base font-semibold">
+            {t("dialogs.addSkill")}
+          </DialogTitle>
         </DialogHeader>
         <div className="space-y-6 py-4">
           <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
             <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-foreground transition-colors group-focus-within:text-primary">
-              Skill
+              {t("fields.name")}
             </span>
             <Select value={selectedSkill} onValueChange={(v) => setSelectedSkill(v)}>
               <SelectTrigger
@@ -72,7 +76,9 @@ export function AddSkillDialog({
               >
                 <SelectValue
                   placeholder={
-                    availableSkills.length === 0 ? "No available skills" : "Select skill"
+                    availableSkills.length === 0
+                      ? t("common.noAvailableSkills")
+                      : t("placeholders.selectSkill")
                   }
                 />
               </SelectTrigger>
@@ -87,14 +93,14 @@ export function AddSkillDialog({
           </div>
           <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
             <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-foreground transition-colors group-focus-within:text-primary">
-              Mastery
+              {t("fields.mastery")}
             </span>
             <Select
               value={selectedMastery}
               onValueChange={(v) => v && setSelectedMastery(v as Mastery)}
             >
               <SelectTrigger className="w-full border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none h-12 py-1 text-lg">
-                <SelectValue placeholder="Select mastery" />
+                <SelectValue placeholder={t("placeholders.selectMastery")} />
               </SelectTrigger>
               <SelectContent>
                 {MASTERY_OPTIONS.map((m) => (
@@ -113,7 +119,7 @@ export function AddSkillDialog({
             className="uppercase min-w-30 border border-border py-1.5"
             onClick={() => onOpenChange(false)}
           >
-            CANCEL
+            {t("buttons.cancel")}
           </Button>
           <Button
             type="button"
@@ -122,7 +128,7 @@ export function AddSkillDialog({
             disabled={!selectedSkill || loading}
             onClick={handleConfirm}
           >
-            {loading ? "CONFIRMING..." : "CONFIRM"}
+            {loading ? t("buttons.confirming") : t("buttons.confirm")}
           </Button>
         </DialogFooter>
       </DialogContent>
