@@ -26,5 +26,5 @@ export default async function LanguagesPage({ params }: LanguagesPageProps) {
 
   const isOwner = currentUserId === userId;
 
-  return <UserLanguagesClient userId={userId} isOwner={isOwner} />;
+  return <UserLanguagesClient userId={userId} initialUser={user} isOwner={isOwner} />;
 }

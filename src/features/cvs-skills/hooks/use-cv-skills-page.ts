@@ -9,18 +9,22 @@ import {
   UpdateCvSkillDocument,
   type CvQuery,
 } from "@/gql/generated/graphql";
-import { useSession } from "@/lib/auth/session";
+import { usePermissions } from "@/lib/auth/permissions";
 import { useSkillsCatalog } from "@/lib/skills/use-skills-catalog";
 import { useSkillMutations } from "@/lib/skills/use-skill-mutations";
 
 type CvSkill = NonNullable<CvQuery["cv"]["skills"]>[number];
 
-export function useCvSkillsPage(cvId: string, initialCv: CvQuery["cv"] | null = null) {
-  const { user: currentUser } = useSession();
+export function useCvSkillsPage(
+  cvId: string,
+  initialCv: CvQuery["cv"] | null = null,
+  isOwner = false,
+) {
   const {
     groupSkillsByCategory,
     availableSkills: getAvailableSkills,
     skillCategoryMap,
+    loading: catalogLoading,
   } = useSkillsCatalog();
 
   const {
@@ -35,8 +39,7 @@ export function useCvSkillsPage(cvId: string, initialCv: CvQuery["cv"] | null = 
 
   const cv = cvData?.cv ?? initialCv;
   const cvUserId = cv?.user?.id;
-  const isAdmin = currentUser?.role === "Admin";
-  const isOwner = currentUser?.id === cvUserId;
+  const { isAdmin } = usePermissions(cvUserId);
   const canMutate = isOwner || isAdmin;
 
   const cvSkills = useMemo(() => cv?.skills ?? [], [cv]);
@@ -100,7 +103,7 @@ export function useCvSkillsPage(cvId: string, initialCv: CvQuery["cv"] | null = 
   }, [deleteSkills, selectedSkills]);
 
   return {
-    loading: cvLoading && cv == null,
+    loading: (cvLoading && cv == null) || catalogLoading,
     hasCv: cv != null,
     skillsByCategory,
     availableSkills,

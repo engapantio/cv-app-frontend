@@ -23,9 +23,11 @@ type User = NonNullable<UserQuery["user"]>;
 export function UserSkillsClient({
   userId,
   initialUser,
+  isOwner,
 }: {
   userId: string;
   initialUser: User | null;
+  isOwner: boolean;
 }) {
   const t = useTranslations();
   const {
@@ -48,7 +50,7 @@ export function UserSkillsClient({
     addingSkill,
     updatingSkill,
     deletingSkill,
-  } = useUserSkillsPage(userId, initialUser);
+  } = useUserSkillsPage(userId, initialUser, isOwner);
 
   const content =
     skillsByCategory.length === 0 ? (
