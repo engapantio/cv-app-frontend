@@ -3,20 +3,20 @@
 import { useState, useCallback, useMemo } from "react";
 import { useQuery } from "@apollo/client/react";
 import {
-  AddCvSkillDocument,
-  CvDocument,
-  DeleteCvSkillDocument,
-  UpdateCvSkillDocument,
-  type CvQuery,
+  AddProfileSkillDocument,
+  DeleteProfileSkillDocument,
+  UpdateProfileSkillDocument,
+  UserDocument,
+  type UserQuery,
 } from "@/gql/generated/graphql";
-import { useSession } from "@/lib/auth/session";
+import { usePermissions } from "@/lib/auth/permissions";
 import { useSkillsCatalog } from "@/lib/skills/use-skills-catalog";
 import { useSkillMutations } from "@/lib/skills/use-skill-mutations";
 
-type CvSkill = NonNullable<CvQuery["cv"]["skills"]>[number];
+type ProfileSkill = NonNullable<UserQuery["user"]["profile"]["skills"]>[number];
 
-export function useCvSkillsPage(cvId: string, initialCv: CvQuery["cv"] | null = null) {
-  const { user: currentUser } = useSession();
+export function useUserSkillsPage(userId: string, initialUser: UserQuery["user"] | null = null) {
+  const { canEdit } = usePermissions(userId);
   const {
     groupSkillsByCategory,
     availableSkills: getAvailableSkills,
@@ -24,36 +24,33 @@ export function useCvSkillsPage(cvId: string, initialCv: CvQuery["cv"] | null = 
   } = useSkillsCatalog();
 
   const {
-    data: cvData,
-    loading: cvLoading,
-    refetch: refetchCv,
-  } = useQuery(CvDocument, {
-    variables: { cvId },
+    data: userData,
+    loading: userLoading,
+    refetch: refetchUser,
+  } = useQuery(UserDocument, {
+    variables: { userId },
     fetchPolicy: "network-only",
     errorPolicy: "all",
   });
 
-  const cv = cvData?.cv ?? initialCv;
-  const cvUserId = cv?.user?.id;
-  const isAdmin = currentUser?.role === "Admin";
-  const isOwner = currentUser?.id === cvUserId;
-  const canMutate = isOwner || isAdmin;
+  const user = userData?.user ?? initialUser;
+  const canMutate = canEdit;
 
-  const cvSkills = useMemo(() => cv?.skills ?? [], [cv]);
+  const profileSkills = useMemo(() => user?.profile?.skills ?? [], [user]);
 
   const skillsByCategory = useMemo(
-    () => groupSkillsByCategory(cvSkills),
-    [groupSkillsByCategory, cvSkills],
+    () => groupSkillsByCategory(profileSkills),
+    [groupSkillsByCategory, profileSkills],
   );
   const availableSkills = useMemo(
-    () => getAvailableSkills(cvSkills),
-    [getAvailableSkills, cvSkills],
+    () => getAvailableSkills(profileSkills),
+    [getAvailableSkills, profileSkills],
   );
 
   const [removeMode, setRemoveMode] = useState(false);
   const [selectedSkills, setSelectedSkills] = useState<Set<string>>(new Set());
   const [addDialogOpen, setAddDialogOpen] = useState(false);
-  const [updateSkillTarget, setUpdateSkillTarget] = useState<CvSkill | null>(null);
+  const [updateSkillTarget, setUpdateSkillTarget] = useState<ProfileSkill | null>(null);
 
   const toggleSkillSelection = useCallback((skillName: string) => {
     setSelectedSkills((prev) => {
@@ -82,12 +79,12 @@ export function useCvSkillsPage(cvId: string, initialCv: CvQuery["cv"] | null = 
     updatingSkill,
     deletingSkill,
   } = useSkillMutations({
-    entityId: cvId,
-    idField: "cvId",
-    addDocument: AddCvSkillDocument,
-    updateDocument: UpdateCvSkillDocument,
-    deleteDocument: DeleteCvSkillDocument,
-    refetch: refetchCv,
+    entityId: userId,
+    idField: "userId",
+    addDocument: AddProfileSkillDocument,
+    updateDocument: UpdateProfileSkillDocument,
+    deleteDocument: DeleteProfileSkillDocument,
+    refetch: refetchUser,
     skillCategoryMap,
   });
 
@@ -100,8 +97,8 @@ export function useCvSkillsPage(cvId: string, initialCv: CvQuery["cv"] | null = 
   }, [deleteSkills, selectedSkills]);
 
   return {
-    loading: cvLoading && cv == null,
-    hasCv: cv != null,
+    loading: userLoading && user == null,
+    hasUser: user != null,
     skillsByCategory,
     availableSkills,
     canMutate,

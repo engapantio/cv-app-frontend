@@ -100,20 +100,22 @@ export function CvSkillsClient({
               {category.skills.map((skill) => {
                 const config = MASTERY_MAP[skill.mastery as Mastery] ?? MASTERY_MAP.Novice;
                 const isSelected = selectedSkills.has(skill.name);
+                const barEditable = canMutate && !removeMode;
+                const nameRemovable = removeMode && canMutate;
                 return (
                   <div key={skill.name} className="flex items-center gap-4 min-w-0">
                     <button
                       type="button"
                       onClick={() => {
-                        if (!removeMode && canMutate) {
+                        if (barEditable) {
                           setUpdateSkillTarget(skill);
                         }
                       }}
                       className={
-                        "w-28.25 md:w-24 min-[1440px]:w-19.75 p-0 bg-transparent border-none shrink-0 " +
-                        (!canMutate || removeMode ? "cursor-default " : "cursor-pointer ")
+                        "w-28.25 md:w-24 min-[1440px]:w-19.75 p-0 bg-transparent border-none shrink-0 transition-opacity " +
+                        (barEditable ? "cursor-pointer hover:opacity-80 " : "cursor-default ")
                       }
-                      disabled={!canMutate || removeMode}
+                      disabled={!barEditable}
                     >
                       <div
                         className="w-full rounded-sm"
@@ -136,13 +138,15 @@ export function CvSkillsClient({
                     <button
                       type="button"
                       onClick={() => {
-                        if (removeMode && canMutate) {
+                        if (nameRemovable) {
                           toggleSkillSelection(skill.name);
                         }
                       }}
                       className={
-                        "text-base leading-none bg-transparent border-none p-0 text-left truncate " +
-                        (removeMode && canMutate ? "cursor-pointer " : "cursor-default ") +
+                        "text-base leading-none bg-transparent border-none p-0 text-left truncate transition-colors " +
+                        (nameRemovable
+                          ? "cursor-pointer hover:text-black dark:hover:text-white "
+                          : "cursor-default ") +
                         (isSelected ? "text-black dark:text-white " : "text-[#767676] ")
                       }
                     >

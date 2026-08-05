@@ -80,12 +80,14 @@ body {
   min-height: 100%;
 }
 
-button:not(:disabled) {
-  cursor: pointer;
-}
+@layer base {
+  button:not(:disabled) {
+    cursor: pointer;
+  }
 
-button:hover:not(:disabled) {
-  filter: brightness(0.9);
+  button:hover:not(:disabled) {
+    filter: brightness(0.9);
+  }
 }
 
 body {

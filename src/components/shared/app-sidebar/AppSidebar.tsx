@@ -97,19 +97,7 @@ const isActivePath = (pathname: string, href: string): boolean => {
   if (pathname === href || pathname === href + "/") {
     return true;
   }
-  if (pathname.startsWith(href + "/")) {
-    if (
-      href === "/users" &&
-      (pathname.endsWith("/cvs") ||
-        pathname.includes("/cvs/") ||
-        pathname.endsWith("/languages") ||
-        pathname.includes("/languages/"))
-    ) {
-      return false;
-    }
-    return true;
-  }
-  if (href === "/cvs" && (pathname.endsWith("/cvs") || pathname.includes("/cvs/"))) {
+  if (href !== "/users" && pathname.startsWith(href + "/")) {
     return true;
   }
   return false;

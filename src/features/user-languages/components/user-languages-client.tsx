@@ -132,7 +132,6 @@ export function UserLanguagesClient({ userId, isOwner }: UserLanguagesClientProp
 
   return (
     <div className="mx-auto w-full max-w-225">
-      <h2 className="text-base text-foreground/70">{t("tabs.languages")}</h2>
       {languages.length === 0 ? (
         <div className="text-center text-muted-foreground py-8">
           {t("common.noLanguagesAssigned")}
