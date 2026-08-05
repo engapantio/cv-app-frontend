@@ -15,15 +15,17 @@ import {
 } from "./group-skills";
 
 export function useSkillsCatalog() {
-  const { data: skillsData } = useQuery(SkillsDocument, {
+  const { data: skillsData, loading: skillsLoading } = useQuery(SkillsDocument, {
     fetchPolicy: "cache-first",
     errorPolicy: "all",
   });
 
-  const { data: categoriesData } = useQuery(SkillCategoriesDocument, {
+  const { data: categoriesData, loading: categoriesLoading } = useQuery(SkillCategoriesDocument, {
     fetchPolicy: "cache-first",
     errorPolicy: "all",
   });
+
+  const loading = skillsLoading || categoriesLoading;
 
   const allSkillsList = useMemo(() => skillsData?.skills ?? [], [skillsData]);
   const categories = useMemo(() => categoriesData?.skillCategories ?? [], [categoriesData]);
@@ -47,5 +49,5 @@ export function useSkillsCatalog() {
     [allSkillsList],
   );
 
-  return { groupSkillsByCategory, availableSkills, skillCategoryMap };
+  return { groupSkillsByCategory, availableSkills, skillCategoryMap, loading };
 }

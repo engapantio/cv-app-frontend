@@ -13,9 +13,9 @@ import {
   type UserQuery,
   type Proficiency,
 } from "@/gql/generated/graphql";
-import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { usePermissions } from "@/lib/auth/permissions";
 import { cn } from "@/lib/utils";
 import { PROFICIENCY_MAP } from "../utils/proficiency-mapping";
@@ -34,20 +34,21 @@ type Language = NonNullable<User["profile"]["languages"]>[number];
 
 interface UserLanguagesClientProps {
   userId: string;
+  initialUser: User | null;
   isOwner: boolean;
 }
 
-export function UserLanguagesClient({ userId, isOwner }: UserLanguagesClientProps) {
+export function UserLanguagesClient({ userId, initialUser, isOwner }: UserLanguagesClientProps) {
   const t = useTranslations();
-  const { data, loading } = useQuery(UserDocument, {
+  const { data, loading: dataLoading } = useQuery(UserDocument, {
     variables: { userId },
     fetchPolicy: "cache-and-network",
   });
 
-  const user = data?.user;
+  const user = data?.user ?? initialUser;
   const languages = user?.profile?.languages || [];
 
-  const [isRemoving, setIsRemoving] = useState(false);
+  const [removeMode, setRemoveMode] = useState(false);
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [updateDialogOpen, setUpdateDialogOpen] = useState(false);
@@ -101,6 +102,16 @@ export function UserLanguagesClient({ userId, isOwner }: UserLanguagesClientProp
     toast.success(t("common.languageUpdatedSuccess"));
   };
 
+  const enterRemoveMode = () => {
+    setRemoveMode(true);
+    setSelectedLanguages([]);
+  };
+
+  const cancelRemove = () => {
+    setRemoveMode(false);
+    setSelectedLanguages([]);
+  };
+
   const handleDeleteLanguages = async () => {
     if (selectedLanguages.length === 0) return;
     await deleteLanguages({
@@ -113,7 +124,7 @@ export function UserLanguagesClient({ userId, isOwner }: UserLanguagesClientProp
     });
     toast.success(t("common.languagesDeletedSuccess"));
     setSelectedLanguages([]);
-    setIsRemoving(false);
+    setRemoveMode(false);
   };
 
   const toggleLanguageSelection = (name: string) => {
@@ -127,7 +138,7 @@ export function UserLanguagesClient({ userId, isOwner }: UserLanguagesClientProp
     setUpdateDialogOpen(true);
   };
 
-  if (loading)
+  if (dataLoading && !user)
     return <div className="text-center text-muted-foreground py-8">{t("common.loading")}</div>;
 
   return (
@@ -137,39 +148,43 @@ export function UserLanguagesClient({ userId, isOwner }: UserLanguagesClientProp
           {t("common.noLanguagesAssigned")}
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-30 gap-y-11 pl-45 pr-6 pt-8 pb-14">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-3 gap-y-11 pl-0 min-[1440px]:pl-10 pr-6 pt-8 pb-10.5">
           {languages.map((lang) => {
             const isSelected = selectedLanguages.includes(lang.name);
             return (
-              <div key={lang.name} className="flex items-center min-w-0">
+              <div key={lang.name} className="flex items-center gap-4 min-w-0">
+                <span
+                  className={cn(
+                    "w-20 shrink-0 text-left cursor-default",
+                    removeMode && isSelected ? "text-black dark:text-white" : "",
+                  )}
+                  style={
+                    removeMode && isSelected
+                      ? undefined
+                      : { color: PROFICIENCY_MAP[lang.proficiency]?.color ?? "#767676" }
+                  }
+                >
+                  {lang.proficiency}
+                </span>
                 <button
                   type="button"
                   onClick={() => {
-                    if (!isRemoving && canEdit) {
+                    if (removeMode && canEdit) {
+                      toggleLanguageSelection(lang.name);
+                    } else if (canEdit) {
                       openUpdateDialog(lang);
                     }
                   }}
                   className={cn(
-                    "flex-1 flex items-center justify-between bg-transparent border-none p-0 text-left truncate",
-                    !canEdit || isRemoving ? "cursor-default" : "cursor-pointer",
+                    "flex-1 min-w-0 text-left truncate text-base leading-none bg-transparent border-none p-0 transition-colors",
+                    canEdit ? "cursor-pointer" : "cursor-default",
+                    removeMode && canEdit ? "hover:text-black dark:hover:text-white" : "",
                     isSelected ? "text-black dark:text-white" : "text-foreground/70",
                   )}
+                  title={lang.name}
                 >
-                  <span
-                    className="w-20 shrink-0"
-                    style={{ color: PROFICIENCY_MAP[lang.proficiency]?.color || "#767676" }}
-                  >
-                    {lang.proficiency}
-                  </span>
-                  <span>{lang.name}</span>
+                  {lang.name}
                 </button>
-                {isRemoving && canEdit && (
-                  <Checkbox
-                    checked={isSelected}
-                    onCheckedChange={() => toggleLanguageSelection(lang.name)}
-                    className="ml-3 shrink-0"
-                  />
-                )}
               </div>
             );
           })}
@@ -178,7 +193,7 @@ export function UserLanguagesClient({ userId, isOwner }: UserLanguagesClientProp
 
       {canEdit && (
         <div className="flex justify-end items-center gap-6 pl-10 pr-6 py-4">
-          {!isRemoving ? (
+          {!removeMode ? (
             <>
               <button
                 type="button"
@@ -190,7 +205,7 @@ export function UserLanguagesClient({ userId, isOwner }: UserLanguagesClientProp
               </button>
               <button
                 type="button"
-                onClick={() => setIsRemoving(true)}
+                onClick={enterRemoveMode}
                 className="uppercase text-base font-medium inline-flex items-center gap-1.5 bg-transparent border-none cursor-pointer"
                 style={{ color: "#C63031" }}
               >
@@ -202,35 +217,25 @@ export function UserLanguagesClient({ userId, isOwner }: UserLanguagesClientProp
             <>
               <button
                 type="button"
-                onClick={() => {
-                  setIsRemoving(false);
-                  setSelectedLanguages([]);
-                }}
+                onClick={cancelRemove}
                 className="uppercase text-base font-medium text-foreground bg-transparent border border-border rounded-[40px] min-w-30 py-2 cursor-pointer"
               >
                 {t("buttons.cancel")}
               </button>
-              <button
+              <Button
                 type="button"
                 onClick={handleDeleteLanguages}
                 disabled={selectedLanguages.length === 0 || deleting}
-                className="uppercase text-white min-w-30 py-1.5 inline-flex items-center justify-center gap-1"
-                style={{
-                  backgroundColor: "#e53935",
-                  borderRadius: "40px",
-                  border: "none",
-                  padding: "0.5rem 1rem",
-                  cursor: selectedLanguages.length === 0 || deleting ? "default" : "pointer",
-                  opacity: selectedLanguages.length === 0 || deleting ? 0.5 : 1,
-                }}
+                className="uppercase text-white min-w-30 py-1.5"
+                style={{ backgroundColor: "#e53935" }}
               >
-                {t("buttons.confirm")}
+                {t("buttons.delete")}
                 {selectedLanguages.length > 0 && (
                   <span className="inline-flex items-center justify-center w-5 h-5 rounded-full text-xs font-bold text-[#e53935] bg-white border border-white">
                     {selectedLanguages.length}
                   </span>
                 )}
-              </button>
+              </Button>
             </>
           )}
         </div>

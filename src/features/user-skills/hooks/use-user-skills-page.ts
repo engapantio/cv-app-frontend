@@ -15,12 +15,17 @@ import { useSkillMutations } from "@/lib/skills/use-skill-mutations";
 
 type ProfileSkill = NonNullable<UserQuery["user"]["profile"]["skills"]>[number];
 
-export function useUserSkillsPage(userId: string, initialUser: UserQuery["user"] | null = null) {
-  const { canEdit } = usePermissions(userId);
+export function useUserSkillsPage(
+  userId: string,
+  initialUser: UserQuery["user"] | null = null,
+  isOwner = false,
+) {
+  const { isAdmin } = usePermissions(userId);
   const {
     groupSkillsByCategory,
     availableSkills: getAvailableSkills,
     skillCategoryMap,
+    loading: catalogLoading,
   } = useSkillsCatalog();
 
   const {
@@ -34,7 +39,7 @@ export function useUserSkillsPage(userId: string, initialUser: UserQuery["user"]
   });
 
   const user = userData?.user ?? initialUser;
-  const canMutate = canEdit;
+  const canMutate = isOwner || isAdmin;
 
   const profileSkills = useMemo(() => user?.profile?.skills ?? [], [user]);
 
@@ -97,7 +102,7 @@ export function useUserSkillsPage(userId: string, initialUser: UserQuery["user"]
   }, [deleteSkills, selectedSkills]);
 
   return {
-    loading: userLoading && user == null,
+    loading: (userLoading && user == null) || catalogLoading,
     hasUser: user != null,
     skillsByCategory,
     availableSkills,
