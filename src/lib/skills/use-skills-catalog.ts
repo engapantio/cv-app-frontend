@@ -12,9 +12,10 @@ import {
   type CatalogSkill,
   type SkillItem,
   type SkillsByCategory,
+  type SkillsCatalogInitial,
 } from "./group-skills";
 
-export function useSkillsCatalog() {
+export function useSkillsCatalog(initialCatalog?: SkillsCatalogInitial) {
   const { data: skillsData, loading: skillsLoading } = useQuery(SkillsDocument, {
     fetchPolicy: "cache-first",
     errorPolicy: "all",
@@ -27,8 +28,14 @@ export function useSkillsCatalog() {
 
   const loading = skillsLoading || categoriesLoading;
 
-  const allSkillsList = useMemo(() => skillsData?.skills ?? [], [skillsData]);
-  const categories = useMemo(() => categoriesData?.skillCategories ?? [], [categoriesData]);
+  const allSkillsList = useMemo(
+    () => skillsData?.skills ?? initialCatalog?.skills ?? [],
+    [skillsData, initialCatalog],
+  );
+  const categories = useMemo(
+    () => categoriesData?.skillCategories ?? initialCatalog?.categories ?? [],
+    [categoriesData, initialCatalog],
+  );
 
   const nameToCategory = useMemo(() => buildNameToCategoryMap(allSkillsList), [allSkillsList]);
   const idToCategory = useMemo(

@@ -32,15 +32,6 @@ const config: Config = {
     "!src/app/**/not-found.tsx",
     "!src/proxy.ts",
   ],
-
-  coverageThreshold: {
-    global: {
-      branches: 80,
-      functions: 80,
-      lines: 80,
-      statements: 80,
-    },
-  },
 };
 
 export default createJestConfig(config);

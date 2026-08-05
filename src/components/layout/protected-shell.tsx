@@ -5,7 +5,7 @@ import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { AppSidebar, Container } from "../shared";
 
 export function ProtectedShell({ children }: { children: React.ReactNode }) {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const isTablet = useMediaQuery("(max-width: 1439px)");
 
   return (

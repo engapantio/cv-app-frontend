@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { UserQuery } from "@/gql/generated/graphql";
+import { useEffect, useMemo, useState } from "react";
+import { useQuery } from "@apollo/client/react";
+import { UserDocument, UserQuery } from "@/gql/generated/graphql";
 import { AvatarUpload } from "./avatar-upload";
 import { ProfileForm } from "./profile-form";
 import { useSession } from "@/lib/auth/session";
@@ -28,30 +29,29 @@ export function UserProfileClient({ user, isOwner }: UserProfileClientProps) {
     }
   }, [isAdmin]);
 
-  const isSelf = currentUser?.id === user.id;
-  const fullName =
-    (isSelf
-      ? (currentUser?.profile?.full_name ?? user.profile?.full_name)
-      : user.profile?.full_name) || "";
-  const avatar = isSelf
-    ? (currentUser?.profile?.avatar ?? user.profile?.avatar)
-    : user.profile?.avatar;
-  const first_name = isSelf
-    ? (currentUser?.profile?.first_name ?? user.profile?.first_name)
-    : user.profile?.first_name;
-  const last_name = isSelf
-    ? (currentUser?.profile?.last_name ?? user.profile?.last_name)
-    : user.profile?.last_name;
-  const departmentId = isSelf
-    ? (currentUser?.department?.id ?? user.department?.id)
-    : user.department?.id;
-  const positionId = isSelf ? (currentUser?.position?.id ?? user.position?.id) : user.position?.id;
-  const userDepartmentName = isSelf
-    ? (currentUser?.department_name ?? user.department_name)
-    : user.department_name;
-  const userPositionName = isSelf
-    ? (currentUser?.position_name ?? user.position_name)
-    : user.position_name;
+  const { data } = useQuery(UserDocument, {
+    variables: { userId: user.id },
+  });
+
+  const profileUser = data?.user ?? user;
+  const fullName = profileUser.profile?.full_name ?? "";
+  const avatar = profileUser.profile?.avatar ?? null;
+  const first_name = profileUser.profile?.first_name ?? null;
+  const last_name = profileUser.profile?.last_name ?? null;
+  const departmentId = profileUser.department?.id ?? null;
+  const positionId = profileUser.position?.id ?? null;
+  const userDepartmentName = profileUser.department_name ?? null;
+  const userPositionName = profileUser.position_name ?? null;
+
+  const defaultValues = useMemo(
+    () => ({
+      first_name: first_name || "",
+      last_name: last_name || "",
+      departmentId: departmentId || "",
+      positionId: positionId || "",
+    }),
+    [first_name, last_name, departmentId, positionId],
+  );
 
   const formatDate = (value: string | number | null | undefined) => {
     if (!value) return t("common.na");
@@ -88,12 +88,7 @@ export function UserProfileClient({ user, isOwner }: UserProfileClientProps) {
       <div>
         <ProfileForm
           userId={user.id}
-          defaultValues={{
-            first_name,
-            last_name,
-            departmentId,
-            positionId,
-          }}
+          defaultValues={defaultValues}
           userDepartmentName={userDepartmentName}
           userPositionName={userPositionName}
           isOwner={canEdit}

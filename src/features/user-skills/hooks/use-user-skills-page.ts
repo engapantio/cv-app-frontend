@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { useQuery } from "@apollo/client/react";
 import {
   AddProfileSkillDocument,
@@ -10,23 +10,17 @@ import {
   type UserQuery,
 } from "@/gql/generated/graphql";
 import { usePermissions } from "@/lib/auth/permissions";
-import { useSkillsCatalog } from "@/lib/skills/use-skills-catalog";
+import { useSkillsPageState } from "@/lib/skills/use-skills-page-state";
 import { useSkillMutations } from "@/lib/skills/use-skill-mutations";
-
-type ProfileSkill = NonNullable<UserQuery["user"]["profile"]["skills"]>[number];
+import type { SkillsCatalogInitial } from "@/lib/skills/group-skills";
 
 export function useUserSkillsPage(
   userId: string,
   initialUser: UserQuery["user"] | null = null,
   isOwner = false,
+  initialCatalog?: SkillsCatalogInitial,
 ) {
   const { isAdmin } = usePermissions(userId);
-  const {
-    groupSkillsByCategory,
-    availableSkills: getAvailableSkills,
-    skillCategoryMap,
-    loading: catalogLoading,
-  } = useSkillsCatalog();
 
   const {
     data: userData,
@@ -43,38 +37,22 @@ export function useUserSkillsPage(
 
   const profileSkills = useMemo(() => user?.profile?.skills ?? [], [user]);
 
-  const skillsByCategory = useMemo(
-    () => groupSkillsByCategory(profileSkills),
-    [groupSkillsByCategory, profileSkills],
-  );
-  const availableSkills = useMemo(
-    () => getAvailableSkills(profileSkills),
-    [getAvailableSkills, profileSkills],
-  );
-
-  const [removeMode, setRemoveMode] = useState(false);
-  const [selectedSkills, setSelectedSkills] = useState<Set<string>>(new Set());
-  const [addDialogOpen, setAddDialogOpen] = useState(false);
-  const [updateSkillTarget, setUpdateSkillTarget] = useState<ProfileSkill | null>(null);
-
-  const toggleSkillSelection = useCallback((skillName: string) => {
-    setSelectedSkills((prev) => {
-      const next = new Set(prev);
-      if (next.has(skillName)) next.delete(skillName);
-      else next.add(skillName);
-      return next;
-    });
-  }, []);
-
-  const enterRemoveMode = useCallback(() => {
-    setRemoveMode(true);
-    setSelectedSkills(new Set());
-  }, []);
-
-  const cancelRemove = useCallback(() => {
-    setRemoveMode(false);
-    setSelectedSkills(new Set());
-  }, []);
+  const {
+    skillCategoryMap,
+    skillsByCategory,
+    availableSkills,
+    removeMode,
+    selectedSkills,
+    addDialogOpen,
+    setAddDialogOpen,
+    updateSkillTarget,
+    setUpdateSkillTarget,
+    toggleSkillSelection,
+    enterRemoveMode,
+    cancelRemove,
+    setSelectedSkills,
+    setRemoveMode,
+  } = useSkillsPageState(profileSkills, initialCatalog);
 
   const {
     handleAddSkill,
@@ -99,10 +77,10 @@ export function useUserSkillsPage(
       setSelectedSkills(new Set());
       setRemoveMode(false);
     }
-  }, [deleteSkills, selectedSkills]);
+  }, [deleteSkills, selectedSkills, setSelectedSkills, setRemoveMode]);
 
   return {
-    loading: (userLoading && user == null) || catalogLoading,
+    loading: userLoading && user == null,
     hasUser: user != null,
     skillsByCategory,
     availableSkills,

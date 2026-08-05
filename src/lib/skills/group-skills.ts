@@ -3,6 +3,11 @@ import type { Mastery, SkillCategoriesQuery, SkillsQuery } from "@/gql/generated
 export type CatalogSkill = SkillsQuery["skills"][number];
 export type CatalogCategory = SkillCategoriesQuery["skillCategories"][number];
 
+export type SkillsCatalogInitial = {
+  skills: CatalogSkill[];
+  categories: CatalogCategory[];
+};
+
 export type SkillItem = {
   name: string;
   mastery: Mastery;

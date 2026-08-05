@@ -7,6 +7,7 @@ import { useCvSkillsPage } from "@/features/cvs-skills/hooks/use-cv-skills-page"
 import { MASTERY_MAP } from "@/features/cvs-skills/utils/mastery-mapping";
 import { Button } from "@/components/ui/button";
 import type { Mastery, CvQuery } from "@/gql/generated/graphql";
+import type { SkillsCatalogInitial } from "@/lib/skills/group-skills";
 
 const AddSkillDialog = dynamic(
   () => import("@/features/cvs-skills/components/add-skill-dialog").then((m) => m.AddSkillDialog),
@@ -23,11 +24,13 @@ export function CvSkillsClient({
   initialCv,
   serverError,
   isOwner,
+  skillsCatalog,
 }: {
   cvId: string;
   initialCv: CvQuery["cv"] | null;
   serverError?: string | null;
   isOwner: boolean;
+  skillsCatalog: SkillsCatalogInitial;
 }) {
   const t = useTranslations();
   const {
@@ -51,7 +54,7 @@ export function CvSkillsClient({
     addingSkill,
     updatingSkill,
     deletingSkill,
-  } = useCvSkillsPage(cvId, initialCv, isOwner);
+  } = useCvSkillsPage(cvId, initialCv, isOwner, skillsCatalog);
 
   if (loading) {
     return <div className="text-center text-muted-foreground py-8">{t("common.loading")}</div>;

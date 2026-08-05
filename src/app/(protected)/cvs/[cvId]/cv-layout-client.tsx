@@ -16,10 +16,12 @@ const TABS = [
 export function CvLayoutClient({
   cvId,
   initialCvName,
+  cvUserId,
   children,
 }: {
   cvId: string;
   initialCvName?: string | null;
+  cvUserId?: string | null;
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
@@ -45,7 +47,7 @@ export function CvLayoutClient({
     <div className="flex w-full flex-col">
       <div className="flex items-center h-11 gap-2 mb-4">
         <Link
-          href="/cvs"
+          href={cvUserId ? `/users/${cvUserId}/cvs` : "/cvs"}
           className="text-base text-foreground/70 hover:text-primary transition-colors"
         >
           {t("breadcrumbs.cvs")}

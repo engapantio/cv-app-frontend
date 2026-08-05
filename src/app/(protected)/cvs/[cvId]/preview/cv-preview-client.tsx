@@ -331,25 +331,29 @@ export function CvPreviewClient({
         </>
       )}
 
-      <h3
-        className="text-[34px] font-normal leading-10.5 tracking-[0.25px] mt-12 mb-6"
-        style={fgStyle}
-      >
-        {t("preview.professionalSkills")}
-      </h3>
+      {skillsByCategory.size > 0 && (
+        <>
+          <h3
+            className="text-[34px] font-normal leading-10.5 tracking-[0.25px] mt-12 mb-6"
+            style={fgStyle}
+          >
+            {t("preview.professionalSkills")}
+          </h3>
 
-      <SkillsTable
-        skillsByCategory={skillsByCategory}
-        categoryMap={categoryMap}
-        years={years}
-        lastUsed={lastUsed}
-        labels={{
-          skills: t("preview.skills"),
-          experience: t("preview.experience"),
-          inYears: t("preview.inYears"),
-          lastUsed: t("preview.lastUsed"),
-        }}
-      />
+          <SkillsTable
+            skillsByCategory={skillsByCategory}
+            categoryMap={categoryMap}
+            years={years}
+            lastUsed={lastUsed}
+            labels={{
+              skills: t("preview.skills"),
+              experience: t("preview.experience"),
+              inYears: t("preview.inYears"),
+              lastUsed: t("preview.lastUsed"),
+            }}
+          />
+        </>
+      )}
     </div>
   );
 }

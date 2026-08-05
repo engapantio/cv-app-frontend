@@ -7,6 +7,7 @@ import { useUserSkillsPage } from "@/features/user-skills/hooks/use-user-skills-
 import { MASTERY_MAP } from "@/features/cvs-skills/utils/mastery-mapping";
 import { Button } from "@/components/ui/button";
 import type { Mastery, UserQuery } from "@/gql/generated/graphql";
+import type { SkillsCatalogInitial } from "@/lib/skills/group-skills";
 
 const AddSkillDialog = dynamic(
   () => import("@/features/cvs-skills/components/add-skill-dialog").then((m) => m.AddSkillDialog),
@@ -24,10 +25,12 @@ export function UserSkillsClient({
   userId,
   initialUser,
   isOwner,
+  skillsCatalog,
 }: {
   userId: string;
   initialUser: User | null;
   isOwner: boolean;
+  skillsCatalog: SkillsCatalogInitial;
 }) {
   const t = useTranslations();
   const {
@@ -50,7 +53,7 @@ export function UserSkillsClient({
     addingSkill,
     updatingSkill,
     deletingSkill,
-  } = useUserSkillsPage(userId, initialUser, isOwner);
+  } = useUserSkillsPage(userId, initialUser, isOwner, skillsCatalog);
 
   const content =
     skillsByCategory.length === 0 ? (

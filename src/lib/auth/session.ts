@@ -99,6 +99,7 @@ export function updateSessionProfile(patch: {
   first_name?: string | null;
   last_name?: string | null;
   full_name?: string | null;
+  avatar?: string | null;
   department?: { id: string; name?: string | null } | null;
   position?: { id: string; name?: string | null } | null;
   department_name?: string | null;

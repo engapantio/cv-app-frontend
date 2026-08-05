@@ -158,31 +158,35 @@ export function PrintableCv({
         </>
       )}
 
-      <h3
-        style={{
-          fontSize: 34,
-          fontWeight: 400,
-          margin: "32px 0 16px",
-          color: c.foreground,
-        }}
-      >
-        {l.professionalSkills}
-      </h3>
-      <SkillsTable
-        skillsByCategory={skillsByCategory}
-        categoryMap={categoryMap}
-        years={years}
-        lastUsed={lastUsed}
-        color={c.foreground}
-        primary={c.primary}
-        muted={c.muted}
-        labels={{
-          skills: l.skills,
-          experience: l.experience,
-          inYears: l.inYears,
-          lastUsed: l.lastUsed,
-        }}
-      />
+      {skillsByCategory.size > 0 && (
+        <>
+          <h3
+            style={{
+              fontSize: 34,
+              fontWeight: 400,
+              margin: "32px 0 16px",
+              color: c.foreground,
+            }}
+          >
+            {l.professionalSkills}
+          </h3>
+          <SkillsTable
+            skillsByCategory={skillsByCategory}
+            categoryMap={categoryMap}
+            years={years}
+            lastUsed={lastUsed}
+            color={c.foreground}
+            primary={c.primary}
+            muted={c.muted}
+            labels={{
+              skills: l.skills,
+              experience: l.experience,
+              inYears: l.inYears,
+              lastUsed: l.lastUsed,
+            }}
+          />
+        </>
+      )}
     </>
   );
 }
