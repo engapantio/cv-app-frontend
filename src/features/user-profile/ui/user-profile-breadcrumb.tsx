@@ -4,11 +4,17 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { ChevronRight, User } from "lucide-react";
 
-export function UserProfileBreadcrumb({ userName }: { userName: string }) {
+export function UserProfileBreadcrumb({
+  userName,
+  tabLabel,
+}: {
+  userName: string;
+  tabLabel?: string;
+}) {
   const t = useTranslations();
 
   return (
-    <div className="flex items-center h-11 gap-4">
+    <div className="flex items-center h-11 gap-4 mb-4">
       <Link
         href="/users"
         className="text-base text-foreground/70 hover:text-primary transition-colors"
@@ -20,6 +26,12 @@ export function UserProfileBreadcrumb({ userName }: { userName: string }) {
         <User className="w-5 h-5" />
         {userName}
       </div>
+      {tabLabel && (
+        <>
+          <ChevronRight className="text-icon w-5 h-5" />
+          <span className="text-base text-foreground/70">{tabLabel}</span>
+        </>
+      )}
     </div>
   );
 }

@@ -4,8 +4,6 @@ import { useEffect, useState } from "react";
 import { UserQuery } from "@/gql/generated/graphql";
 import { AvatarUpload } from "./avatar-upload";
 import { ProfileForm } from "./profile-form";
-import { usePathname, useRouter } from "next/navigation";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui";
 import { useSession } from "@/lib/auth/session";
 import { VerifiedBadge } from "@/components/shared";
 import { useTranslations } from "next-intl";
@@ -18,8 +16,6 @@ interface UserProfileClientProps {
 }
 
 export function UserProfileClient({ user, isOwner }: UserProfileClientProps) {
-  const pathname = usePathname();
-  const router = useRouter();
   const t = useTranslations();
   const { user: currentUser } = useSession();
   const isAdmin = currentUser?.role === "Admin";
@@ -31,27 +27,6 @@ export function UserProfileClient({ user, isOwner }: UserProfileClientProps) {
       setCanEdit(true);
     }
   }, [isAdmin]);
-
-  const tabLabels: Record<string, string> = {
-    profile: t("tabs.profile"),
-    skills: t("tabs.skills"),
-    languages: t("tabs.languages"),
-    cvs: t("tabs.cvs"),
-  };
-
-  const tabs = [
-    { name: "profile", href: `/users/${user.id}/profile` },
-    { name: "skills", href: `/users/${user.id}/skills` },
-    { name: "languages", href: `/users/${user.id}/languages` },
-    { name: "cvs", href: `/users/${user.id}/cvs` },
-  ];
-
-  const currentTab = pathname.split("/").pop() || "profile";
-
-  const handleTabChange = (value: string) => {
-    const tab = tabs.find((t) => t.name === value);
-    if (tab) router.push(tab.href);
-  };
 
   const isSelf = currentUser?.id === user.id;
   const fullName =
@@ -90,66 +65,39 @@ export function UserProfileClient({ user, isOwner }: UserProfileClientProps) {
   const formattedDate = formatDate(user.created_at);
 
   return (
-    <div className="space-y-8">
-      <Tabs value={currentTab} onValueChange={handleTabChange}>
-        <TabsList variant="line" className="flex flex-wrap mb-8">
-          {tabs.map((tab) => {
-            const isActive = pathname === tab.href;
-            return (
-              <TabsTrigger
-                key={tab.name}
-                value={tab.name}
-                className={`
-                flex justify-center items-center
-                w-37.5 h-12
-                uppercase text-sm font-medium
-                transition-colors duration-200
-                cursor-pointer ${
-                  isActive ? "border-primary text-primary!" : "text-foreground! hover:text-primary!"
-                }
-              `}
-              >
-                {tabLabels[tab.name]}
-              </TabsTrigger>
-            );
-          })}
-        </TabsList>
-      </Tabs>
+    <div>
+      <div className="flex flex-col items-center gap-8">
+        <AvatarUpload
+          userId={user.id}
+          currentAvatar={avatar}
+          fullName={fullName}
+          isOwner={canEdit}
+        />
+        <div className="flex flex-col items-center mb-16">
+          <h2 className="mb-2 font-normal text-2xl">{fullName}</h2>
+          <div className="flex items-center gap-1.5">
+            <p className="text-muted-foreground text-base">{user.email}</p>
+            <VerifiedBadge verified={user.is_verified} />
+          </div>
+          <p className="text-base text-foreground">
+            {t("common.memberSince", { date: formattedDate })}
+          </p>
+        </div>
+      </div>
 
       <div>
-        <div className="flex flex-col items-center gap-8">
-          <AvatarUpload
-            userId={user.id}
-            currentAvatar={avatar}
-            fullName={fullName}
-            isOwner={canEdit}
-          />
-          <div className="flex flex-col items-center mb-16">
-            <h2 className="mb-2 font-normal text-2xl">{fullName}</h2>
-            <div className="flex items-center gap-1.5">
-              <p className="text-muted-foreground text-base">{user.email}</p>
-              <VerifiedBadge verified={user.is_verified} />
-            </div>
-            <p className="text-base text-foreground">
-              {t("common.memberSince", { date: formattedDate })}
-            </p>
-          </div>
-        </div>
-
-        <div>
-          <ProfileForm
-            userId={user.id}
-            defaultValues={{
-              first_name,
-              last_name,
-              departmentId,
-              positionId,
-            }}
-            userDepartmentName={userDepartmentName}
-            userPositionName={userPositionName}
-            isOwner={canEdit}
-          />
-        </div>
+        <ProfileForm
+          userId={user.id}
+          defaultValues={{
+            first_name,
+            last_name,
+            departmentId,
+            positionId,
+          }}
+          userDepartmentName={userDepartmentName}
+          userPositionName={userPositionName}
+          isOwner={canEdit}
+        />
       </div>
     </div>
   );

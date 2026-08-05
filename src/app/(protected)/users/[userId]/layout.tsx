@@ -1,17 +1,17 @@
 import { notFound } from "next/navigation";
-import { getServerUserId } from "@/lib/auth/cookies";
 import { createServerApolloClientForRequest } from "@/lib/apollo/server-client";
 import { UserDocument } from "@/gql/generated/graphql";
-import { UserLanguagesClient } from "@/features/user-languages/components/user-languages-client";
+import { UserLayoutClient } from "./user-layout-client";
 
-interface LanguagesPageProps {
+export default async function UserLayout({
+  params,
+  children,
+}: {
   params: Promise<{ userId: string }>;
-}
-
-export default async function LanguagesPage({ params }: LanguagesPageProps) {
+  children: React.ReactNode;
+}) {
   const { userId } = await params;
   const { client, accessToken: token } = await createServerApolloClientForRequest();
-  const currentUserId = await getServerUserId();
 
   if (!token) return notFound();
 
@@ -24,7 +24,11 @@ export default async function LanguagesPage({ params }: LanguagesPageProps) {
   const user = data?.user;
   if (!user) return notFound();
 
-  const isOwner = currentUserId === userId;
+  const userName = user.profile.full_name ?? "";
 
-  return <UserLanguagesClient userId={userId} isOwner={isOwner} />;
+  return (
+    <UserLayoutClient userId={userId} userName={userName}>
+      {children}
+    </UserLayoutClient>
+  );
 }
