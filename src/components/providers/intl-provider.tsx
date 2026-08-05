@@ -8,7 +8,7 @@ export function IntlProvider({ children }: { children: React.ReactNode }) {
   const locale = useLocalePref();
 
   return (
-    <NextIntlClientProvider locale={locale} messages={messages[locale]}>
+    <NextIntlClientProvider locale={locale} timeZone="UTC" messages={messages[locale]}>
       {children}
     </NextIntlClientProvider>
   );

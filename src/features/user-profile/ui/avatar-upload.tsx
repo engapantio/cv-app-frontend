@@ -7,6 +7,7 @@ import { Camera, Trash2, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { UploadAvatarDocument, DeleteAvatarDocument, UserDocument } from "@/gql/generated/graphql";
 import { useMutation } from "@apollo/client/react";
+import { updateSessionProfile } from "@/lib/auth/session";
 
 interface AvatarUploadProps {
   userId: string;
@@ -29,6 +30,7 @@ export function AvatarUpload({ userId, currentAvatar, fullName, isOwner }: Avata
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    e.target.value = "";
     if (!file) return;
     if (file.size > 500 * 1024) {
       toast.error(t("common.avatarTooLarge"));
@@ -48,11 +50,15 @@ export function AvatarUpload({ userId, currentAvatar, fullName, isOwner }: Avata
         reader.onerror = reject;
         reader.readAsDataURL(file);
       });
-      await uploadAvatar({
+      const uploadResult = await uploadAvatar({
         variables: {
           avatar: { userId, base64, size: file.size, type: file.type },
         },
       });
+      if (uploadResult.error) {
+        throw new Error(uploadResult.error.message);
+      }
+      updateSessionProfile({ avatar: uploadResult.data?.uploadAvatar ?? null });
       toast.success(t("common.avatarUploadedSuccess"));
     } catch {
       toast.error(t("common.avatarUploadFailed"));
@@ -65,7 +71,11 @@ export function AvatarUpload({ userId, currentAvatar, fullName, isOwner }: Avata
   const handleDelete = async () => {
     if (!currentAvatar) return;
     try {
-      await deleteAvatar({ variables: { avatar: { userId } } });
+      const deleteResult = await deleteAvatar({ variables: { avatar: { userId } } });
+      if (deleteResult.error) {
+        throw new Error(deleteResult.error.message);
+      }
+      updateSessionProfile({ avatar: null });
       toast.success(t("common.avatarDeletedSuccess"));
     } catch {
       toast.error(t("common.avatarDeletedFailed"));
@@ -103,18 +113,18 @@ export function AvatarUpload({ userId, currentAvatar, fullName, isOwner }: Avata
       <div>
         {isOwner && (
           <div className="flex gap-1 items-center justify-center font-bold">
-            <Button variant="ghost" size={"lg"} onClick={triggerFileInput} disabled={isUploading}>
-              <Upload />
-            </Button>
             {currentAvatar && (
               <Button variant="destructive" size="sm" onClick={handleDelete}>
                 <Trash2 className="h-4 w-4" />
               </Button>
             )}
+            <Button variant="ghost" size={"lg"} onClick={triggerFileInput} disabled={isUploading}>
+              <Upload />
+            </Button>
             <div>{t("fields.avatar.upload")}</div>
           </div>
         )}
-        <p className="text-base text-muted-foreground text-center max-w-50">
+        <p className="text-base text-muted-foreground text-center whitespace-nowrap">
           {isOwner ? t("fields.avatar.sizeHint") : ""}
         </p>
       </div>

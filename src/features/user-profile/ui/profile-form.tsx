@@ -3,7 +3,6 @@
 import { useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import {
   Button,
   Input,
@@ -24,15 +23,10 @@ import {
 } from "@/gql/generated/graphql";
 import { useMutation, useQuery } from "@apollo/client/react";
 import { useTranslations } from "next-intl";
-
-const profileSchema = z.object({
-  first_name: z.string().optional(),
-  last_name: z.string().optional(),
-  departmentId: z.string().optional(),
-  positionId: z.string().optional(),
-});
-
-type ProfileFormValues = z.infer<typeof profileSchema>;
+import {
+  profileSchema,
+  type ProfileFormValues,
+} from "@/features/user-profile/utils/profile-form-schema";
 
 interface ProfileFormProps {
   userId: string;
@@ -59,7 +53,7 @@ export function ProfileForm({
     control,
     handleSubmit,
     reset,
-    formState: { isDirty, isSubmitting },
+    formState: { errors, isDirty, isSubmitting },
   } = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
@@ -107,8 +101,8 @@ export function ProfileForm({
             variables: {
               profile: {
                 userId,
-                first_name: data.first_name || null,
-                last_name: data.last_name || null,
+                first_name: data.first_name || "",
+                last_name: data.last_name || "",
               },
             },
           }),
@@ -120,8 +114,8 @@ export function ProfileForm({
             variables: {
               user: {
                 userId,
-                departmentId: data.departmentId || null,
-                positionId: data.positionId || null,
+                departmentId: data.departmentId || "",
+                positionId: data.positionId || "",
               },
             },
           }),
@@ -129,8 +123,9 @@ export function ProfileForm({
       }
 
       const results = await Promise.all(operations);
-      if (results.some((result) => result.error)) {
-        throw new Error("Partial update — some fields failed");
+      const failed = results.find((result) => result.error);
+      if (failed) {
+        throw new Error(failed.error?.message || "Partial update — some fields failed");
       }
 
       const dept = departments.find((d) => d.id === data.departmentId);
@@ -145,8 +140,8 @@ export function ProfileForm({
 
       toast.success("Profile updated successfully");
       reset(data);
-    } catch {
-      toast.error("Failed to update profile");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to update profile");
     }
   };
 
@@ -158,7 +153,7 @@ export function ProfileForm({
   const fieldLabelClasses =
     "absolute -top-2.5 left-3 bg-background px-1 text-xs text-foreground transition-colors group-focus-within:text-primary";
   const fieldInputClasses =
-    "border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none h-full w-full";
+    "border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none h-full w-full disabled:bg-transparent dark:disabled:bg-transparent";
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
@@ -180,6 +175,9 @@ export function ProfileForm({
               )}
             />
           </div>
+          {errors.first_name?.message && (
+            <p className="mt-1 text-sm text-destructive">{errors.first_name.message}</p>
+          )}
         </div>
         <div className="relative">
           <div className={fieldGroupClasses}>
@@ -198,6 +196,9 @@ export function ProfileForm({
               )}
             />
           </div>
+          {errors.last_name?.message && (
+            <p className="mt-1 text-sm text-destructive">{errors.last_name.message}</p>
+          )}
         </div>
       </div>
 
@@ -280,7 +281,7 @@ export function ProfileForm({
               disabled={!isDirty || isSubmitting}
               className="w-full uppercase"
             >
-              {isSubmitting ? t("common.loading") : t("buttons.save")}
+              {isSubmitting ? t("common.loading") : t("buttons.update")}
             </Button>
           </div>
         </div>

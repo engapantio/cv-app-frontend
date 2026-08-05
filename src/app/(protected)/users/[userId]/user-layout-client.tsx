@@ -2,6 +2,8 @@
 
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { useQuery } from "@apollo/client/react";
+import { UserDocument } from "@/gql/generated/graphql";
 import { UserProfileBreadcrumb } from "@/features/user-profile/ui/user-profile-breadcrumb";
 import { UserProfileTabs } from "@/features/user-profile/ui/user-profile-tabs";
 
@@ -19,6 +21,12 @@ export function UserLayoutClient({
   const pathname = usePathname();
   const t = useTranslations();
 
+  const { data } = useQuery(UserDocument, {
+    variables: { userId },
+  });
+
+  const liveUserName = data?.user?.profile?.full_name ?? userName;
+
   const currentTab = pathname.split("/").pop() ?? "profile";
 
   const tabLabels: Record<(typeof TABS)[number], string> = {
@@ -31,7 +39,7 @@ export function UserLayoutClient({
   return (
     <div className="flex w-full flex-col">
       <UserProfileBreadcrumb
-        userName={userName}
+        userName={liveUserName}
         tabLabel={
           TABS.includes(currentTab as (typeof TABS)[number])
             ? tabLabels[currentTab as (typeof TABS)[number]]

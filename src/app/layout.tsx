@@ -3,6 +3,7 @@ import { Roboto } from "next/font/google";
 import { ApolloWrapper } from "@/lib/apollo/apollo-wrapper";
 import { ThemeProvider } from "next-themes";
 import { IntlProvider } from "@/components/providers/intl-provider";
+import { Toaster } from "@/components/ui";
 import "./globals.css";
 
 const roboto = Roboto({
@@ -31,6 +32,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <IntlProvider>
             <ApolloWrapper>{children}</ApolloWrapper>
           </IntlProvider>
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>

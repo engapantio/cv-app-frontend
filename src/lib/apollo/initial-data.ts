@@ -1,5 +1,7 @@
 import type { DocumentNode, ErrorPolicy } from "@apollo/client";
 import { createServerApolloClientForRequest } from "@/lib/apollo/server-client";
+import { SkillCategoriesDocument, SkillsDocument } from "@/gql/generated/graphql";
+import type { SkillsCatalogInitial } from "@/lib/skills/group-skills";
 
 interface ServerQueryOptions {
   errorPolicy?: ErrorPolicy;
@@ -96,6 +98,22 @@ interface FetchInitialRecordOptions<TQuery, TRecord> {
   errorPolicy?: ErrorPolicy;
   requireAuth?: boolean;
   notFoundMessage?: string;
+}
+
+export async function fetchSkillsCatalog(): Promise<SkillsCatalogInitial> {
+  try {
+    const { client } = await createServerApolloClientForRequest();
+    const [skillsRes, categoriesRes] = await Promise.all([
+      client.query({ query: SkillsDocument, fetchPolicy: "no-cache" }),
+      client.query({ query: SkillCategoriesDocument, fetchPolicy: "no-cache" }),
+    ]);
+    return {
+      skills: skillsRes.data?.skills ?? [],
+      categories: categoriesRes.data?.skillCategories ?? [],
+    };
+  } catch {
+    return { skills: [], categories: [] };
+  }
 }
 
 export async function fetchInitialRecord<TQuery, TRecord>({

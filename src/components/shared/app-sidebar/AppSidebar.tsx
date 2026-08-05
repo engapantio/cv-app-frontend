@@ -1,26 +1,7 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { useSyncExternalStore } from "react";
-import { cn, buildFullName } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Skeleton } from "@/components/ui/skeleton";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarMenu,
-  SidebarMenuButton,
-} from "@/components/ui/sidebar";
+import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   Users,
   Languages,
@@ -30,18 +11,19 @@ import {
   Building,
   Briefcase,
   Menu,
-  Globe,
   ChevronLeft,
-  Sun,
-  Moon,
 } from "lucide-react";
+import { buildFullName } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Sidebar, SidebarContent, SidebarFooter, SidebarMenu } from "@/components/ui/sidebar";
 import { Container } from "../container";
-import { useTheme } from "next-themes";
-import { useSession, logout } from "@/lib/auth/session";
+import { useSession } from "@/lib/auth/session";
 import { usePermissions } from "@/lib/auth/permissions";
-import { useTranslations } from "next-intl";
-import { locales } from "@/i18n/locales";
-import { useLocalePref, setLocale } from "@/lib/preferences/locale";
+import { ThemeToggle } from "./theme-toggle";
+import { LanguageSwitcher } from "./language-switcher";
+import { ProfileSection } from "./profile-section";
+import { MenuItem, type MenuItemData } from "./menu-item";
+
 interface AppSidebarProps {
   isSidebarOpen: boolean;
   setIsSidebarOpen: (open: boolean) => void;
@@ -64,220 +46,11 @@ const employeeMenuItems = [
   { href: "/cvs", labelKey: "nav.cvs", icon: FileUser },
 ];
 
-function ThemeToggle() {
-  const t = useTranslations();
-  const { resolvedTheme, setTheme } = useTheme();
-  const mounted = useSyncExternalStore(
-    () => () => {},
-    () => true,
-    () => false,
-  );
-  const isDark = resolvedTheme === "dark";
-
-  return (
-    <Button
-      variant="ghost"
-      size="icon"
-      onClick={() => setTheme(isDark ? "light" : "dark")}
-      aria-label={t("header.toggleTheme")}
-      className="rounded-full"
-    >
-      {!mounted ? (
-        <span className="h-5 w-5" />
-      ) : isDark ? (
-        <Sun className="h-5 w-5 text-icon" />
-      ) : (
-        <Moon className="h-5 w-5 text-icon" />
-      )}
-    </Button>
-  );
-}
-
 const isActivePath = (pathname: string, href: string): boolean => {
-  if (pathname === href || pathname === href + "/") {
-    return true;
-  }
-  if (href !== "/users" && pathname.startsWith(href + "/")) {
-    return true;
-  }
+  if (pathname === href || pathname === href + "/") return true;
+  if (href !== "/users" && pathname.startsWith(href + "/")) return true;
   return false;
 };
-
-function LanguageSwitcher() {
-  const t = useTranslations();
-  const locale = useLocalePref();
-
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger
-        render={<Button variant="ghost" size="icon" aria-label={t("header.selectLanguage")} />}
-      >
-        <Globe className="text-icon" />
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className={"flex justify-around"}>
-        {locales.map((lang) => (
-          <DropdownMenuItem
-            key={lang.code}
-            onClick={() => setLocale(lang.code)}
-            className={cn(
-              locale === lang.code && "bg-sidebar-accent",
-              "w-7 hover:bg-sidebar-accent",
-            )}
-          >
-            {lang.short}
-          </DropdownMenuItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-}
-
-function ProfileSection({
-  loading,
-  error,
-  fullName,
-  avatar,
-  initial,
-  compact = false,
-  showLanguageSwitcher = true,
-  userId,
-  menuSide = "bottom",
-}: {
-  loading: boolean;
-  error?: Error | null;
-  fullName: string;
-  avatar?: string | null;
-  initial: string;
-  compact?: boolean;
-  showLanguageSwitcher?: boolean;
-  userId?: string | null;
-  menuSide?: "top" | "bottom";
-}) {
-  const router = useRouter();
-  const t = useTranslations();
-
-  if (loading) {
-    return (
-      <div className="flex items-center gap-3">
-        <Skeleton className="h-10 w-10 rounded-full" />
-        {!compact && (
-          <div className="flex-1 space-y-2">
-            <Skeleton className="h-4 w-24" />
-            <Skeleton className="h-3 w-16" />
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  if (error) {
-    return <div className="text-sm text-destructive">Error loading profile</div>;
-  }
-
-  const content = (
-    <>
-      {compact && fullName && <h2>{fullName}</h2>}
-      <Avatar className="h-10 w-10">
-        <AvatarFallback>{initial}</AvatarFallback>
-        <AvatarImage src={avatar ?? undefined} />
-      </Avatar>
-      {!compact && <p className="text-sm font-medium truncate">{fullName}</p>}
-    </>
-  );
-
-  const handleLogout = async () => {
-    await logout();
-    router.push("/auth/login");
-  };
-
-  return (
-    <div className="flex items-center gap-3">
-      {showLanguageSwitcher && <LanguageSwitcher />}
-      {userId ? (
-        <DropdownMenu>
-          <DropdownMenuTrigger
-            render={
-              <button
-                type="button"
-                className="flex items-center gap-3 cursor-pointer outline-none"
-              />
-            }
-          >
-            {content}
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" side={menuSide} className="min-w-36">
-            <DropdownMenuItem
-              onClick={() => router.push(`/users/${userId}/profile`)}
-              className="justify-center cursor-pointer"
-            >
-              {t("profile.profile")}
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => router.push("/settings")}
-              className="justify-center cursor-pointer"
-            >
-              {t("profile.settings")}
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout} className="justify-center cursor-pointer">
-              {t("profile.logout")}
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      ) : (
-        content
-      )}
-    </div>
-  );
-}
-
-interface MenuItemData {
-  href: string;
-  labelKey: string;
-  icon: React.ComponentType<{ className?: string }>;
-  prefetch?: boolean;
-}
-
-function MenuItem({
-  item,
-  label,
-  isActive,
-  isMobile,
-  onClick,
-}: {
-  item: MenuItemData;
-  label: string;
-  isActive: boolean;
-  isMobile: boolean;
-  onClick: () => void;
-}) {
-  const baseClasses = cn(
-    "w-full text-icon",
-    isMobile ? "p-5 w-auto! shrink-0" : "py-8",
-    isActive &&
-      (isMobile
-        ? "bg-sidebar-accent rounded-full text-foreground"
-        : "bg-sidebar-accent rounded-r-full rounded-l-none text-foreground"),
-    !isMobile && "hover:rounded-r-full rounded-l-none",
-  );
-
-  return (
-    <SidebarMenuButton
-      className={baseClasses}
-      render={
-        <Link
-          href={item.href}
-          prefetch={item.prefetch ?? true}
-          onClick={onClick}
-          className="flex items-center gap-4 w-full h-full"
-        />
-      }
-    >
-      <item.icon className="h-4 w-4" />
-      <span>{label}</span>
-    </SidebarMenuButton>
-  );
-}
 
 export function AppSidebar({ isSidebarOpen, setIsSidebarOpen }: AppSidebarProps) {
   const pathname = usePathname();
@@ -297,10 +70,12 @@ export function AppSidebar({ isSidebarOpen, setIsSidebarOpen }: AppSidebarProps)
     "nav.languages": `/users/${userId}/languages`,
   };
 
-  const menuItems: MenuItemData[] = (isAdmin ? adminMenuItems : employeeMenuItems).map((item) => {
-    const personalHref = !isAdmin && userId ? employeePersonalLinks[item.labelKey] : undefined;
-    return personalHref ? { ...item, href: personalHref } : item;
-  });
+  const menuItems: MenuItemData[] = loading
+    ? []
+    : (isAdmin ? adminMenuItems : employeeMenuItems).map((item) => {
+        const personalHref = !isAdmin && userId ? employeePersonalLinks[item.labelKey] : undefined;
+        return personalHref ? { ...item, href: personalHref } : item;
+      });
 
   const renderMenuItems = (isMobile: boolean, showDivider = false) => {
     const items = menuItems.map((item) => (

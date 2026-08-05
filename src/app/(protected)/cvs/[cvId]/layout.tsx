@@ -19,9 +19,10 @@ export default async function CvLayout({
   });
 
   const cvName = initial?.name ?? null;
+  const cvUserId = initial?.user?.id ?? null;
 
   return (
-    <CvLayoutClient cvId={cvId} initialCvName={cvName}>
+    <CvLayoutClient cvId={cvId} initialCvName={cvName} cvUserId={cvUserId}>
       {children}
     </CvLayoutClient>
   );
