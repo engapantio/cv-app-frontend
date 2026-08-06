@@ -17,10 +17,9 @@ import type { SkillsCatalogInitial } from "@/lib/skills/group-skills";
 export function useUserSkillsPage(
   userId: string,
   initialUser: UserQuery["user"] | null = null,
-  isOwner = false,
   initialCatalog?: SkillsCatalogInitial,
 ) {
-  const { isAdmin } = usePermissions(userId);
+  const { canEdit: canMutate } = usePermissions(userId);
 
   const {
     data: userData,
@@ -33,7 +32,6 @@ export function useUserSkillsPage(
   });
 
   const user = userData?.user ?? initialUser;
-  const canMutate = isOwner || isAdmin;
 
   const profileSkills = useMemo(() => user?.profile?.skills ?? [], [user]);
 

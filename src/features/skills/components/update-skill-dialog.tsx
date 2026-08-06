@@ -80,7 +80,7 @@ export function UpdateSkillDialog({
   const inputClasses =
     "peer border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none h-12";
   const selectTriggerClasses =
-    "w-full border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none h-12 py-1 text-sm";
+    "w-full border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none data-[size=default]:h-12 py-1 text-sm";
 
   return (
     <Dialog open={!!target} onOpenChange={(open) => !open && onClose()}>

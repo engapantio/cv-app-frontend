@@ -62,25 +62,25 @@ export function UpdateSkillDialog({
         </DialogHeader>
         <div className="space-y-6 py-4">
           <div className="group relative rounded-none border border-border transition-colors">
-            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-foreground">
+            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)]">
               {t("fields.name")}
             </span>
             <Input
               value={skillName}
               readOnly
-              className="border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none opacity-60 h-12 py-1 text-lg"
+              className="border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none opacity-60 h-12 text-lg"
             />
             <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
           </div>
           <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
-            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-foreground transition-colors group-focus-within:text-primary">
+            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)] transition-colors group-focus-within:text-primary">
               {t("fields.mastery")}
             </span>
             <Select
               value={selectedMastery}
               onValueChange={(v) => v && setSelectedMastery(v as Mastery)}
             >
-              <SelectTrigger className="w-full border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none h-12 py-1 text-lg">
+              <SelectTrigger className="w-full border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none data-[size=default]:h-12 text-lg">
                 <SelectValue placeholder={t("placeholders.selectMastery")} />
               </SelectTrigger>
               <SelectContent>

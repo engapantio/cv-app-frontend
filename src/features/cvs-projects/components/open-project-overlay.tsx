@@ -25,7 +25,7 @@ export function OpenProjectOverlay({ open, onOpenChange, project }: OpenProjectO
         <div className="space-y-5">
           <div className="grid grid-cols-2 gap-4">
             <div className="group relative rounded-none border border-border">
-              <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground">
+              <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)]">
                 {t("fields.project")}
               </span>
               <Input
@@ -35,7 +35,7 @@ export function OpenProjectOverlay({ open, onOpenChange, project }: OpenProjectO
               />
             </div>
             <div className="group relative rounded-none border border-border">
-              <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground">
+              <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)]">
                 {t("fields.domain")}
               </span>
               <Input
@@ -47,7 +47,7 @@ export function OpenProjectOverlay({ open, onOpenChange, project }: OpenProjectO
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="group relative rounded-none border border-border">
-              <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground">
+              <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)]">
                 {t("fields.startDate")}
               </span>
               <Input
@@ -57,7 +57,7 @@ export function OpenProjectOverlay({ open, onOpenChange, project }: OpenProjectO
               />
             </div>
             <div className="group relative rounded-none border border-border">
-              <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground">
+              <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)]">
                 {t("fields.endDate")}
               </span>
               <Input
@@ -68,17 +68,17 @@ export function OpenProjectOverlay({ open, onOpenChange, project }: OpenProjectO
             </div>
           </div>
           <div className="group relative rounded-none border border-border">
-            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground">
+            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)]">
               {t("fields.description")}
             </span>
             <textarea
               value={project.description}
               readOnly
-              className="flex w-full bg-card px-4 pt-6 pb-3 text-sm focus-visible:outline-none border-0 min-h-[100px] resize-none"
+              className="flex w-full bg-card px-4 pt-6 pb-3 text-sm focus-visible:outline-none border-0 min-h-25 resize-none"
             />
           </div>
           <div className="group relative rounded-none border border-border">
-            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground">
+            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)]">
               {t("fields.environment")}
             </span>
             <div className="flex flex-wrap gap-2 px-4 py-3 min-h-12">
@@ -88,13 +88,13 @@ export function OpenProjectOverlay({ open, onOpenChange, project }: OpenProjectO
             </div>
           </div>
           <div className="group relative rounded-none border border-border">
-            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground">
+            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)]">
               {t("fields.rolesAndResponsibilities")}
             </span>
             <textarea
               value={[...project.roles, ...project.responsibilities].join("\n")}
               readOnly
-              className="flex w-full bg-card px-4 pt-6 pb-3 text-sm focus-visible:outline-none border-0 min-h-[100px] resize-none"
+              className="flex w-full bg-card px-4 pt-6 pb-3 text-sm focus-visible:outline-none border-0 min-h-25 resize-none"
             />
           </div>
         </div>

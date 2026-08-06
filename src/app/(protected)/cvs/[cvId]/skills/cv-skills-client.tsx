@@ -23,13 +23,11 @@ export function CvSkillsClient({
   cvId,
   initialCv,
   serverError,
-  isOwner,
   skillsCatalog,
 }: {
   cvId: string;
   initialCv: CvQuery["cv"] | null;
   serverError?: string | null;
-  isOwner: boolean;
   skillsCatalog: SkillsCatalogInitial;
 }) {
   const t = useTranslations();
@@ -54,7 +52,7 @@ export function CvSkillsClient({
     addingSkill,
     updatingSkill,
     deletingSkill,
-  } = useCvSkillsPage(cvId, initialCv, isOwner, skillsCatalog);
+  } = useCvSkillsPage(cvId, initialCv, skillsCatalog);
 
   if (loading) {
     return <div className="text-center text-muted-foreground py-8">{t("common.loading")}</div>;

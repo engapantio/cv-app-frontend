@@ -151,7 +151,7 @@ export function ProfileForm({
   const fieldGroupClasses =
     "group relative rounded-none border border-border transition-colors focus-within:border-primary h-12";
   const fieldLabelClasses =
-    "absolute -top-2.5 left-3 bg-background px-1 text-xs text-foreground transition-colors group-focus-within:text-primary";
+    "absolute -top-2.5 left-3 bg-background px-1 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)] transition-colors group-focus-within:text-primary";
   const fieldInputClasses =
     "border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none h-full w-full disabled:bg-transparent dark:disabled:bg-transparent";
 

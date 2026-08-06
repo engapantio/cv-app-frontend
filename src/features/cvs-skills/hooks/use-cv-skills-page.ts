@@ -17,7 +17,6 @@ import type { SkillsCatalogInitial } from "@/lib/skills/group-skills";
 export function useCvSkillsPage(
   cvId: string,
   initialCv: CvQuery["cv"] | null = null,
-  isOwner = false,
   initialCatalog?: SkillsCatalogInitial,
 ) {
   const {
@@ -32,8 +31,7 @@ export function useCvSkillsPage(
 
   const cv = cvData?.cv ?? initialCv;
   const cvUserId = cv?.user?.id;
-  const { isAdmin } = usePermissions(cvUserId);
-  const canMutate = isOwner || isAdmin;
+  const { canEdit: canMutate } = usePermissions(cvUserId);
 
   const cvSkills = useMemo(() => cv?.skills ?? [], [cv]);
 

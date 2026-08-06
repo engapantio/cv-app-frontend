@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
 import { createServerApolloClientForRequest } from "@/lib/apollo/server-client";
-import { getServerUserId } from "@/lib/auth/cookies";
 import { UserDocument } from "@/gql/generated/graphql";
 import { fetchSkillsCatalog } from "@/lib/apollo/initial-data";
 import { UserSkillsClient } from "./user-skills-client";
@@ -24,18 +23,7 @@ export default async function UserSkillsPage({ params }: SkillsPageProps) {
   const user = data?.user;
   if (!user) return notFound();
 
-  const [currentUserId, skillsCatalog] = await Promise.all([
-    getServerUserId(),
-    fetchSkillsCatalog(),
-  ]);
-  const isOwner = currentUserId === userId;
+  const skillsCatalog = await fetchSkillsCatalog();
 
-  return (
-    <UserSkillsClient
-      userId={userId}
-      initialUser={user}
-      isOwner={isOwner}
-      skillsCatalog={skillsCatalog}
-    />
-  );
+  return <UserSkillsClient userId={userId} initialUser={user} skillsCatalog={skillsCatalog} />;
 }

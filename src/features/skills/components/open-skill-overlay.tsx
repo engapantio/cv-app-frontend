@@ -23,26 +23,26 @@ export function OpenSkillOverlay({ target, onClose }: OpenSkillOverlayProps) {
         {target && (
           <div className="space-y-6 py-4">
             <div className="group relative rounded-none border border-border transition-colors">
-              <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-foreground">
+              <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)]">
                 {t("fields.name")}
               </span>
-              <div className="h-12 py-1 px-3 flex items-center text-base text-foreground">
+              <div className="h-12 px-3 flex items-center text-base text-foreground">
                 {target.name}
               </div>
             </div>
             <div className="group relative rounded-none border border-border transition-colors">
-              <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-foreground">
+              <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)]">
                 {t("fields.type")}
               </span>
-              <div className="h-12 py-1 px-3 flex items-center text-base text-foreground">
+              <div className="h-12 px-3 flex items-center text-base text-foreground">
                 {target.category_parent_name ?? "—"}
               </div>
             </div>
             <div className="group relative rounded-none border border-border transition-colors">
-              <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-foreground">
+              <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)]">
                 {t("fields.category")}
               </span>
-              <div className="h-12 py-1 px-3 flex items-center text-base text-foreground">
+              <div className="h-12 px-3 flex items-center text-base text-foreground">
                 {target.category_name ?? "—"}
               </div>
             </div>

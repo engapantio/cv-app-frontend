@@ -35,10 +35,9 @@ type Language = NonNullable<User["profile"]["languages"]>[number];
 interface UserLanguagesClientProps {
   userId: string;
   initialUser: User | null;
-  isOwner: boolean;
 }
 
-export function UserLanguagesClient({ userId, initialUser, isOwner }: UserLanguagesClientProps) {
+export function UserLanguagesClient({ userId, initialUser }: UserLanguagesClientProps) {
   const t = useTranslations();
   const { data, loading: dataLoading } = useQuery(UserDocument, {
     variables: { userId },
@@ -73,8 +72,7 @@ export function UserLanguagesClient({ userId, initialUser, isOwner }: UserLangua
     (lang) => !languages.some((ul) => ul.name === lang.name),
   );
 
-  const { isAdmin } = usePermissions(userId);
-  const canEdit = isOwner || isAdmin;
+  const { canEdit } = usePermissions(userId);
 
   const handleAddLanguage = async (languageName: string, proficiency: Proficiency) => {
     await addLanguage({
