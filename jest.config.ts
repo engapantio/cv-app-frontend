@@ -19,7 +19,22 @@ const config: Config = {
     "\\.(gif|ttf|eot|svg|png|jpg|jpeg|webp|avif)$": "<rootDir>/test/__mocks__/fileMock.ts",
   },
 
-  testPathIgnorePatterns: ["<rootDir>/.next/", "<rootDir>/node_modules/", "<rootDir>/coverage/"],
+  testPathIgnorePatterns: [
+    "<rootDir>/.next/",
+    "<rootDir>/node_modules/",
+    "<rootDir>/coverage/",
+    "<rooDir>/src/messages",
+    "<rootDir>/src/components/ui",
+  ],
+
+  coverageThreshold: {
+    global: {
+      statements: 18,
+      branches: 18,
+      functions: 18,
+      lines: 18,
+    },
+  },
 
   collectCoverageFrom: [
     "src/**/*.{ts,tsx}",
