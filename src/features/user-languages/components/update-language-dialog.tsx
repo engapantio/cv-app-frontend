@@ -69,22 +69,22 @@ export function UpdateLanguageDialog({
         </DialogHeader>
         <div className="space-y-6 py-4">
           <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
-            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-foreground transition-colors group-focus-within:text-primary">
+            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)] transition-colors group-focus-within:text-primary">
               {t("fields.name")}
             </span>
-            <div className="w-full border-0 bg-transparent px-3 h-12 py-1 text-lg text-muted-foreground flex items-center">
+            <div className="w-full border-0 bg-transparent px-3 h-12 text-lg text-muted-foreground flex items-center">
               {currentLanguage?.name || ""}
             </div>
           </div>
           <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
-            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-foreground transition-colors group-focus-within:text-primary">
+            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)] transition-colors group-focus-within:text-primary">
               {t("fields.proficiency")}
             </span>
             <Select
               value={selectedProficiency}
               onValueChange={(v) => v && setSelectedProficiency(v as Proficiency)}
             >
-              <SelectTrigger className="w-full border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none h-12 py-1 text-lg">
+              <SelectTrigger className="w-full border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none data-[size=default]:h-12 text-lg">
                 <SelectValue placeholder={t("placeholders.selectProficiency")} />
               </SelectTrigger>
               <SelectContent>

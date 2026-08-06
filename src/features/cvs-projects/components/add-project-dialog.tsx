@@ -149,7 +149,7 @@ export function AddProjectDialog({
               </Select>
             </FloatingField>
             <div className="group relative rounded-none border border-border">
-              <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground">
+              <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)]">
                 {t("fields.domain")}
               </span>
               <Input
@@ -165,7 +165,7 @@ export function AddProjectDialog({
                 className={cn(
                   "absolute left-3 bg-background px-1 text-xs transition-all duration-200 pointer-events-none z-10",
                   startDate || startDateOpen
-                    ? "-top-2.5 translate-y-0 text-xs text-foreground group-focus-within:text-primary"
+                    ? "-top-2.5 translate-y-0 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)] group-focus-within:text-primary"
                     : "top-1/2 -translate-y-1/2 text-sm text-muted-foreground",
                 )}
               >
@@ -200,7 +200,7 @@ export function AddProjectDialog({
                 className={cn(
                   "absolute left-3 bg-background px-1 text-xs transition-all duration-200 pointer-events-none z-10",
                   endDate || endDateOpen
-                    ? "-top-2.5 translate-y-0 text-xs text-foreground group-focus-within:text-primary"
+                    ? "-top-2.5 translate-y-0 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)] group-focus-within:text-primary"
                     : "top-1/2 -translate-y-1/2 text-sm text-muted-foreground",
                 )}
               >
@@ -232,17 +232,17 @@ export function AddProjectDialog({
             </div>
           </div>
           <div className="group relative rounded-none border border-border">
-            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground">
+            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)]">
               {t("fields.description")}
             </span>
             <Textarea
               value={selectedProject?.description ?? ""}
               readOnly
-              className="border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none min-h-[80px] resize-none"
+              className="border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none min-h-25 resize-none"
             />
           </div>
           <div className="group relative rounded-none border border-border">
-            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground">
+            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)]">
               {t("fields.environment")}
             </span>
             <div className="flex flex-wrap gap-2 px-4 py-3 min-h-12">
@@ -254,14 +254,14 @@ export function AddProjectDialog({
             </div>
           </div>
           <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
-            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-foreground transition-colors group-focus-within:text-primary z-10">
+            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)] transition-colors group-focus-within:text-primary z-10">
               {t("fields.rolesAndResponsibilities")}
             </span>
             <Textarea
               value={rolesInput}
               onChange={(e) => setRolesInput(e.target.value)}
               placeholder={t("placeholders.rolesAndResponsibilities")}
-              className="border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none min-h-[100px] resize-none pt-6 placeholder:text-muted-foreground dark:placeholder:text-muted-foreground"
+              className="border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none min-h-25 resize-none pt-6 placeholder:text-muted-foreground dark:placeholder:text-muted-foreground"
             />
           </div>
         </div>

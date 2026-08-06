@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useQuery } from "@apollo/client/react";
 import { UserDocument, UserQuery } from "@/gql/generated/graphql";
 import { AvatarUpload } from "./avatar-upload";
 import { ProfileForm } from "./profile-form";
-import { useSession } from "@/lib/auth/session";
+import { usePermissions } from "@/lib/auth/permissions";
 import { VerifiedBadge } from "@/components/shared";
 import { useTranslations } from "next-intl";
 
@@ -13,21 +13,11 @@ type User = NonNullable<UserQuery["user"]>;
 
 interface UserProfileClientProps {
   user: User;
-  isOwner: boolean;
 }
 
-export function UserProfileClient({ user, isOwner }: UserProfileClientProps) {
+export function UserProfileClient({ user }: UserProfileClientProps) {
   const t = useTranslations();
-  const { user: currentUser } = useSession();
-  const isAdmin = currentUser?.role === "Admin";
-  const [canEdit, setCanEdit] = useState(isOwner);
-
-  useEffect(() => {
-    if (isAdmin) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setCanEdit(true);
-    }
-  }, [isAdmin]);
+  const { canEdit } = usePermissions(user.id);
 
   const { data } = useQuery(UserDocument, {
     variables: { userId: user.id },

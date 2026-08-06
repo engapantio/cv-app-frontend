@@ -145,7 +145,7 @@ function UpdateProjectForm({
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
-            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-foreground transition-colors group-focus-within:text-primary z-10">
+            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)] transition-colors group-focus-within:text-primary z-10">
               {t("fields.startDate")}
             </span>
             <Popover open={startDateOpen} onOpenChange={setStartDateOpen}>
@@ -173,7 +173,7 @@ function UpdateProjectForm({
             </Popover>
           </div>
           <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
-            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-foreground transition-colors group-focus-within:text-primary z-10">
+            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)] transition-colors group-focus-within:text-primary z-10">
               {t("fields.endDate")}
             </span>
             <Popover open={endDateOpen} onOpenChange={setEndDateOpen}>
@@ -206,11 +206,11 @@ function UpdateProjectForm({
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder=" "
-            className="peer border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none min-h-20 resize-none pt-6 px-4"
+            className="peer border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none min-h-25 resize-none pt-6 px-4"
           />
         </FloatingField>
         <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
-          <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-foreground transition-colors group-focus-within:text-primary z-10">
+          <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)] transition-colors group-focus-within:text-primary z-10">
             {t("fields.environment")}
           </span>
           <Popover open={envOpen} onOpenChange={setEnvOpen}>

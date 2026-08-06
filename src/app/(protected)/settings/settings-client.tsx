@@ -10,7 +10,7 @@ import { useLocalePref, setLocale } from "@/lib/preferences/locale";
 type AppearanceValue = "system" | "light" | "dark";
 
 const selectClassName =
-  "border-0 w-full bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none h-12 py-1 text-sm";
+  "border-0 w-full bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none data-[size=default]:h-12 py-1 text-sm";
 
 export default function SettingsClient() {
   const t = useTranslations();

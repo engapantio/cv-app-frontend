@@ -66,12 +66,12 @@ export function AddSkillDialog({
         </DialogHeader>
         <div className="space-y-6 py-4">
           <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
-            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-foreground transition-colors group-focus-within:text-primary">
+            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)] transition-colors group-focus-within:text-primary">
               {t("fields.name")}
             </span>
             <Select value={selectedSkill} onValueChange={(v) => setSelectedSkill(v)}>
               <SelectTrigger
-                className="w-full border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none h-12 py-1 text-lg"
+                className="w-full border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none data-[size=default]:h-12 py-1 text-lg"
                 disabled={availableSkills.length === 0}
               >
                 <SelectValue
@@ -92,14 +92,14 @@ export function AddSkillDialog({
             </Select>
           </div>
           <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
-            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-foreground transition-colors group-focus-within:text-primary">
+            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)] transition-colors group-focus-within:text-primary">
               {t("fields.mastery")}
             </span>
             <Select
               value={selectedMastery}
               onValueChange={(v) => v && setSelectedMastery(v as Mastery)}
             >
-              <SelectTrigger className="w-full border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none h-12 py-1 text-lg">
+              <SelectTrigger className="w-full border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none data-[size=default]:h-12 py-1 text-lg">
                 <SelectValue placeholder={t("placeholders.selectMastery")} />
               </SelectTrigger>
               <SelectContent>

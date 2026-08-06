@@ -132,7 +132,7 @@ export function CreateProjectDialog({
                 className={cn(
                   "absolute left-3 bg-background px-1 text-xs transition-all duration-200 pointer-events-none z-10",
                   startDate || startDateOpen
-                    ? "-top-2.5 translate-y-0 text-xs text-foreground group-focus-within:text-primary"
+                    ? "-top-2.5 translate-y-0 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)] group-focus-within:text-primary"
                     : "top-1/2 -translate-y-1/2 text-sm text-muted-foreground",
                 )}
               >
@@ -167,7 +167,7 @@ export function CreateProjectDialog({
                 className={cn(
                   "absolute left-3 bg-background px-1 text-xs transition-all duration-200 pointer-events-none z-10",
                   endDate || endDateOpen
-                    ? "-top-2.5 translate-y-0 text-xs text-foreground group-focus-within:text-primary"
+                    ? "-top-2.5 translate-y-0 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)] group-focus-within:text-primary"
                     : "top-1/2 -translate-y-1/2 text-sm text-muted-foreground",
                 )}
               >
@@ -203,7 +203,7 @@ export function CreateProjectDialog({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder=" "
-              className="peer flex w-full bg-transparent px-4 pt-6 pb-3 text-sm focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 border-0 min-h-30 resize-none"
+              className="peer flex w-full bg-transparent px-4 pt-6 pb-3 text-sm focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 border-0 min-h-25 resize-none"
             />
           </FloatingField>
           <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
@@ -211,7 +211,7 @@ export function CreateProjectDialog({
               className={cn(
                 "absolute left-3 bg-background px-1 text-xs transition-all duration-200 pointer-events-none z-10",
                 selectedEnv.length > 0 || envOpen
-                  ? "-top-2.5 translate-y-0 text-xs text-foreground group-focus-within:text-primary"
+                  ? "-top-2.5 translate-y-0 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)] group-focus-within:text-primary"
                   : "top-1/2 -translate-y-1/2 text-sm text-muted-foreground",
               )}
             >

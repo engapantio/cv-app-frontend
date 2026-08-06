@@ -17,7 +17,7 @@ type CreateCvFormData = {
 };
 
 const inputClasses =
-  "peer border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none py-3";
+  "peer border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none h-12 py-3";
 
 export function CreateCvDialog({
   open,
@@ -123,7 +123,7 @@ export function CreateCvDialog({
                 {...register("description")}
                 placeholder=" "
                 disabled={isSubmitting}
-                className="peer flex w-full bg-background px-4 pt-6 pb-3 text-sm focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 border-0 min-h-30 resize-none disabled:opacity-50 disabled:cursor-not-allowed"
+                className="peer flex w-full bg-background px-4 pt-6 pb-3 text-sm focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 border-0 min-h-25 resize-none disabled:opacity-50 disabled:cursor-not-allowed"
               />
             </FloatingField>
           </div>
