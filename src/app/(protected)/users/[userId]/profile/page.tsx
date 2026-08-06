@@ -29,6 +29,12 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
   }
 
   const isOwner = currentUserId === userId;
+  const avatar = user.profile?.avatar ?? null;
 
-  return <UserProfileClient user={user} isOwner={isOwner} />;
+  return (
+    <>
+      {avatar && <link rel="preload" as="image" href={avatar} />}
+      <UserProfileClient user={user} isOwner={isOwner} />
+    </>
+  );
 }

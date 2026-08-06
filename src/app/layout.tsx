@@ -4,6 +4,7 @@ import { ApolloWrapper } from "@/lib/apollo/apollo-wrapper";
 import { ThemeProvider } from "next-themes";
 import { IntlProvider } from "@/components/providers/intl-provider";
 import { Toaster } from "@/components/ui";
+import { getServerLocale } from "@/lib/preferences/server-locale";
 import "./globals.css";
 
 const roboto = Roboto({
@@ -19,9 +20,11 @@ export const metadata: Metadata = {
   description: "Curriculum Vitae management application",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const locale = await getServerLocale();
+
   return (
-    <html lang="en" suppressHydrationWarning className={roboto.variable}>
+    <html lang={locale} suppressHydrationWarning className={roboto.variable}>
       <body>
         <ThemeProvider
           attribute="class"
@@ -29,7 +32,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           enableSystem
           disableTransitionOnChange
         >
-          <IntlProvider>
+          <IntlProvider initialLocale={locale}>
             <ApolloWrapper>{children}</ApolloWrapper>
           </IntlProvider>
           <Toaster />
