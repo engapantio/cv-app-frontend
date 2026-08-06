@@ -13,8 +13,9 @@ import {
   Menu,
   ChevronLeft,
 } from "lucide-react";
-import { buildFullName } from "@/lib/utils";
+import { buildFullName, cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Sidebar, SidebarContent, SidebarFooter, SidebarMenu } from "@/components/ui/sidebar";
 import { Container } from "../container";
 import { useSession } from "@/lib/auth/session";
@@ -70,14 +71,27 @@ export function AppSidebar({ isSidebarOpen, setIsSidebarOpen }: AppSidebarProps)
     "nav.languages": `/users/${userId}/languages`,
   };
 
-  const menuItems: MenuItemData[] = loading
-    ? []
-    : (isAdmin ? adminMenuItems : employeeMenuItems).map((item) => {
-        const personalHref = !isAdmin && userId ? employeePersonalLinks[item.labelKey] : undefined;
-        return personalHref ? { ...item, href: personalHref } : item;
-      });
+  const menuItems: MenuItemData[] = (isAdmin ? adminMenuItems : employeeMenuItems).map((item) => {
+    const personalHref = !isAdmin && userId ? employeePersonalLinks[item.labelKey] : undefined;
+    return personalHref ? { ...item, href: personalHref } : item;
+  });
+
+  const renderMenuSkeleton = (isMobile: boolean) => {
+    const count = isMobile ? 4 : menuItems.length;
+    return Array.from({ length: count }).map((_, i) => (
+      <div
+        key={`skeleton-${i}`}
+        className={cn("flex items-center gap-4 w-full", isMobile ? "p-5 w-auto! shrink-0" : "py-8")}
+      >
+        <Skeleton className="h-4 w-4 rounded-md" />
+        {!isMobile && <Skeleton className="h-4 w-24" />}
+      </div>
+    ));
+  };
 
   const renderMenuItems = (isMobile: boolean, showDivider = false) => {
+    if (loading) return renderMenuSkeleton(isMobile);
+
     const items = menuItems.map((item) => (
       <MenuItem
         key={item.href}

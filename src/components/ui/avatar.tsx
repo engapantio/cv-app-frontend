@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import { useState, type ComponentProps, type ImgHTMLAttributes } from "react";
 import { Avatar as AvatarPrimitive } from "@base-ui/react/avatar";
 
 import { cn } from "@/lib/utils";
@@ -25,22 +25,53 @@ function Avatar({
   );
 }
 
-function AvatarImage({ className, ...props }: AvatarPrimitive.Image.Props) {
+function AvatarImage({ className, src, alt = "", ...props }: ImgHTMLAttributes<HTMLImageElement>) {
+  const [resolvedSrc, setResolvedSrc] = useState(src);
+  const [status, setStatus] = useState<"loading" | "loaded" | "error">(src ? "loading" : "error");
+
+  if (resolvedSrc !== src) {
+    setResolvedSrc(src);
+    setStatus(src ? "loading" : "error");
+  }
+
+  if (status === "error") return null;
+
   return (
-    <AvatarPrimitive.Image
-      data-slot="avatar-image"
-      className={cn("aspect-square size-full rounded-full object-cover", className)}
-      {...props}
-    />
+    <>
+      <span
+        aria-hidden
+        className="absolute inset-0 z-10 size-full rounded-full"
+        style={{ backgroundColor: "var(--avatar-bg)" }}
+      />
+      {/* eslint-disable-next-line @next/next/no-img-element -- avatars may be base64 data URIs or arbitrary-host URLs and can arrive asynchronously, so next/image optimization does not apply */}
+      <img
+        src={src}
+        alt={alt}
+        data-slot="avatar-image"
+        ref={(node) => {
+          if (node?.complete) {
+            setStatus(node.naturalWidth > 0 ? "loaded" : "error");
+          }
+        }}
+        className={cn(
+          "absolute inset-0 z-10 size-full rounded-full object-cover transition-opacity",
+          status === "loading" && "opacity-0",
+          className,
+        )}
+        onLoad={() => setStatus("loaded")}
+        onError={() => setStatus("error")}
+        {...props}
+      />
+    </>
   );
 }
 
-function AvatarFallback({ className, ...props }: AvatarPrimitive.Fallback.Props) {
+function AvatarFallback({ className, ...props }: ComponentProps<"span">) {
   return (
-    <AvatarPrimitive.Fallback
+    <span
       data-slot="avatar-fallback"
       className={cn(
-        "flex size-full items-center justify-center rounded-full text-sm text-[var(--avatar-letter)] group-data-[size=sm]/avatar:text-xs group-data-[size=xl]/avatar:text-4xl",
+        "absolute inset-0 flex size-full items-center justify-center rounded-full text-sm text-[var(--avatar-letter)] group-data-[size=sm]/avatar:text-xs group-data-[size=xl]/avatar:text-4xl",
         className,
       )}
       style={{ backgroundColor: "var(--avatar-bg)" }}
@@ -49,7 +80,7 @@ function AvatarFallback({ className, ...props }: AvatarPrimitive.Fallback.Props)
   );
 }
 
-function AvatarBadge({ className, ...props }: React.ComponentProps<"span">) {
+function AvatarBadge({ className, ...props }: ComponentProps<"span">) {
   return (
     <span
       data-slot="avatar-badge"
@@ -66,7 +97,7 @@ function AvatarBadge({ className, ...props }: React.ComponentProps<"span">) {
   );
 }
 
-function AvatarGroup({ className, ...props }: React.ComponentProps<"div">) {
+function AvatarGroup({ className, ...props }: ComponentProps<"div">) {
   return (
     <div
       data-slot="avatar-group"
@@ -79,7 +110,7 @@ function AvatarGroup({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
-function AvatarGroupCount({ className, ...props }: React.ComponentProps<"div">) {
+function AvatarGroupCount({ className, ...props }: ComponentProps<"div">) {
   return (
     <div
       data-slot="avatar-group-count"

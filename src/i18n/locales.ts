@@ -9,6 +9,8 @@ export type LocaleCode = (typeof locales)[number]["code"];
 
 export const defaultLocale: LocaleCode = "en";
 
+export const LOCALE_COOKIE = "cv_locale";
+
 export function isLocale(value: unknown): value is LocaleCode {
   return typeof value === "string" && locales.some((locale) => locale.code === value);
 }

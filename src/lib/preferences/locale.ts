@@ -1,7 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import { defaultLocale, isLocale, type LocaleCode } from "@/i18n/locales";
+import { defaultLocale, isLocale, LOCALE_COOKIE, type LocaleCode } from "@/i18n/locales";
 
 const STORAGE_KEY = "cv_locale";
 
@@ -34,13 +34,14 @@ export function setLocale(locale: LocaleCode) {
   currentLocale = locale;
   try {
     window.localStorage.setItem(STORAGE_KEY, locale);
+    document.cookie = `${LOCALE_COOKIE}=${locale};path=/;max-age=31536000;samesite=lax`;
   } catch {
     // persist best-effort
   }
   emit();
 }
 
-function subscribe(callback: () => void) {
+export function subscribe(callback: () => void) {
   listeners.add(callback);
   return () => {
     listeners.delete(callback);
@@ -49,6 +50,13 @@ function subscribe(callback: () => void) {
 
 if (typeof window !== "undefined") {
   currentLocale = loadStoredLocale();
+  if (currentLocale !== defaultLocale) {
+    try {
+      document.cookie = `${LOCALE_COOKIE}=${currentLocale};path=/;max-age=31536000;samesite=lax`;
+    } catch {
+      // persist best-effort
+    }
+  }
 }
 
 export function useLocalePref(): LocaleCode {

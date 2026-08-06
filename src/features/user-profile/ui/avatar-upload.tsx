@@ -90,8 +90,8 @@ export function AvatarUpload({ userId, currentAvatar, fullName, isOwner }: Avata
     <div className="flex items-center gap-10">
       <div className=" relative group">
         <Avatar className="size-30 cursor-pointer" onClick={isOwner ? triggerFileInput : undefined}>
-          <AvatarImage src={currentAvatar || undefined} />
           <AvatarFallback className="text-3xl">{initial}</AvatarFallback>
+          <AvatarImage src={currentAvatar || undefined} />
         </Avatar>
         {isOwner && (
           <div
