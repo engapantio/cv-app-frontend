@@ -88,7 +88,6 @@ export function PositionsTable({
           actionLabel={tButtons("createPosition")}
           onAction={() => setCreateOpen(true)}
           showAction={isAdmin}
-          actionClassName="hover:bg-transparent"
         />
 
         <div className="overflow-x-hidden">

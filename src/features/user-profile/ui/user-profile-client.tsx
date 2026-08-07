@@ -14,9 +14,10 @@ type User = NonNullable<UserQuery["user"]>;
 interface UserProfileClientProps {
   user: User;
   canEdit: boolean;
+  isSelf: boolean;
 }
 
-export function UserProfileClient({ user, canEdit }: UserProfileClientProps) {
+export function UserProfileClient({ user, canEdit, isSelf }: UserProfileClientProps) {
   const t = useTranslations();
 
   const { data } = useQuery(UserDocument, {
@@ -62,6 +63,7 @@ export function UserProfileClient({ user, canEdit }: UserProfileClientProps) {
           currentAvatar={avatar}
           fullName={fullName}
           isOwner={canEdit}
+          isSelf={isSelf}
         />
         <div className="flex flex-col items-center mb-16">
           <h2 className="mb-2 font-normal text-2xl">
@@ -88,6 +90,7 @@ export function UserProfileClient({ user, canEdit }: UserProfileClientProps) {
           userDepartmentName={userDepartmentName}
           userPositionName={userPositionName}
           isOwner={canEdit}
+          isSelf={isSelf}
         />
       </div>
     </div>

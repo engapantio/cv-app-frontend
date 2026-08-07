@@ -3,30 +3,33 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
+import { useTranslations } from "next-intl";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation } from "@apollo/client/react";
 import { CheckCircle2, Loader2 } from "lucide-react";
 import { VerifyMailDocument } from "@/gql/generated/graphql";
 import { markUserVerified, useSession } from "@/lib/auth/session";
+import { AuthField } from "@/components/auth/auth-field";
 import { AuthFormHeader } from "@/components/auth/auth-form-header";
 import { AuthFormRootError } from "@/components/auth/auth-form-root-error";
 import { AuthFormSubmitButton } from "@/components/auth/auth-form-submit-button";
-import { Input } from "@/components/ui/input";
 
-const verifyEmailSchema = z.object({
-  otp: z
-    .string()
-    .min(1, "Verification code is required")
-    .regex(/^[0-9]+$/, "Verification code must contain only digits"),
-});
+const verifyEmailSchema = (t: ReturnType<typeof useTranslations<"auth">>) =>
+  z.object({
+    otp: z
+      .string()
+      .min(1, t("validation.otpRequired"))
+      .regex(/^[0-9]+$/, t("validation.otpDigits")),
+  });
 
-type VerifyEmailFormData = z.infer<typeof verifyEmailSchema>;
+type VerifyEmailFormData = z.infer<ReturnType<typeof verifyEmailSchema>>;
 
 const REDIRECT_DELAY_MS = 1500;
 
-export function VerifyEmailForm() {
+export function VerifyEmailForm({ userId }: { userId?: string }) {
   const router = useRouter();
+  const t = useTranslations("auth");
   const [verified, setVerified] = useState(false);
   const [verifyMail] = useMutation(VerifyMailDocument);
   const { user } = useSession();
@@ -36,11 +39,12 @@ export function VerifyEmailForm() {
     setError,
     formState: { errors, isSubmitting },
   } = useForm<VerifyEmailFormData>({
-    resolver: zodResolver(verifyEmailSchema),
+    resolver: zodResolver(verifyEmailSchema(t)),
   });
 
   const continueIntoApp = () => {
-    router.replace(`/users/${user?.id ?? ""}/profile`);
+    const id = user?.id ?? userId;
+    router.replace(id ? `/users/${id}/profile` : "/users");
     router.refresh();
   };
 
@@ -52,7 +56,7 @@ export function VerifyEmailForm() {
       setTimeout(continueIntoApp, REDIRECT_DELAY_MS);
     } catch {
       setError("root", {
-        message: "Invalid verification code. Please check the code and try again.",
+        message: t("verify.failed"),
       });
     }
   };
@@ -62,10 +66,10 @@ export function VerifyEmailForm() {
       <div className="flex flex-col items-center text-center">
         <CheckCircle2 className="size-16 text-primary" />
         <h1 className="mt-6 text-[34px] font-normal leading-10.5 tracking-[0.25px] text-foreground">
-          Email verified
+          {t("verify.verifiedTitle")}
         </h1>
         <p className="mt-4 text-base leading-6 tracking-[0.15px] text-foreground">
-          Your account is now verified. Redirecting you to the app...
+          {t("verify.verifiedText")}
         </p>
         <Loader2 className="mt-8 size-5 animate-spin text-muted-foreground" />
       </div>
@@ -74,21 +78,17 @@ export function VerifyEmailForm() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <AuthFormHeader
-        title="Verify your email"
-        subtitle="Enter the code we sent to your email to verify your account"
-      />
+      <AuthFormHeader title={t("verify.title")} subtitle={t("verify.subtitle")} />
 
       <div className="space-y-5">
         <div className="relative">
-          <Input
+          <AuthField
             id="verify-email-otp"
+            label={t("verify.otpLabel")}
             type="text"
             inputMode="numeric"
             autoComplete="one-time-code"
-            placeholder="Verification code"
             disabled={isSubmitting}
-            className="rounded-none placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-primary"
             {...register("otp")}
           />
           {errors.otp && (
@@ -102,8 +102,8 @@ export function VerifyEmailForm() {
       <AuthFormRootError message={errors.root?.message} />
 
       <div className="mt-14 flex flex-col items-center gap-2">
-        <AuthFormSubmitButton loading={isSubmitting} loadingText="Verifying...">
-          Verify email
+        <AuthFormSubmitButton loading={isSubmitting} loadingText={t("verify.submitLoading")}>
+          {t("verify.submit")}
         </AuthFormSubmitButton>
 
         <button
@@ -112,7 +112,7 @@ export function VerifyEmailForm() {
           className="flex items-center gap-1.5 text-sm tracking-[0.4px] uppercase text-muted-foreground transition-colors hover:text-foreground"
         >
           <CheckCircle2 className="size-4" />
-          Skip for now
+          {t("verify.skip")}
         </button>
       </div>
     </form>

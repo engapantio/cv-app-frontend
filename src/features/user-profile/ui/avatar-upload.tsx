@@ -14,9 +14,16 @@ interface AvatarUploadProps {
   currentAvatar?: string | null;
   fullName: string;
   isOwner: boolean;
+  isSelf: boolean;
 }
 
-export function AvatarUpload({ userId, currentAvatar, fullName, isOwner }: AvatarUploadProps) {
+export function AvatarUpload({
+  userId,
+  currentAvatar,
+  fullName,
+  isOwner,
+  isSelf,
+}: AvatarUploadProps) {
   const t = useTranslations();
   const [uploadAvatar] = useMutation(UploadAvatarDocument, {
     refetchQueries: [{ query: UserDocument, variables: { userId } }],
@@ -58,7 +65,9 @@ export function AvatarUpload({ userId, currentAvatar, fullName, isOwner }: Avata
       if (uploadResult.error) {
         throw new Error(uploadResult.error.message);
       }
-      updateSessionProfile({ avatar: uploadResult.data?.uploadAvatar ?? null });
+      if (isSelf) {
+        updateSessionProfile({ avatar: uploadResult.data?.uploadAvatar ?? null });
+      }
       toast.success(t("common.avatarUploadedSuccess"));
     } catch {
       toast.error(t("common.avatarUploadFailed"));
@@ -75,7 +84,9 @@ export function AvatarUpload({ userId, currentAvatar, fullName, isOwner }: Avata
       if (deleteResult.error) {
         throw new Error(deleteResult.error.message);
       }
-      updateSessionProfile({ avatar: null });
+      if (isSelf) {
+        updateSessionProfile({ avatar: null });
+      }
       toast.success(t("common.avatarDeletedSuccess"));
     } catch {
       toast.error(t("common.avatarDeletedFailed"));

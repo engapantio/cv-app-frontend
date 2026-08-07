@@ -2,15 +2,18 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
-const TABS = [
-  { label: "Log in", href: "/auth/login" },
-  { label: "Sign up", href: "/auth/signup" },
-] as const;
-
 export function AuthTabsSwitcher() {
+  const t = useTranslations("auth.tabs");
   const pathname = usePathname();
+
+  const TABS = [
+    { label: t("login"), href: "/auth/login" },
+    { label: t("signup"), href: "/auth/signup" },
+  ] as const;
+
   const showTabs = TABS.some((tab) => tab.href === pathname);
 
   if (!showTabs) return null;

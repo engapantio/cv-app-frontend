@@ -100,7 +100,6 @@ export function LanguagesTable({
           actionLabel={tButtons("createLanguage")}
           onAction={() => setCreateOpen(true)}
           showAction={isAdmin}
-          actionClassName="hover:bg-transparent"
         />
 
         <div className="overflow-x-hidden">
