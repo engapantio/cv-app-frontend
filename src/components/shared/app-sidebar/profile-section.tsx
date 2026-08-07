@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { UserCircle2Icon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -18,6 +19,7 @@ interface ProfileSectionProps {
   loading: boolean;
   error?: Error | null;
   fullName: string;
+  email?: string | null;
   avatar?: string | null;
   initial: string;
   compact?: boolean;
@@ -30,6 +32,7 @@ export function ProfileSection({
   loading,
   error,
   fullName,
+  email,
   avatar,
   initial,
   compact = false,
@@ -58,14 +61,17 @@ export function ProfileSection({
     return <div className="text-sm text-destructive">Error loading profile</div>;
   }
 
+  const name = fullName || email || "";
   const content = (
     <>
-      {compact && fullName && <h2>{fullName}</h2>}
+      {compact && name && <h2>{name}</h2>}
       <Avatar className="h-10 w-10">
-        <AvatarFallback>{initial}</AvatarFallback>
+        <AvatarFallback>
+          {initial ? initial : <UserCircle2Icon className="size-6 text-[var(--avatar-letter)]" />}
+        </AvatarFallback>
         <AvatarImage src={avatar ?? undefined} />
       </Avatar>
-      {!compact && <p className="text-sm font-medium truncate">{fullName}</p>}
+      {!compact && <p className="text-sm font-medium truncate">{name}</p>}
     </>
   );
 

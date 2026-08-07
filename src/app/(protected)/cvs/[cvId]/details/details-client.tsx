@@ -10,6 +10,7 @@ import { UpdateCvDocument, type CvQuery } from "@/gql/generated/graphql";
 import { usePermissions } from "@/lib/auth/permissions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 
 type CvData = CvQuery["cv"];
@@ -145,7 +146,7 @@ function CvDetailsForm({ cv, cvId }: { cv: NonNullable<CvData>; cvId: string }) 
           <span className="absolute -top-2.5 left-3 bg-background px-1 text-xs text-muted-foreground dark:text-icon transition-colors group-focus-within:text-primary">
             {t("fields.description")}
           </span>
-          <textarea
+          <Textarea
             {...register("description")}
             readOnly={!canEdit}
             disabled={isSubmitting}

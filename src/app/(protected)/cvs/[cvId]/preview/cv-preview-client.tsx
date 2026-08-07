@@ -135,8 +135,8 @@ export function CvPreviewClient({
     li { font-size: 16px; }
     .grid { display: grid; }
     .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
-    .md\:grid-cols-\[260px_1fr\] { grid-template-columns: 260px 1fr; }
-    .min-\[1440px\]\:grid-cols-\[260px_592px\] { grid-template-columns: 260px 592px; }
+    .md\:grid-cols-\[284px_1fr\] { grid-template-columns: 284px 1fr; }
+    .min-\[1440px\]\:grid-cols-\[284px_568px\] { grid-template-columns: 284px 568px; }
     .gap-x-4 { column-gap: 1rem; }
     .gap-y-0 { row-gap: 0; }
     .gap-y-2 { row-gap: 0.5rem; }
@@ -243,7 +243,7 @@ export function CvPreviewClient({
             {fullName}
           </h1>
           {positionName && (
-            <p className="text-base mt-1" style={fgStyle}>
+            <p className="text-base mt-1 uppercase" style={fgStyle}>
               {positionName}
             </p>
           )}
@@ -252,7 +252,7 @@ export function CvPreviewClient({
           type="button"
           onClick={handleExportPdf}
           disabled={exporting}
-          className="shrink-0 h-10 px-4 rounded-full border text-sm font-medium uppercase tracking-[0.4px] bg-transparent cursor-pointer disabled:opacity-50"
+          className="shrink-0 h-10 px-4 rounded-full border text-sm font-medium uppercase tracking-[0.4px] bg-transparent hover:bg-muted cursor-pointer disabled:opacity-50"
           style={{
             borderColor: "rgba(198, 48, 49, 0.5)",
             color: "#c63031",
@@ -263,7 +263,7 @@ export function CvPreviewClient({
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-[260px_1fr] min-[1440px]:grid-cols-[260px_592px] gap-x-4 gap-y-0">
+      <div className="grid grid-cols-1 md:grid-cols-[284px_1fr] min-[1440px]:grid-cols-[284px_568px] gap-x-4 gap-y-0">
         <div className="space-y-6">
           <CvSection label={t("preview.education")}>
             <p className="text-base" style={fgStyle}>
@@ -281,9 +281,7 @@ export function CvPreviewClient({
         </div>
 
         <div className="md:border-l-2 pl-0 md:pl-8 pt-6 md:pt-0" style={{ borderColor: "#c63031" }}>
-          <CvSection
-            label={`${positionName || t("preview.professional")} with ${years ?? t("common.na")} ${t("preview.inYears").toLowerCase()}`}
-          >
+          <CvSection label={cv.name}>
             <p className="text-base leading-relaxed" style={fgStyle}>
               {cv.description}
             </p>

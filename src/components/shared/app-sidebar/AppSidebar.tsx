@@ -19,7 +19,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Sidebar, SidebarContent, SidebarFooter, SidebarMenu } from "@/components/ui/sidebar";
 import { Container } from "../container";
 import { useSession } from "@/lib/auth/session";
-import { usePermissions } from "@/lib/auth/permissions";
+import type { SessionUser } from "@/lib/auth/cookies";
 import { ThemeToggle } from "./theme-toggle";
 import { LanguageSwitcher } from "./language-switcher";
 import { ProfileSection } from "./profile-section";
@@ -28,6 +28,7 @@ import { MenuItem, type MenuItemData } from "./menu-item";
 interface AppSidebarProps {
   isSidebarOpen: boolean;
   setIsSidebarOpen: (open: boolean) => void;
+  initialUser?: SessionUser | null;
 }
 
 const adminMenuItems = [
@@ -53,16 +54,21 @@ const isActivePath = (pathname: string, href: string): boolean => {
   return false;
 };
 
-export function AppSidebar({ isSidebarOpen, setIsSidebarOpen }: AppSidebarProps) {
+export function AppSidebar({ isSidebarOpen, setIsSidebarOpen, initialUser }: AppSidebarProps) {
   const pathname = usePathname();
-  const { user, loading } = useSession();
-  const { isAdmin } = usePermissions();
+  const { user, loading: sessionLoading } = useSession();
   const t = useTranslations();
 
-  const userId = user?.id ?? null;
+  const userData = user ?? initialUser ?? null;
+  const loading = sessionLoading && !initialUser;
+  const isAdmin = userData?.role === "Admin";
+
+  const userId = userData?.id ?? null;
   const fullName =
-    user?.profile?.full_name || buildFullName(user?.profile?.first_name, user?.profile?.last_name);
-  const avatar = user?.profile?.avatar;
+    userData?.profile?.full_name ||
+    buildFullName(userData?.profile?.first_name, userData?.profile?.last_name);
+  const avatar = userData?.profile?.avatar;
+  const email = userData?.email ?? "";
   const initial = fullName ? fullName[0].toUpperCase() : "";
   const closeSidebar = () => setIsSidebarOpen(false);
 
@@ -137,6 +143,7 @@ export function AppSidebar({ isSidebarOpen, setIsSidebarOpen }: AppSidebarProps)
             <ProfileSection
               loading={loading}
               fullName={fullName}
+              email={email}
               avatar={avatar}
               initial={initial}
               compact
@@ -167,6 +174,7 @@ export function AppSidebar({ isSidebarOpen, setIsSidebarOpen }: AppSidebarProps)
           <ProfileSection
             loading={loading}
             fullName={fullName}
+            email={email}
             avatar={avatar}
             initial={initial}
             compact={false}
@@ -191,6 +199,7 @@ export function AppSidebar({ isSidebarOpen, setIsSidebarOpen }: AppSidebarProps)
         <ProfileSection
           loading={loading}
           fullName={fullName}
+          email={email}
           avatar={avatar}
           initial={initial}
           compact

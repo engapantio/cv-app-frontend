@@ -18,6 +18,7 @@ import {
   PopoverTrigger,
   PopoverContent,
   Calendar,
+  Textarea,
 } from "@/components/ui";
 
 interface CreateProjectDialogProps {
@@ -199,7 +200,7 @@ export function CreateProjectDialog({
             </div>
           </div>
           <FloatingField label={t("fields.description")} variant="textarea">
-            <textarea
+            <Textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder=" "

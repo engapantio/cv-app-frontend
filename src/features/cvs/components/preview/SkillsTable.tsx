@@ -36,7 +36,13 @@ export function SkillsTable({
 
   return (
     <div className="overflow-x-auto">
-      <table className="w-full" style={{ borderCollapse: "collapse" }}>
+      <table className="w-full" style={{ borderCollapse: "collapse", tableLayout: "fixed" }}>
+        <colgroup>
+          <col style={{ width: "22%" }} />
+          <col style={{ width: "48%" }} />
+          <col style={{ width: "15%" }} />
+          <col style={{ width: "15%" }} />
+        </colgroup>
         <thead>
           <tr>
             <th

@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { Button, Avatar, AvatarFallback, AvatarImage } from "@/components/ui";
-import { Camera, Trash2, Upload } from "lucide-react";
+import { Camera, Trash2, Upload, UserCircle2Icon } from "lucide-react";
 import { toast } from "sonner";
 import { UploadAvatarDocument, DeleteAvatarDocument, UserDocument } from "@/gql/generated/graphql";
 import { useMutation } from "@apollo/client/react";
@@ -84,13 +84,19 @@ export function AvatarUpload({ userId, currentAvatar, fullName, isOwner }: Avata
 
   const triggerFileInput = () => fileInputRef.current?.click();
 
-  const initial = fullName ? fullName[0].toUpperCase() : "?";
+  const initial = fullName ? fullName[0].toUpperCase() : "";
 
   return (
     <div className="flex items-center gap-10">
       <div className=" relative group">
         <Avatar className="size-30 cursor-pointer" onClick={isOwner ? triggerFileInput : undefined}>
-          <AvatarFallback className="text-3xl">{initial}</AvatarFallback>
+          <AvatarFallback className="text-3xl">
+            {initial ? (
+              initial
+            ) : (
+              <UserCircle2Icon className="size-12 text-[var(--avatar-letter)]" />
+            )}
+          </AvatarFallback>
           <AvatarImage src={currentAvatar || undefined} />
         </Avatar>
         {isOwner && (
