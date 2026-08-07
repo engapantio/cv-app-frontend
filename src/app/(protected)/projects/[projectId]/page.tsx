@@ -98,7 +98,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ projec
       <div className="max-w-2xl mx-auto space-y-5">
         <div className="grid grid-cols-2 gap-4">
           <div className="group relative rounded-none border border-border">
-            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)]">
+            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-icon">
               Project
             </span>
             <Input
@@ -108,7 +108,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ projec
             />
           </div>
           <div className="group relative rounded-none border border-border">
-            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)]">
+            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-icon">
               Internal name
             </span>
             <Input
@@ -120,7 +120,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ projec
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div className="group relative rounded-none border border-border">
-            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)]">
+            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-icon">
               Domain
             </span>
             <Input
@@ -130,7 +130,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ projec
             />
           </div>
           <div className="group relative rounded-none border border-border">
-            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)]">
+            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-icon">
               Start Date
             </span>
             <Input
@@ -140,7 +140,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ projec
             />
           </div>
           <div className="group relative rounded-none border border-border">
-            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)]">
+            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-icon">
               End Date
             </span>
             <Input
@@ -153,7 +153,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ projec
           </div>
         </div>
         <div className="group relative rounded-none border border-border">
-          <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)]">
+          <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-icon">
             Description
           </span>
           <textarea
@@ -163,7 +163,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ projec
           />
         </div>
         <div className="group relative rounded-none border border-border">
-          <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)]">
+          <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-icon">
             Environment
           </span>
           <div className="flex flex-wrap gap-2 px-4 py-3 min-h-12">
