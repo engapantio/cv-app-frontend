@@ -32,11 +32,12 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
   const sessionUser = await getServerSessionUser();
   const canEdit =
     sessionUser != null && (sessionUser.role === "Admin" || sessionUser.id === userId);
+  const isSelf = sessionUser?.id === userId;
 
   return (
     <>
       {avatar && <link rel="preload" as="image" href={avatar} />}
-      <UserProfileClient user={user} canEdit={canEdit} />
+      <UserProfileClient user={user} canEdit={canEdit} isSelf={isSelf} />
     </>
   );
 }

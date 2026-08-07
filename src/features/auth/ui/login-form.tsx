@@ -1,34 +1,40 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
 import { z } from "zod";
 import { setAuthenticatedSession } from "@/lib/auth/session";
 import { setTokens } from "@/lib/auth/token-store";
-import { PasswordField } from "@/components/auth/password-field";
+import { AuthField } from "@/components/auth/auth-field";
 import { AuthFormHeader } from "@/components/auth/auth-form-header";
 import { AuthFormRootError } from "@/components/auth/auth-form-root-error";
 import { AuthFormSubmitButton } from "@/components/auth/auth-form-submit-button";
-import { Input } from "@/components/ui/input";
+import { GlobalLoader } from "@/components/auth/global-loader";
 
-const loginSchema = z.object({
-  email: z.string().min(1, "Email is required").email("Invalid email format"),
-  password: z.string().min(1, "Password is required"),
-});
+const loginSchema = (t: ReturnType<typeof useTranslations<"auth">>) =>
+  z.object({
+    email: z.string().min(1, t("validation.emailRequired")).email(t("validation.emailInvalid")),
+    password: z.string().min(1, t("validation.passwordRequired")),
+  });
 
-type LoginFormData = z.infer<typeof loginSchema>;
+type LoginFormData = z.infer<ReturnType<typeof loginSchema>>;
 
 export function LoginForm() {
   const router = useRouter();
+  const t = useTranslations("auth");
+  const [redirecting, setRedirecting] = useState(false);
   const {
     register,
     handleSubmit,
     setError,
+    reset,
     formState: { errors, isSubmitting },
   } = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
+    resolver: zodResolver(loginSchema(t)),
   });
 
   const onSubmit = async (data: LoginFormData) => {
@@ -48,7 +54,9 @@ export function LoginForm() {
         typeof payload.user !== "object" ||
         Array.isArray(payload.user)
       ) {
-        setError("root", { message: payload.message ?? "Unable to authenticate." });
+        setError("root", {
+          message: payload.message ?? t("login.failed"),
+        });
         return;
       }
 
@@ -56,67 +64,71 @@ export function LoginForm() {
         setTokens(payload.accessToken, payload.refreshToken ?? null);
       }
       setAuthenticatedSession(payload.user);
+      reset();
+      setRedirecting(true);
       const profileUrl = `/users/${payload.user.id}/profile`;
       router.replace(profileUrl);
       router.refresh();
     } catch {
-      setError("root", { message: "Unexpected error. Please try again." });
+      setError("root", { message: t("common.unexpectedError") });
     }
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <AuthFormHeader title="Welcome back" subtitle="Nice to see you! Log in to continue" />
+    <>
+      {redirecting && <GlobalLoader />}
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <AuthFormHeader title={t("login.title")} subtitle={t("login.subtitle")} />
 
-      <div className="space-y-5">
-        <div className="relative">
-          <Input
-            id="login-email"
-            type="email"
-            placeholder="Email"
-            autoComplete="email"
-            disabled={isSubmitting}
-            className="rounded-none placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-primary"
-            {...register("email")}
-          />
-          {errors.email && (
-            <p className="absolute left-0 top-full text-sm text-destructive">
-              {errors.email.message}
-            </p>
-          )}
+        <div className="space-y-5">
+          <div className="relative">
+            <AuthField
+              id="login-email"
+              label={t("login.emailLabel")}
+              type="email"
+              autoComplete="email"
+              disabled={isSubmitting}
+              {...register("email")}
+            />
+            {errors.email && (
+              <p className="absolute left-0 top-full text-sm text-destructive">
+                {errors.email.message}
+              </p>
+            )}
+          </div>
+
+          <div className="relative">
+            <AuthField
+              id="login-password"
+              label={t("login.passwordLabel")}
+              type="password"
+              autoComplete="current-password"
+              disabled={isSubmitting}
+              {...register("password")}
+            />
+            {errors.password && (
+              <p className="absolute left-0 top-full text-sm text-destructive">
+                {errors.password.message}
+              </p>
+            )}
+          </div>
         </div>
 
-        <div className="relative">
-          <PasswordField
-            id="login-password"
-            placeholder="Password"
-            autoComplete="current-password"
-            disabled={isSubmitting}
-            className="focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-primary"
-            {...register("password")}
-          />
-          {errors.password && (
-            <p className="absolute left-0 top-full text-sm text-destructive">
-              {errors.password.message}
-            </p>
-          )}
+        <AuthFormRootError message={errors.root?.message} />
+
+        <div className="mt-14 flex flex-col items-center gap-2">
+          <AuthFormSubmitButton loading={isSubmitting} loadingText={t("login.submitLoading")}>
+            {t("login.submit")}
+          </AuthFormSubmitButton>
+
+          <Link
+            href="/auth/forgot-password"
+            className="text-sm tracking-[0.4px] uppercase text-muted-foreground transition-colors hover:text-foreground"
+          >
+            {t("login.forgotPassword")}
+          </Link>
         </div>
-      </div>
-
-      <AuthFormRootError message={errors.root?.message} />
-
-      <div className="mt-14 flex flex-col items-center gap-2">
-        <AuthFormSubmitButton loading={isSubmitting} loadingText="Logging in...">
-          Log in
-        </AuthFormSubmitButton>
-
-        <Link
-          href="/auth/forgot-password"
-          className="text-sm tracking-[0.4px] uppercase text-muted-foreground transition-colors hover:text-foreground"
-        >
-          Forgot password?
-        </Link>
-      </div>
-    </form>
+      </form>
+    </>
   );
 }

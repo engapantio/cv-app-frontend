@@ -78,7 +78,6 @@ export function UsersTable({
           actionLabel={t("buttons.createUser")}
           onAction={() => setCreateOpen(true)}
           showAction={isAdmin}
-          actionClassName="hover:bg-transparent"
         />
 
         <div className="overflow-x-hidden">

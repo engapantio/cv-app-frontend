@@ -39,6 +39,7 @@ interface ProfileFormProps {
   userDepartmentName?: string | null;
   userPositionName?: string | null;
   isOwner: boolean;
+  isSelf: boolean;
 }
 
 export function ProfileForm({
@@ -47,6 +48,7 @@ export function ProfileForm({
   userDepartmentName,
   userPositionName,
   isOwner,
+  isSelf,
 }: ProfileFormProps) {
   const t = useTranslations();
   const {
@@ -131,12 +133,16 @@ export function ProfileForm({
       const dept = departments.find((d) => d.id === data.departmentId);
       const pos = positions.find((p) => p.id === data.positionId);
 
-      syncSessionProfileFromUpdate({
-        first_name: data.first_name || null,
-        last_name: data.last_name || null,
-        department: data.departmentId ? { id: data.departmentId, name: dept?.name ?? null } : null,
-        position: data.positionId ? { id: data.positionId, name: pos?.name ?? null } : null,
-      });
+      if (isSelf) {
+        syncSessionProfileFromUpdate({
+          first_name: data.first_name || null,
+          last_name: data.last_name || null,
+          department: data.departmentId
+            ? { id: data.departmentId, name: dept?.name ?? null }
+            : null,
+          position: data.positionId ? { id: data.positionId, name: pos?.name ?? null } : null,
+        });
+      }
 
       toast.success("Profile updated successfully");
       reset(data);

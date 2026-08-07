@@ -102,6 +102,7 @@ export function createUsersColumns(
         const user = row.original;
         const isOwnRow = currentUserId != null && user.id === currentUserId;
         const canEditRow = isAdmin || isOwnRow;
+        const canDeleteUser = isAdmin && !user.is_verified;
 
         return (
           <RowActions canMutate={canEditRow} onOpen={() => actions.onNavigate(user)}>
@@ -122,7 +123,7 @@ export function createUsersColumns(
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => actions.onDelete(user)}
-                  disabled={!isAdmin}
+                  disabled={!canDeleteUser}
                   variant="destructive"
                   className="justify-center cursor-pointer"
                 >

@@ -31,9 +31,6 @@ importers:
       cmdk:
         specifier: ^1.1.1
         version: 1.1.1(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      cv-graphql:
-        specifier: ^2.13.2
-        version: 2.13.2
       date-fns:
         specifier: ^4.4.0
         version: 4.4.0
@@ -105,8 +102,8 @@ importers:
         specifier: ^10.4.1
         version: 10.4.1
       "@testing-library/jest-dom":
-        specifier: ^6.9.1
-        version: 6.10.0(@testing-library/dom@10.4.1)
+        specifier: ~6.9.1
+        version: 6.9.1
       "@testing-library/react":
         specifier: ^16.3.2
         version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -2700,15 +2697,12 @@ packages:
       }
     engines: { node: ">=18" }
 
-  "@testing-library/jest-dom@6.10.0":
+  "@testing-library/jest-dom@6.9.1":
     resolution:
       {
-        integrity: sha512-HQwu0KaB2zyT0iLzBL+8CLyZDL3KlZlZJ+2iyc9uCUnlJVskJU/UlPuVCyIPhtukjPQdT2QNoR5nCP5FqTmmDQ==,
+        integrity: sha512-zIcONa+hVtVSSep9UT3jZ5rizo2BsxgyDYU7WFD5eICBE7no3881HGeb/QkGfsJs6JTkY1aQhT7rIPC7e+0nnA==,
       }
-    engines: { node: ">=22", npm: ">=6", yarn: ">=1" }
-    deprecated: Incorrect minor release with breaking changes (Node >=22 and required @testing-library/dom peer). Use 6.9.1 for the 6.x line, or upgrade to 7.0.0.
-    peerDependencies:
-      "@testing-library/dom": ">=10 <11"
+    engines: { node: ">=14", npm: ">=6", yarn: ">=1" }
 
   "@testing-library/react@16.3.2":
     resolution:
@@ -3999,12 +3993,6 @@ packages:
     resolution:
       {
         integrity: sha512-z1HGKcYy2xA8AGQfwrn0PAy+PB7X/GSj3UVJW9qKyn43xWa+gl5nXmU4qqLMRzWVLFC8KusUX8T/0kCiOYpAIQ==,
-      }
-
-  cv-graphql@2.13.2:
-    resolution:
-      {
-        integrity: sha512-9EImov4YgvknyRdCF7btTzuUbTLQUaXk/sMGGzJYCvbnNG9uo7nSrMetpXzMAhQtljjrORUyPM1mXjySy1VfvQ==,
       }
 
   damerau-levenshtein@1.0.8:
@@ -10599,10 +10587,9 @@ snapshots:
       picocolors: 1.1.1
       pretty-format: 27.5.1
 
-  "@testing-library/jest-dom@6.10.0(@testing-library/dom@10.4.1)":
+  "@testing-library/jest-dom@6.9.1":
     dependencies:
       "@adobe/css-tools": 4.5.0
-      "@testing-library/dom": 10.4.1
       aria-query: 5.3.2
       css.escape: 1.5.1
       dom-accessibility-api: 0.6.3
@@ -11417,8 +11404,6 @@ snapshots:
       rrweb-cssom: 0.8.0
 
   csstype@3.2.3: {}
-
-  cv-graphql@2.13.2: {}
 
   damerau-levenshtein@1.0.8: {}
 

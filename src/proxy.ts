@@ -5,6 +5,7 @@ const PUBLIC_PATHS = [
   "/auth/signup",
   "/auth/forgot-password",
   "/auth/reset-password",
+  "/reset-password",
 ];
 
 export function proxy(request: NextRequest) {

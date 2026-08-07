@@ -88,7 +88,6 @@ export function DepartmentsTable({
           actionLabel={tButtons("createDepartment")}
           onAction={() => setCreateOpen(true)}
           showAction={isAdmin}
-          actionClassName="hover:bg-transparent"
         />
 
         <div className="overflow-x-hidden">

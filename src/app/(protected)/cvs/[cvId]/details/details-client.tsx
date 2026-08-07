@@ -11,6 +11,7 @@ import { usePermissions } from "@/lib/auth/permissions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { FloatingField } from "@/components/shared/floating-field";
 import { toast } from "sonner";
 
 type CvData = CvQuery["cv"];
@@ -110,52 +111,43 @@ function CvDetailsForm({ cv, cvId }: { cv: NonNullable<CvData>; cvId: string }) 
   return (
     <form onSubmit={handleSubmit(handleSave)} className="space-y-6 pl-50">
       <div className="relative">
-        <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
-          <span className="absolute -top-2.5 left-3 bg-background px-1 text-xs text-muted-foreground dark:text-icon transition-colors group-focus-within:text-primary">
-            {t("fields.name")}
-          </span>
+        <FloatingField label={t("fields.name")} error={errors.name?.message}>
           <Input
             {...register("name")}
+            placeholder=" "
             readOnly={!canEdit}
             disabled={isSubmitting}
-            className="border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none"
+            className="peer border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none h-12 py-3"
           />
-        </div>
-        {errors.name && <p className="text-sm text-destructive mt-1">{errors.name.message}</p>}
+        </FloatingField>
       </div>
 
       <div className="relative">
-        <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
-          <span className="absolute -top-2.5 left-3 bg-background px-1 text-xs text-muted-foreground dark:text-icon transition-colors group-focus-within:text-primary">
-            {t("fields.education")}
-          </span>
+        <FloatingField label={t("fields.education")} error={errors.education?.message}>
           <Input
             {...register("education")}
+            placeholder=" "
             readOnly={!canEdit}
             disabled={isSubmitting}
-            className="border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none"
+            className="peer border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none h-12 py-3"
           />
-        </div>
-        {errors.education && (
-          <p className="text-sm text-destructive mt-1">{errors.education.message}</p>
-        )}
+        </FloatingField>
       </div>
 
       <div className="relative">
-        <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
-          <span className="absolute -top-2.5 left-3 bg-background px-1 text-xs text-muted-foreground dark:text-icon transition-colors group-focus-within:text-primary">
-            {t("fields.description")}
-          </span>
+        <FloatingField
+          label={t("fields.description")}
+          variant="textarea"
+          error={errors.description?.message}
+        >
           <Textarea
             {...register("description")}
+            placeholder=" "
             readOnly={!canEdit}
             disabled={isSubmitting}
-            className="flex w-full bg-background px-4 py-3 text-sm placeholder:text-black/60 dark:placeholder:text-white/60 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 border-0 min-h-46.25 resize-none"
+            className="peer flex w-full bg-background px-4 pt-6 pb-3 text-sm focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 border-0 min-h-46.25 resize-none disabled:opacity-50 disabled:cursor-not-allowed"
           />
-        </div>
-        {errors.description && (
-          <p className="text-sm text-destructive mt-1">{errors.description.message}</p>
-        )}
+        </FloatingField>
       </div>
 
       <div className="flex justify-end pt-4">

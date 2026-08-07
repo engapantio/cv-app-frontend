@@ -103,7 +103,6 @@ export function SkillsTable({
           actionLabel={tButtons("createSkill")}
           onAction={() => setCreateOpen(true)}
           showAction={isAdmin}
-          actionClassName="hover:bg-transparent"
         />
 
         <div className="overflow-x-hidden">
