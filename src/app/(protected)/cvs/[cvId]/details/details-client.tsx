@@ -107,10 +107,10 @@ function CvDetailsForm({ cv, cvId }: { cv: NonNullable<CvData>; cvId: string }) 
   };
 
   return (
-    <form onSubmit={handleSubmit(handleSave)} className="space-y-6 pl-[200px]">
+    <form onSubmit={handleSubmit(handleSave)} className="space-y-6 pl-50">
       <div className="relative">
         <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
-          <span className="absolute -top-2.5 left-3 bg-background px-1 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)] transition-colors group-focus-within:text-primary">
+          <span className="absolute -top-2.5 left-3 bg-background px-1 text-xs text-muted-foreground dark:text-icon transition-colors group-focus-within:text-primary">
             {t("fields.name")}
           </span>
           <Input
@@ -125,7 +125,7 @@ function CvDetailsForm({ cv, cvId }: { cv: NonNullable<CvData>; cvId: string }) 
 
       <div className="relative">
         <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
-          <span className="absolute -top-2.5 left-3 bg-background px-1 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)] transition-colors group-focus-within:text-primary">
+          <span className="absolute -top-2.5 left-3 bg-background px-1 text-xs text-muted-foreground dark:text-icon transition-colors group-focus-within:text-primary">
             {t("fields.education")}
           </span>
           <Input
@@ -142,14 +142,14 @@ function CvDetailsForm({ cv, cvId }: { cv: NonNullable<CvData>; cvId: string }) 
 
       <div className="relative">
         <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
-          <span className="absolute -top-2.5 left-3 bg-background px-1 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)] transition-colors group-focus-within:text-primary">
+          <span className="absolute -top-2.5 left-3 bg-background px-1 text-xs text-muted-foreground dark:text-icon transition-colors group-focus-within:text-primary">
             {t("fields.description")}
           </span>
           <textarea
             {...register("description")}
             readOnly={!canEdit}
             disabled={isSubmitting}
-            className="flex w-full bg-background px-4 py-3 text-sm placeholder:text-black/60 dark:placeholder:text-white/60 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 border-0 min-h-[185px] resize-none"
+            className="flex w-full bg-background px-4 py-3 text-sm placeholder:text-black/60 dark:placeholder:text-white/60 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 border-0 min-h-46.25 resize-none"
           />
         </div>
         {errors.description && (

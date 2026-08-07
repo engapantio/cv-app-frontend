@@ -132,7 +132,7 @@ export function CreateProjectDialog({
                 className={cn(
                   "absolute left-3 bg-background px-1 text-xs transition-all duration-200 pointer-events-none z-10",
                   startDate || startDateOpen
-                    ? "-top-2.5 translate-y-0 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)] group-focus-within:text-primary"
+                    ? "-top-2.5 translate-y-0 text-xs text-muted-foreground dark:text-icon group-focus-within:text-primary"
                     : "top-1/2 -translate-y-1/2 text-sm text-muted-foreground",
                 )}
               >
@@ -167,7 +167,7 @@ export function CreateProjectDialog({
                 className={cn(
                   "absolute left-3 bg-background px-1 text-xs transition-all duration-200 pointer-events-none z-10",
                   endDate || endDateOpen
-                    ? "-top-2.5 translate-y-0 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)] group-focus-within:text-primary"
+                    ? "-top-2.5 translate-y-0 text-xs text-muted-foreground dark:text-icon group-focus-within:text-primary"
                     : "top-1/2 -translate-y-1/2 text-sm text-muted-foreground",
                 )}
               >
@@ -211,7 +211,7 @@ export function CreateProjectDialog({
               className={cn(
                 "absolute left-3 bg-background px-1 text-xs transition-all duration-200 pointer-events-none z-10",
                 selectedEnv.length > 0 || envOpen
-                  ? "-top-2.5 translate-y-0 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)] group-focus-within:text-primary"
+                  ? "-top-2.5 translate-y-0 text-xs text-muted-foreground dark:text-icon group-focus-within:text-primary"
                   : "top-1/2 -translate-y-1/2 text-sm text-muted-foreground",
               )}
             >

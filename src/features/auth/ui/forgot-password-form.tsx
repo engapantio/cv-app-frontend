@@ -85,7 +85,7 @@ export function ForgotPasswordForm() {
 
       <div className="relative">
         <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
-          <span className="absolute -top-2.5 left-3 bg-background px-1 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)] transition-colors group-focus-within:text-primary">
+          <span className="absolute -top-2.5 left-3 bg-background px-1 text-xs text-muted-foreground dark:text-icon transition-colors group-focus-within:text-primary">
             Email
           </span>
           <Input

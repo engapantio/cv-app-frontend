@@ -25,7 +25,7 @@ export function OpenProjectOverlay({ open, onOpenChange, project }: OpenProjectO
         <div className="space-y-5">
           <div className="grid grid-cols-2 gap-4">
             <div className="group relative rounded-none border border-border">
-              <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)]">
+              <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-icon">
                 {t("fields.project")}
               </span>
               <Input
@@ -35,7 +35,7 @@ export function OpenProjectOverlay({ open, onOpenChange, project }: OpenProjectO
               />
             </div>
             <div className="group relative rounded-none border border-border">
-              <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)]">
+              <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-icon">
                 {t("fields.domain")}
               </span>
               <Input
@@ -47,7 +47,7 @@ export function OpenProjectOverlay({ open, onOpenChange, project }: OpenProjectO
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="group relative rounded-none border border-border">
-              <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)]">
+              <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-icon">
                 {t("fields.startDate")}
               </span>
               <Input
@@ -57,7 +57,7 @@ export function OpenProjectOverlay({ open, onOpenChange, project }: OpenProjectO
               />
             </div>
             <div className="group relative rounded-none border border-border">
-              <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)]">
+              <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-icon">
                 {t("fields.endDate")}
               </span>
               <Input
@@ -68,7 +68,7 @@ export function OpenProjectOverlay({ open, onOpenChange, project }: OpenProjectO
             </div>
           </div>
           <div className="group relative rounded-none border border-border">
-            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)]">
+            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-icon">
               {t("fields.description")}
             </span>
             <textarea
@@ -78,7 +78,7 @@ export function OpenProjectOverlay({ open, onOpenChange, project }: OpenProjectO
             />
           </div>
           <div className="group relative rounded-none border border-border">
-            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)]">
+            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-icon">
               {t("fields.environment")}
             </span>
             <div className="flex flex-wrap gap-2 px-4 py-3 min-h-12">
@@ -88,7 +88,7 @@ export function OpenProjectOverlay({ open, onOpenChange, project }: OpenProjectO
             </div>
           </div>
           <div className="group relative rounded-none border border-border">
-            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)]">
+            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-icon">
               {t("fields.rolesAndResponsibilities")}
             </span>
             <textarea

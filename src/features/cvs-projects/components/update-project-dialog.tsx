@@ -102,7 +102,7 @@ function UpdateProjectForm({
       <div className="space-y-5">
         <div className="grid grid-cols-2 gap-4">
           <div className="group relative rounded-none border border-border">
-            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)]">
+            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-icon">
               {t("fields.project")}
             </span>
             <Input
@@ -112,7 +112,7 @@ function UpdateProjectForm({
             />
           </div>
           <div className="group relative rounded-none border border-border">
-            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)]">
+            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-icon">
               {t("fields.domain")}
             </span>
             <Input
@@ -124,7 +124,7 @@ function UpdateProjectForm({
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
-            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)] transition-colors group-focus-within:text-primary z-10">
+            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-icon transition-colors group-focus-within:text-primary z-10">
               {t("fields.startDate")}
             </span>
             <Popover open={startDateOpen} onOpenChange={setStartDateOpen}>
@@ -152,7 +152,7 @@ function UpdateProjectForm({
             </Popover>
           </div>
           <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
-            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)] transition-colors group-focus-within:text-primary z-10">
+            <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-icon transition-colors group-focus-within:text-primary z-10">
               {t("fields.endDate")}
             </span>
             <Popover open={endDateOpen} onOpenChange={setEndDateOpen}>
@@ -181,7 +181,7 @@ function UpdateProjectForm({
           </div>
         </div>
         <div className="group relative rounded-none border border-border">
-          <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)]">
+          <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-icon">
             {t("fields.description")}
           </span>
           <Textarea
@@ -191,7 +191,7 @@ function UpdateProjectForm({
           />
         </div>
         <div className="group relative rounded-none border border-border">
-          <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)]">
+          <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-icon">
             {t("fields.environment")}
           </span>
           <div className="flex flex-wrap gap-2 px-4 py-3 min-h-12">
@@ -203,7 +203,7 @@ function UpdateProjectForm({
           </div>
         </div>
         <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
-          <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-[rgba(255,255,255,0.7)] transition-colors group-focus-within:text-primary z-10">
+          <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-icon transition-colors group-focus-within:text-primary z-10">
             {t("fields.rolesAndResponsibilities")}
           </span>
           <Textarea
