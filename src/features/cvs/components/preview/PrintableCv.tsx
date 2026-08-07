@@ -65,13 +65,22 @@ export function PrintableCv({
         {fullName}
       </h1>
       {positionName && (
-        <p style={{ fontSize: 16, margin: "0 0 16px", color: c.foreground }}>{positionName}</p>
+        <p
+          style={{
+            fontSize: 16,
+            margin: "0 0 16px",
+            color: c.foreground,
+            textTransform: "uppercase",
+          }}
+        >
+          {positionName}
+        </p>
       )}
 
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "260px 1fr",
+          gridTemplateColumns: "284px 1fr",
           gap: "0 16px",
         }}
       >
@@ -95,10 +104,7 @@ export function PrintableCv({
             paddingLeft: 32,
           }}
         >
-          <CvSection
-            label={`${positionName || l.professional} with ${years ?? l.na} ${l.inYears.toLowerCase()}`}
-            color={c.foreground}
-          >
+          <CvSection label={cv.name} color={c.foreground}>
             <p
               style={{
                 fontSize: 16,

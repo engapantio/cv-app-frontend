@@ -25,7 +25,7 @@ export function ProjectCard({ project, color, primary, labels }: Props) {
     <div
       style={{
         display: "grid",
-        gridTemplateColumns: "260px 1fr",
+        gridTemplateColumns: "284px 1fr",
         gap: "0 1rem",
       }}
     >

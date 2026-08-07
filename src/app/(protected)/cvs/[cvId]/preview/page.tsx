@@ -34,7 +34,10 @@ function computeSkillTableData(projects: CvQuery["cv"]["projects"]) {
   const years = Math.round((Date.now() - earliestStart.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
 
   let lastUsed: number | null = null;
-  if (validEnds.length > 0) {
+  const missingEndDate = projects.some((p) => !p.end_date);
+  if (missingEndDate) {
+    lastUsed = new Date().getFullYear();
+  } else if (validEnds.length > 0) {
     const latestEnd = new Date(Math.max(...validEnds.map((d) => d.getTime())));
     lastUsed = latestEnd.getFullYear();
   } else {

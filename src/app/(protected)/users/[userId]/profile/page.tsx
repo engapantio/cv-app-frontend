@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { createServerApolloClientForRequest } from "@/lib/apollo/server-client";
 import { UserDocument } from "@/gql/generated/graphql";
 import { UserProfileClient } from "@/features/user-profile/ui/user-profile-client";
+import { getServerSessionUser } from "@/lib/auth/session-server";
 
 interface ProfilePageProps {
   params: Promise<{ userId: string }>;
@@ -28,10 +29,14 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
 
   const avatar = user.profile?.avatar ?? null;
 
+  const sessionUser = await getServerSessionUser();
+  const canEdit =
+    sessionUser != null && (sessionUser.role === "Admin" || sessionUser.id === userId);
+
   return (
     <>
       {avatar && <link rel="preload" as="image" href={avatar} />}
-      <UserProfileClient user={user} />
+      <UserProfileClient user={user} canEdit={canEdit} />
     </>
   );
 }

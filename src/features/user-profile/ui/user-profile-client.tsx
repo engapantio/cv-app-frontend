@@ -3,9 +3,9 @@
 import { useMemo } from "react";
 import { useQuery } from "@apollo/client/react";
 import { UserDocument, UserQuery } from "@/gql/generated/graphql";
+import { UserCircle2Icon } from "lucide-react";
 import { AvatarUpload } from "./avatar-upload";
 import { ProfileForm } from "./profile-form";
-import { usePermissions } from "@/lib/auth/permissions";
 import { VerifiedBadge } from "@/components/shared";
 import { useTranslations } from "next-intl";
 
@@ -13,11 +13,11 @@ type User = NonNullable<UserQuery["user"]>;
 
 interface UserProfileClientProps {
   user: User;
+  canEdit: boolean;
 }
 
-export function UserProfileClient({ user }: UserProfileClientProps) {
+export function UserProfileClient({ user, canEdit }: UserProfileClientProps) {
   const t = useTranslations();
-  const { canEdit } = usePermissions(user.id);
 
   const { data } = useQuery(UserDocument, {
     variables: { userId: user.id },
@@ -64,7 +64,13 @@ export function UserProfileClient({ user }: UserProfileClientProps) {
           isOwner={canEdit}
         />
         <div className="flex flex-col items-center mb-16">
-          <h2 className="mb-2 font-normal text-2xl">{fullName}</h2>
+          <h2 className="mb-2 font-normal text-2xl">
+            {fullName || (
+              <span className="inline-flex items-center">
+                <UserCircle2Icon className="size-9 text-muted-foreground" />
+              </span>
+            )}
+          </h2>
           <div className="flex items-center gap-1.5">
             <p className="text-muted-foreground text-base">{user.email}</p>
             <VerifiedBadge verified={user.is_verified} />

@@ -7,7 +7,7 @@ import { z } from "zod";
 import { useMutation } from "@apollo/client/react";
 import { useTranslations } from "next-intl";
 import { CreateCvDocument, type CreateCvMutation } from "@/gql/generated/graphql";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, Input } from "@/components/ui";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, Input, Textarea } from "@/components/ui";
 import { DialogActions, FloatingField } from "@/components/shared";
 
 type CreateCvFormData = {
@@ -119,7 +119,7 @@ export function CreateCvDialog({
               variant="textarea"
               error={errors.description?.message}
             >
-              <textarea
+              <Textarea
                 {...register("description")}
                 placeholder=" "
                 disabled={isSubmitting}
