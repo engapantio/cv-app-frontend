@@ -72,6 +72,7 @@ async function refreshAuthSession(): Promise<void> {
         if (res.status === 401) {
           clearTokens();
           refreshFailed = true;
+          // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- non-component module (ApolloLink), not in React render context, so useRouter()/redirect() are unavailable; a full page reload is intentional to reset client state after session expiry
           window.location.href = "/auth/login";
           throw new Error("Refresh token expired");
         }
