@@ -15,16 +15,24 @@ type AuthFieldProps = Omit<React.ComponentProps<"input">, "type"> & {
   id: string;
   label: string;
   type?: "email" | "text" | "password";
+  error?: string;
 };
 
-export function AuthField({ id, label, type = "text", className, ...inputProps }: AuthFieldProps) {
+export function AuthField({
+  id,
+  label,
+  type = "text",
+  error,
+  className,
+  ...inputProps
+}: AuthFieldProps) {
   const t = useTranslations("auth.passwordToggle");
   const [visible, setVisible] = useState(false);
   const isPassword = type === "password";
   const inputType = isPassword ? (visible ? "text" : "password") : type;
 
   return (
-    <FloatingField label={label}>
+    <FloatingField label={label} error={error}>
       {isPassword && (
         <Button
           type="button"

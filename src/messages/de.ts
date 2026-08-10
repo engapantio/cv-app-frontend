@@ -179,6 +179,9 @@ export const de: Messages = {
     noSkillsAvailable: "Keine verfügbaren Fähigkeiten",
     experienceSummary: "{position} mit {years} Jahren Erfahrung",
     createUserFailed: "Benutzer konnte nicht erstellt werden",
+    userCreatedSuccess: "Benutzer erfolgreich erstellt",
+    userCreatedEmailFailed:
+      "Benutzer erstellt, aber die Verifizierungs-E-Mail konnte nicht gesendet werden.",
     createProjectFailed: "Projekt konnte nicht erstellt werden",
     updateProjectFailed: "Projekt konnte nicht aktualisiert werden",
     deleteProjectFailed: "Projekt konnte nicht gelöscht werden",
@@ -261,6 +264,11 @@ export const de: Messages = {
     iso2Required: "ISO2 ist erforderlich",
     iso2Length: "ISO2 muss genau 2 Zeichen lang sein",
     descriptionRequired: "Beschreibung ist erforderlich",
+    emailInUse: "Diese E-Mail ist bereits registriert",
+    emailRequired: "E-Mail ist erforderlich",
+    emailInvalid: "Ungültiges E-Mail-Format",
+    passwordRequired: "Passwort ist erforderlich",
+    passwordMin: "Das Passwort muss mindestens 8 Zeichen lang sein",
   },
   preview: {
     education: "Ausbildung",

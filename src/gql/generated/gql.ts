@@ -17,6 +17,7 @@ type Documents = {
   "mutation ForgotPassword($auth: ForgotPasswordInput!) {\n  forgotPassword(auth: $auth)\n}": typeof types.ForgotPasswordDocument;
   "query Login($auth: AuthInput!) {\n  login(auth: $auth) {\n    user {\n      id\n      created_at\n      email\n      is_verified\n      profile {\n        id\n        first_name\n        last_name\n        full_name\n        avatar\n        skills {\n          name\n          mastery\n        }\n        languages {\n          name\n          proficiency\n        }\n      }\n      cvs {\n        id\n        name\n        education\n        description\n      }\n      department {\n        id\n      }\n      department_name\n      position {\n        id\n      }\n      position_name\n      role\n    }\n    access_token\n    refresh_token\n  }\n}": typeof types.LoginDocument;
   "mutation ResetPassword($auth: ResetPasswordInput!) {\n  resetPassword(auth: $auth)\n}": typeof types.ResetPasswordDocument;
+  "mutation SendVerificationEmail($email: String!) {\n  sendVerificationEmail(email: $email)\n}": typeof types.SendVerificationEmailDocument;
   "mutation Signup($auth: AuthInput!) {\n  signup(auth: $auth) {\n    user {\n      id\n      created_at\n      email\n      is_verified\n      profile {\n        id\n        first_name\n        last_name\n        full_name\n        avatar\n      }\n      cvs {\n        id\n      }\n      department {\n        id\n      }\n      department_name\n      position {\n        id\n      }\n      position_name\n      role\n    }\n    access_token\n    refresh_token\n  }\n}": typeof types.SignupDocument;
   "mutation UpdateToken {\n  updateToken {\n    access_token\n    refresh_token\n  }\n}": typeof types.UpdateTokenDocument;
   "mutation DeleteAvatar($avatar: DeleteAvatarInput!) {\n  deleteAvatar(avatar: $avatar)\n}": typeof types.DeleteAvatarDocument;
@@ -77,6 +78,8 @@ const documents: Documents = {
     types.LoginDocument,
   "mutation ResetPassword($auth: ResetPasswordInput!) {\n  resetPassword(auth: $auth)\n}":
     types.ResetPasswordDocument,
+  "mutation SendVerificationEmail($email: String!) {\n  sendVerificationEmail(email: $email)\n}":
+    types.SendVerificationEmailDocument,
   "mutation Signup($auth: AuthInput!) {\n  signup(auth: $auth) {\n    user {\n      id\n      created_at\n      email\n      is_verified\n      profile {\n        id\n        first_name\n        last_name\n        full_name\n        avatar\n      }\n      cvs {\n        id\n      }\n      department {\n        id\n      }\n      department_name\n      position {\n        id\n      }\n      position_name\n      role\n    }\n    access_token\n    refresh_token\n  }\n}":
     types.SignupDocument,
   "mutation UpdateToken {\n  updateToken {\n    access_token\n    refresh_token\n  }\n}":
@@ -214,6 +217,12 @@ export function graphql(
 export function graphql(
   source: "mutation ResetPassword($auth: ResetPasswordInput!) {\n  resetPassword(auth: $auth)\n}",
 ): (typeof documents)["mutation ResetPassword($auth: ResetPasswordInput!) {\n  resetPassword(auth: $auth)\n}"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(
+  source: "mutation SendVerificationEmail($email: String!) {\n  sendVerificationEmail(email: $email)\n}",
+): (typeof documents)["mutation SendVerificationEmail($email: String!) {\n  sendVerificationEmail(email: $email)\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

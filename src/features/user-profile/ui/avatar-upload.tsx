@@ -102,11 +102,7 @@ export function AvatarUpload({
       <div className=" relative group">
         <Avatar className="size-30 cursor-pointer" onClick={isOwner ? triggerFileInput : undefined}>
           <AvatarFallback className="text-3xl">
-            {initial ? (
-              initial
-            ) : (
-              <UserCircle2Icon className="size-12 text-[var(--avatar-letter)]" />
-            )}
+            {initial ? initial : <UserCircle2Icon className="size-12 text-(--avatar-letter)" />}
           </AvatarFallback>
           <AvatarImage src={currentAvatar || undefined} />
         </Avatar>
