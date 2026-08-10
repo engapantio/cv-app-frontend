@@ -1,8 +1,11 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { toast } from "sonner";
+import { z } from "zod";
 import type { CreateUserPayload } from "@/features/users/hooks/use-users-page";
+import { isDuplicateEmailError } from "@/features/users/errors";
+import { AuthField } from "@/components/auth/auth-field";
 import {
   Dialog,
   DialogContent,
@@ -60,6 +63,34 @@ export function CreateUserDialog({
   const [departmentOpen, setDepartmentOpen] = useState(false);
   const [positionOpen, setPositionOpen] = useState(false);
   const [roleOpen, setRoleOpen] = useState(false);
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+
+  const validationMessages = useMemo(
+    () => ({
+      emailRequired: t("validation.emailRequired"),
+      emailInvalid: t("validation.emailInvalid"),
+      passwordRequired: t("validation.passwordRequired"),
+      passwordMin: t("validation.passwordMin"),
+    }),
+    [t],
+  );
+
+  const credentialsSchema = useMemo(
+    () =>
+      z.object({
+        email: z
+          .string()
+          .trim()
+          .min(1, validationMessages.emailRequired)
+          .email(validationMessages.emailInvalid),
+        password: z
+          .string()
+          .min(1, validationMessages.passwordRequired)
+          .min(8, validationMessages.passwordMin),
+      }),
+    [validationMessages],
+  );
 
   const reset = useCallback(() => {
     setEmail("");
@@ -69,12 +100,20 @@ export function CreateUserDialog({
     setDepartmentId("");
     setPositionId("");
     setRole("");
+    setEmailError(null);
+    setPasswordError(null);
   }, []);
 
   const canSubmit = email.trim() !== "" && password !== "" && role !== "";
 
   const handleConfirm = useCallback(async () => {
-    if (!canSubmit) return;
+    const parsed = credentialsSchema.safeParse({ email: email.trim(), password });
+    if (!parsed.success) {
+      const fieldErrors = parsed.error.flatten().fieldErrors;
+      setEmailError(fieldErrors.email?.[0] ?? null);
+      setPasswordError(fieldErrors.password?.[0] ?? null);
+      return;
+    }
     try {
       await onConfirm({
         email: email.trim(),
@@ -87,11 +126,14 @@ export function CreateUserDialog({
       });
       reset();
       onOpenChange(false);
-    } catch {
+    } catch (error) {
+      if (isDuplicateEmailError(error)) {
+        setEmailError(t("validation.emailInUse"));
+        return;
+      }
       toast.error(t("common.createUserFailed"));
     }
   }, [
-    canSubmit,
     email,
     password,
     firstName,
@@ -99,6 +141,7 @@ export function CreateUserDialog({
     departmentId,
     positionId,
     role,
+    credentialsSchema,
     onConfirm,
     reset,
     onOpenChange,
@@ -121,28 +164,35 @@ export function CreateUserDialog({
         </DialogHeader>
         <div className="space-y-5">
           <div className="grid grid-cols-2 gap-4">
-            <FloatingField label={t("fields.email")}>
+            <FloatingField label={t("fields.email")} error={emailError ?? undefined}>
               <Input
                 id="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (emailError) setEmailError(null);
+                }}
                 type="email"
+                autoComplete="email"
                 placeholder=" "
                 disabled={loading}
                 className={inputClasses}
               />
             </FloatingField>
-            <FloatingField label={t("fields.password")}>
-              <Input
-                id="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                type="password"
-                placeholder=" "
-                disabled={loading}
-                className={inputClasses}
-              />
-            </FloatingField>
+            <AuthField
+              id="password"
+              label={t("fields.password")}
+              type="password"
+              autoComplete="new-password"
+              disabled={loading}
+              value={password}
+              error={passwordError ?? undefined}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                if (passwordError) setPasswordError(null);
+              }}
+              className={inputClasses}
+            />
           </div>
 
           <div className="grid grid-cols-2 gap-4">

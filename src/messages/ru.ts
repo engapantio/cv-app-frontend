@@ -179,6 +179,9 @@ export const ru: Messages = {
     noSkillsAvailable: "Нет доступных навыков",
     experienceSummary: "{position} с опытом {years} лет",
     createUserFailed: "Не удалось создать пользователя",
+    userCreatedSuccess: "Пользователь успешно создан",
+    userCreatedEmailFailed:
+      "Пользователь создан, но не удалось отправить письмо для подтверждения почты.",
     createProjectFailed: "Не удалось создать проект",
     updateProjectFailed: "Не удалось обновить проект",
     deleteProjectFailed: "Не удалось удалить проект",
@@ -261,6 +264,11 @@ export const ru: Messages = {
     iso2Required: "Укажите ISO2",
     iso2Length: "ISO2 должен содержать ровно 2 символа",
     descriptionRequired: "Укажите описание",
+    emailInUse: "Эта почта уже зарегистрирована",
+    emailRequired: "Эл. почта обязательна",
+    emailInvalid: "Неверный формат эл. почты",
+    passwordRequired: "Пароль обязателен",
+    passwordMin: "Пароль должен содержать не менее 8 символов",
   },
   preview: {
     education: "Образование",

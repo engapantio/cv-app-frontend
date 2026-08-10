@@ -1,18 +1,21 @@
 "use client";
 
-import { useCallback, useMemo, useState, useEffect, useRef } from "react";
+import { useCallback, useMemo, useState, useEffect } from "react";
 import { useQuery, useMutation } from "@apollo/client/react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import {
   UsersDocument,
   DepartmentsDocument,
   PositionsDocument,
   CreateUserDocument,
   DeleteUserDocument,
+  SendVerificationEmailDocument,
   type UsersQuery,
   type UserRole,
 } from "@/gql/generated/graphql";
 import { usePermissions } from "@/lib/auth/permissions";
+import { DuplicateEmailError, isDuplicateEmailError } from "@/features/users/errors";
 import { createUsersColumns } from "@/features/users/columns";
 import { orderUsers } from "@/features/users/order-users";
 import { useTranslations } from "next-intl";
@@ -42,6 +45,7 @@ export function useUsersPage(
   initialIsAdmin: boolean = false,
 ) {
   const router = useRouter();
+  const t = useTranslations();
   const tColumns = useTranslations("columns.users");
   const tButtons = useTranslations("buttons");
   const { isAdmin: sessionIsAdmin, currentUserId: sessionUserId } = usePermissions();
@@ -70,17 +74,15 @@ export function useUsersPage(
 
   const [usersList, setUsersList] = useState<UserItem[]>(initialUsers);
 
-  const hydratedRef = useRef(false);
-
   useEffect(() => {
-    if (usersData?.users && !hydratedRef.current) {
-      hydratedRef.current = true;
+    if (usersData?.users) {
       setUsersList(usersData.users as UserItem[]);
     }
   }, [usersData]);
 
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
+  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
 
   const [createOpen, setCreateOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<UserItem | null>(null);
@@ -98,25 +100,47 @@ export function useUsersPage(
 
   const [createUser, { loading: creating }] = useMutation(CreateUserDocument);
   const [deleteUser, { loading: deleting }] = useMutation(DeleteUserDocument);
+  const [sendVerificationEmail] = useMutation(SendVerificationEmailDocument);
+
+  const dispatchVerificationEmail = useCallback(
+    async (email: string) => {
+      try {
+        await sendVerificationEmail({ variables: { email } });
+      } catch {
+        toast.warning(t("common.userCreatedEmailFailed"));
+      }
+    },
+    [sendVerificationEmail, t],
+  );
 
   const handleCreated = useCallback(
     async (payload: CreateUserPayload) => {
-      await createUser({
-        variables: {
-          user: {
-            auth: { email: payload.email, password: payload.password },
-            profile: { first_name: payload.first_name, last_name: payload.last_name },
-            cvsIds: [],
-            departmentId: payload.departmentId,
-            positionId: payload.positionId,
-            role: payload.role,
+      try {
+        await createUser({
+          variables: {
+            user: {
+              auth: { email: payload.email, password: payload.password },
+              profile: { first_name: payload.first_name, last_name: payload.last_name },
+              cvsIds: [],
+              departmentId: payload.departmentId,
+              positionId: payload.positionId,
+              role: payload.role,
+            },
           },
-        },
-      });
+        });
+      } catch (error) {
+        if (isDuplicateEmailError(error)) {
+          throw new DuplicateEmailError();
+        }
+        throw error;
+      }
       await refetch();
+      setPagination((p) => ({ ...p, pageIndex: 0 }));
       setCreateOpen(false);
+      toast.success(t("common.userCreatedSuccess"));
+      dispatchVerificationEmail(payload.email);
     },
-    [createUser, refetch],
+    [createUser, refetch, setPagination, dispatchVerificationEmail, t],
   );
 
   const handleDeleted = useCallback(
@@ -145,10 +169,11 @@ export function useUsersPage(
   const table = useReactTable<UserItem>({
     data: orderedUsers,
     columns,
-    state: { sorting, globalFilter },
+    state: { sorting, globalFilter, pagination },
     initialState: { columnVisibility: { id: false } },
     onSortingChange: setSorting,
     onGlobalFilterChange: setGlobalFilter,
+    onPaginationChange: setPagination,
     globalFilterFn: (row, _columnId, filterValue) => {
       const user = row.original;
       const query = String(filterValue ?? "")
