@@ -14,6 +14,7 @@ import {
 } from "@/components/ui";
 import { toast } from "sonner";
 import { syncSessionProfileFromUpdate } from "@/lib/auth/session";
+import { buildUserUpdateOperations } from "@/lib/user-updates";
 import {
   UpdateProfileDocument,
   UpdateUserDocument,
@@ -21,7 +22,7 @@ import {
   PositionsDocument,
   UserDocument,
 } from "@/gql/generated/graphql";
-import { useMutation, useQuery } from "@apollo/client/react";
+import { useMutation, useQuery, useApolloClient } from "@apollo/client/react";
 import { useTranslations } from "next-intl";
 import {
   profileSchema,
@@ -69,66 +70,49 @@ export function ProfileForm({
   const { data: departmentsData } = useQuery(DepartmentsDocument);
   const { data: positionsData } = useQuery(PositionsDocument);
 
-  const [updateUser] = useMutation(UpdateUserDocument, {
-    refetchQueries: [{ query: UserDocument, variables: { userId } }],
-  });
-  const [updateProfile] = useMutation(UpdateProfileDocument, {
-    refetchQueries: [{ query: UserDocument, variables: { userId } }],
-  });
+  const [updateUser] = useMutation(UpdateUserDocument);
+  const [updateProfile] = useMutation(UpdateProfileDocument);
+  const client = useApolloClient();
 
   useEffect(() => {
+    if (isSubmitting) return;
     reset({
       first_name: defaultValues.first_name || "",
       last_name: defaultValues.last_name || "",
       departmentId: defaultValues.departmentId || "",
       positionId: defaultValues.positionId || "",
     });
-  }, [defaultValues, reset]);
+  }, [defaultValues, reset, isSubmitting]);
 
   const onSubmit = async (data: ProfileFormValues) => {
-    const namesChanged =
-      (data.first_name ?? "") !== (defaultValues.first_name ?? "") ||
-      (data.last_name ?? "") !== (defaultValues.last_name ?? "");
-    const employmentChanged =
-      (data.departmentId ?? "") !== (defaultValues.departmentId ?? "") ||
-      (data.positionId ?? "") !== (defaultValues.positionId ?? "");
+    const operations = buildUserUpdateOperations(
+      {
+        userId,
+        first_name: data.first_name ?? "",
+        last_name: data.last_name ?? "",
+        departmentId: data.departmentId ?? null,
+        positionId: data.positionId ?? null,
+      },
+      {
+        first_name: defaultValues.first_name ?? "",
+        last_name: defaultValues.last_name ?? "",
+        departmentId: defaultValues.departmentId ?? null,
+        positionId: defaultValues.positionId ?? null,
+      },
+      { updateProfile, updateUser },
+    );
 
-    if (!namesChanged && !employmentChanged) return;
+    if (operations.length === 0) return;
 
     try {
-      const operations = [];
-      if (namesChanged) {
-        operations.push(
-          updateProfile({
-            variables: {
-              profile: {
-                userId,
-                first_name: data.first_name || "",
-                last_name: data.last_name || "",
-              },
-            },
-          }),
-        );
-      }
-      if (employmentChanged) {
-        operations.push(
-          updateUser({
-            variables: {
-              user: {
-                userId,
-                departmentId: data.departmentId || "",
-                positionId: data.positionId || "",
-              },
-            },
-          }),
-        );
+      for (const operation of operations) {
+        const result = (await operation.run()) as { error?: { message?: string } };
+        if (result.error) {
+          throw new Error(result.error?.message || "Partial update — some fields failed");
+        }
       }
 
-      const results = await Promise.all(operations);
-      const failed = results.find((result) => result.error);
-      if (failed) {
-        throw new Error(failed.error?.message || "Partial update — some fields failed");
-      }
+      await client.refetchQueries({ include: [UserDocument] });
 
       const dept = departments.find((d) => d.id === data.departmentId);
       const pos = positions.find((p) => p.id === data.positionId);

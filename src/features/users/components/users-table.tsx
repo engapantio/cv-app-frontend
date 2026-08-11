@@ -13,13 +13,17 @@ import {
 import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
 import type { UserItem } from "@/features/users/types";
-import type { CreateUserPayload } from "@/features/users/hooks/use-users-page";
+import type { CreateUserPayload, UpdateUserPayload } from "@/features/users/hooks/use-users-page";
 import { TableEmptyState } from "@/components/shared/table-empty-state";
 import { TablePagination } from "@/components/shared/table-pagination";
 import { TableToolbar } from "@/components/shared/table-toolbar";
 
 const CreateUserDialog = dynamic(
   () => import("./create-user-dialog").then((m) => m.CreateUserDialog),
+  { loading: () => null },
+);
+const UpdateUserDialog = dynamic(
+  () => import("./update-user-dialog").then((m) => m.UpdateUserDialog),
   { loading: () => null },
 );
 const DeleteUserDialog = dynamic(
@@ -32,19 +36,23 @@ interface UsersTableProps {
   table: Table<UserItem>;
   columnCount: number;
   isAdmin: boolean;
+  currentUserId: string | null;
   createOpen: boolean;
   setCreateOpen: (open: boolean) => void;
+  updateTarget: UserItem | null;
+  setUpdateTarget: (target: UserItem | null) => void;
   deleteTarget: UserItem | null;
   setDeleteTarget: (target: UserItem | null) => void;
   handleCreated: (payload: CreateUserPayload) => Promise<void>;
+  handleUpdated: (payload: UpdateUserPayload) => Promise<void>;
   handleDeleted: (userId: string) => Promise<void>;
-  onNavigate: (user: UserItem) => void;
   globalFilter: string;
   setGlobalFilter: (value: string) => void;
   serverError?: string | null;
   departments: { id: string; name: string }[];
   positions: { id: string; name: string }[];
   creating: boolean;
+  updating: boolean;
 }
 
 export function UsersTable({
@@ -52,19 +60,23 @@ export function UsersTable({
   table,
   columnCount,
   isAdmin,
+  currentUserId,
   createOpen,
   setCreateOpen,
+  updateTarget,
+  setUpdateTarget,
   deleteTarget,
   setDeleteTarget,
   handleCreated,
+  handleUpdated,
   handleDeleted,
-  onNavigate,
   globalFilter,
   setGlobalFilter,
   serverError,
   departments,
   positions,
   creating,
+  updating,
 }: UsersTableProps) {
   const rows = table.getRowModel().rows;
   const t = useTranslations();
@@ -147,10 +159,7 @@ export function UsersTable({
                       "[&_tr:last-child]:border-b [&_tr:last-child]:border-b-table-border",
                   )}
                 >
-                  <TableRow
-                    className="cursor-pointer border-b-0 group-hover:bg-muted/50 dark:group-hover:bg-white/15"
-                    onClick={() => onNavigate(row.original)}
-                  >
+                  <TableRow className="border-b-0 group-hover:bg-muted/50 dark:group-hover:bg-white/15">
                     {row.getVisibleCells().map((cell) => (
                       <TableCell
                         key={cell.id}
@@ -186,6 +195,19 @@ export function UsersTable({
           positions={positions}
           onConfirm={handleCreated}
           loading={creating}
+        />
+      )}
+
+      {updateTarget && (
+        <UpdateUserDialog
+          key={"update-" + updateTarget.id}
+          target={updateTarget}
+          onClose={() => setUpdateTarget(null)}
+          currentUserId={currentUserId}
+          departments={departments}
+          positions={positions}
+          onConfirm={handleUpdated}
+          loading={updating}
         />
       )}
 

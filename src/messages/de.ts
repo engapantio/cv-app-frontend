@@ -182,6 +182,13 @@ export const de: Messages = {
     userCreatedSuccess: "Benutzer erfolgreich erstellt",
     userCreatedEmailFailed:
       "Benutzer erstellt, aber die Verifizierungs-E-Mail konnte nicht gesendet werden.",
+    updateUserFailed: "Benutzer konnte nicht aktualisiert werden",
+    userUpdatedSuccess: "Benutzer erfolgreich aktualisiert",
+    userProfileUpdated: "Profil aktualisiert",
+    userDetailsUpdated: "Nutzerdaten aktualisiert",
+    userProfileUpdateFailed: "Profilaktualisierung fehlgeschlagen",
+    userDetailsUpdateFailed: "Aktualisierung der Nutzerdaten fehlgeschlagen",
+    userUpdatePartial: "{succeeded}, aber {failed}.",
     createProjectFailed: "Projekt konnte nicht erstellt werden",
     updateProjectFailed: "Projekt konnte nicht aktualisiert werden",
     deleteProjectFailed: "Projekt konnte nicht gelöscht werden",
@@ -222,6 +229,8 @@ export const de: Messages = {
   },
   dialogs: {
     createUser: "Benutzer erstellen",
+    updateUser: "Benutzer aktualisieren",
+    updateUserPasswordUnavailable: "Kennwortänderung ist noch nicht verfügbar.",
     deleteUser: "Benutzer löschen",
     deleteUserConfirm: "Möchten Sie den Benutzer {name} wirklich löschen?",
     createProject: "Projekt erstellen",

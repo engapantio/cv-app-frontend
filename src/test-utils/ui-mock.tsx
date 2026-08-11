@@ -77,15 +77,17 @@ const SelectValueContext = React.createContext<SelectValueContextValue>({});
 export const Select = ({
   value,
   onValueChange,
+  disabled,
   children,
 }: {
   value?: string;
   onValueChange?: (value: string) => void;
   onOpenChange?: (open: boolean) => void;
+  disabled?: boolean;
   children?: React.ReactNode;
 }) => (
   <SelectValueContext.Provider value={{ onValueChange }}>
-    <div data-testid="select" data-value={value}>
+    <div data-testid="select" data-value={value} data-disabled={disabled ? "true" : undefined}>
       {children}
     </div>
   </SelectValueContext.Provider>

@@ -9,12 +9,15 @@ import {
   DepartmentsDocument,
   PositionsDocument,
   CreateUserDocument,
+  UpdateProfileDocument,
+  UpdateUserDocument,
   DeleteUserDocument,
   SendVerificationEmailDocument,
   type UsersQuery,
   type UserRole,
 } from "@/gql/generated/graphql";
 import { usePermissions } from "@/lib/auth/permissions";
+import { buildUserUpdateOperations } from "@/lib/user-updates";
 import { DuplicateEmailError, isDuplicateEmailError } from "@/features/users/errors";
 import { createUsersColumns } from "@/features/users/columns";
 import { orderUsers } from "@/features/users/order-users";
@@ -32,6 +35,15 @@ import type { UserItem } from "@/features/users/types";
 export interface CreateUserPayload {
   email: string;
   password: string;
+  first_name: string;
+  last_name: string;
+  departmentId: string | null;
+  positionId: string | null;
+  role: UserRole;
+}
+
+export interface UpdateUserPayload {
+  userId: string;
   first_name: string;
   last_name: string;
   departmentId: string | null;
@@ -85,7 +97,9 @@ export function useUsersPage(
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
 
   const [createOpen, setCreateOpen] = useState(false);
+  const [updateTarget, setUpdateTarget] = useState<UserItem | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<UserItem | null>(null);
+  const [updating, setUpdating] = useState(false);
 
   const handleNavigate = useCallback(
     (user: UserItem) => {
@@ -94,11 +108,17 @@ export function useUsersPage(
     [router],
   );
 
+  const handleUpdate = useCallback((user: UserItem) => {
+    setUpdateTarget(user);
+  }, []);
+
   const handleDelete = useCallback((user: UserItem) => {
     setDeleteTarget(user);
   }, []);
 
   const [createUser, { loading: creating }] = useMutation(CreateUserDocument);
+  const [updateProfile] = useMutation(UpdateProfileDocument);
+  const [updateUser] = useMutation(UpdateUserDocument);
   const [deleteUser, { loading: deleting }] = useMutation(DeleteUserDocument);
   const [sendVerificationEmail] = useMutation(SendVerificationEmailDocument);
 
@@ -134,11 +154,11 @@ export function useUsersPage(
         }
         throw error;
       }
-      await refetch();
-      setPagination((p) => ({ ...p, pageIndex: 0 }));
       setCreateOpen(false);
       toast.success(t("common.userCreatedSuccess"));
       dispatchVerificationEmail(payload.email);
+      await refetch();
+      setPagination((p) => ({ ...p, pageIndex: 0 }));
     },
     [createUser, refetch, setPagination, dispatchVerificationEmail, t],
   );
@@ -151,6 +171,80 @@ export function useUsersPage(
     [refetch],
   );
 
+  const handleUpdated = useCallback(
+    async (payload: UpdateUserPayload) => {
+      if (!updateTarget) return;
+      const target = updateTarget;
+
+      const operations = buildUserUpdateOperations(
+        {
+          userId: payload.userId,
+          first_name: payload.first_name,
+          last_name: payload.last_name,
+          departmentId: payload.departmentId,
+          positionId: payload.positionId,
+          role: payload.role,
+        },
+        {
+          first_name: target.profile?.first_name ?? "",
+          last_name: target.profile?.last_name ?? "",
+          departmentId: target.department?.id ?? null,
+          positionId: target.position?.id ?? null,
+          role: target.role,
+        },
+        { updateProfile, updateUser },
+      );
+
+      if (operations.length === 0) return;
+
+      setUpdating(true);
+      try {
+        const results: boolean[] = [];
+        for (const op of operations) {
+          try {
+            await op.run();
+            results.push(true);
+          } catch {
+            results.push(false);
+          }
+        }
+        const failed = operations.filter((_, i) => !results[i]);
+        if (failed.length === 0) {
+          toast.success(t("common.userUpdatedSuccess"));
+        } else if (failed.length === operations.length) {
+          toast.error(t("common.updateUserFailed"));
+          throw new Error("updateUserFailed");
+        } else {
+          const succeeded = operations.filter((_, i) => results[i]);
+          toast.warning(
+            t("common.userUpdatePartial", {
+              succeeded: succeeded
+                .map((op) =>
+                  t(
+                    `common.${op.kind === "profile" ? "userProfileUpdated" : "userDetailsUpdated"}`,
+                  ),
+                )
+                .join(", "),
+              failed: failed
+                .map((op) =>
+                  t(
+                    `common.${
+                      op.kind === "profile" ? "userProfileUpdateFailed" : "userDetailsUpdateFailed"
+                    }`,
+                  ),
+                )
+                .join(", "),
+            }),
+          );
+        }
+        await refetch();
+      } finally {
+        setUpdating(false);
+      }
+    },
+    [updateTarget, updateProfile, updateUser, refetch, t],
+  );
+
   const orderedUsers = useMemo(
     () => orderUsers(usersList, effectiveUserId, effectiveIsAdmin),
     [usersList, effectiveUserId, effectiveIsAdmin],
@@ -159,10 +253,19 @@ export function useUsersPage(
   const columns = useMemo(
     () =>
       createUsersColumns(tColumns, tButtons, effectiveIsAdmin, effectiveUserId ?? undefined, {
-        onNavigate: handleNavigate,
+        onOpen: handleNavigate,
+        onUpdate: handleUpdate,
         onDelete: handleDelete,
       }),
-    [effectiveIsAdmin, effectiveUserId, handleNavigate, handleDelete, tColumns, tButtons],
+    [
+      effectiveIsAdmin,
+      effectiveUserId,
+      handleNavigate,
+      handleUpdate,
+      handleDelete,
+      tColumns,
+      tButtons,
+    ],
   );
 
   // eslint-disable-next-line react-hooks/incompatible-library
@@ -199,19 +302,24 @@ export function useUsersPage(
     table,
     columnCount: columns.length,
     isAdmin: effectiveIsAdmin,
+    currentUserId: effectiveUserId,
     createOpen,
     setCreateOpen,
+    updateTarget,
+    setUpdateTarget,
     deleteTarget,
     setDeleteTarget,
     handleCreated,
+    handleUpdated,
+    handleUpdate,
     handleDeleted,
     globalFilter,
     setGlobalFilter,
     departments,
     positions,
     creating,
+    updating,
     deleting,
     deleteUser,
-    onNavigate: handleNavigate,
   };
 }

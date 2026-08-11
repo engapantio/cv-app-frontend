@@ -21,8 +21,8 @@ export function DeleteUserDialog({ target, onClose, onDeleted }: DeleteUserDialo
     if (!target) return;
     try {
       await deleteUser({ variables: { userId: target.id } });
-      await onDeleted(target.id);
       onClose();
+      await onDeleted(target.id);
     } catch {}
   }, [target, deleteUser, onDeleted, onClose]);
 

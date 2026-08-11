@@ -15,7 +15,8 @@ import { SortableHeader } from "@/components/shared/sortable-header";
 import type { UserItem } from "./types";
 
 interface UsersActions {
-  onNavigate: (user: UserItem) => void;
+  onOpen: (user: UserItem) => void;
+  onUpdate: (user: UserItem) => void;
   onDelete: (user: UserItem) => void;
 }
 
@@ -105,7 +106,7 @@ export function createUsersColumns(
         const canDeleteUser = isAdmin && !user.is_verified;
 
         return (
-          <RowActions canMutate={canEditRow} onOpen={() => actions.onNavigate(user)}>
+          <RowActions canMutate={canEditRow} onOpen={() => actions.onOpen(user)}>
             <DropdownMenu>
               <DropdownMenuTrigger
                 render={
@@ -116,7 +117,13 @@ export function createUsersColumns(
               />
               <DropdownMenuContent align="end" className="min-w-32">
                 <DropdownMenuItem
-                  onClick={() => actions.onNavigate(user)}
+                  onClick={() => actions.onOpen(user)}
+                  className="justify-center cursor-pointer"
+                >
+                  {tb("open")}
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => actions.onUpdate(user)}
                   className="justify-center cursor-pointer"
                 >
                   {tb("update")}

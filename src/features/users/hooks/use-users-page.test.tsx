@@ -76,6 +76,8 @@ function operationName(doc: unknown): string {
 }
 
 let actionCreateUser: jest.Mock;
+let actionUpdateProfile: jest.Mock;
+let actionUpdateUser: jest.Mock;
 let actionDeleteUser: jest.Mock;
 let actionSendVerificationEmail: jest.Mock;
 
@@ -83,12 +85,16 @@ beforeEach(() => {
   jest.clearAllMocks();
   mockUseQuery.mockReturnValue(queryResults());
   actionCreateUser = jest.fn();
+  actionUpdateProfile = jest.fn();
+  actionUpdateUser = jest.fn();
   actionDeleteUser = jest.fn();
   actionSendVerificationEmail = jest.fn();
   mockUseMutation.mockImplementation((doc: unknown) => {
     const name = operationName(doc);
     if (name === "SendVerificationEmail") return [actionSendVerificationEmail, { loading: false }];
     if (name === "CreateUser") return [actionCreateUser, { loading: false }];
+    if (name === "UpdateProfile") return [actionUpdateProfile, { loading: false }];
+    if (name === "UpdateUser") return [actionUpdateUser, { loading: false }];
     return [actionDeleteUser, { loading: false }];
   });
 });
@@ -111,6 +117,31 @@ describe("useUsersPage create orchestration", () => {
     );
     expect(mockToastSuccess).toHaveBeenCalledWith("userCreatedSuccess");
     expect(mockToastWarning).not.toHaveBeenCalled();
+  });
+
+  it("closes the create dialog as soon as creation succeeds, before the refetch settles", async () => {
+    let resolveRefetch: (value: unknown) => void = () => {};
+    const users = [] as UserItem[];
+    const refetch = jest.fn(() => new Promise((res) => (resolveRefetch = res)));
+    mockUseQuery.mockImplementation(() => ({
+      data: { users, departments: [], positions: [] },
+      loading: false,
+      refetch,
+    }));
+    actionCreateUser.mockResolvedValue(createUserResult);
+    actionSendVerificationEmail.mockResolvedValue({ data: { sendVerificationEmail: null } });
+
+    const { result } = renderHook(() => useUsersPage([]));
+    act(() => result.current.setCreateOpen(true));
+    expect(result.current.createOpen).toBe(true);
+
+    const pending = result.current.handleCreated(payload);
+
+    await waitFor(() => expect(result.current.createOpen).toBe(false));
+    expect(refetch).toHaveBeenCalled();
+
+    act(() => resolveRefetch(undefined));
+    await pending;
   });
 
   it("shows a non-blocking warning when the verification email dispatch fails", async () => {
@@ -188,5 +219,217 @@ describe("useUsersPage create orchestration", () => {
       expect(emails).toContain("new@example.com");
     });
     expect(result.current.table.getState().pagination.pageIndex).toBe(0);
+  });
+});
+
+const updateTarget = {
+  id: "u1",
+  created_at: "2024-01-01T00:00:00Z",
+  email: "alice@example.com",
+  is_verified: true,
+  role: "Employee",
+  department_name: "Engineering",
+  position_name: "Engineer",
+  profile: {
+    id: "p1",
+    created_at: "2024-01-01T00:00:00Z",
+    first_name: "Alice",
+    last_name: "Smith",
+    full_name: "Alice Smith",
+    avatar: null,
+  },
+  department: { id: "d1", created_at: "", name: "Engineering" },
+  position: { id: "pos1", created_at: "", name: "Engineer" },
+  cvs: [],
+} as unknown as UserItem;
+
+const unchangedPayload = {
+  userId: "u1",
+  first_name: "Alice",
+  last_name: "Smith",
+  departmentId: "d1",
+  positionId: "pos1",
+  role: "Employee" as const,
+};
+
+describe("useUsersPage update orchestration", () => {
+  it("routes first name changes to updateProfile only", async () => {
+    actionUpdateProfile.mockResolvedValue({ data: { updateProfile: { id: "p1" } } });
+
+    const { result } = renderHook(() => useUsersPage([], "u1", false));
+    await act(async () => {
+      result.current.setUpdateTarget(updateTarget);
+    });
+    await act(async () => {
+      await result.current.handleUpdated({
+        ...unchangedPayload,
+        first_name: "Alicia",
+      });
+    });
+
+    expect(actionUpdateProfile).toHaveBeenCalledWith({
+      variables: { profile: { userId: "u1", first_name: "Alicia", last_name: "Smith" } },
+    });
+    expect(actionUpdateUser).not.toHaveBeenCalled();
+    expect(mockToastSuccess).toHaveBeenCalledWith("userUpdatedSuccess");
+  });
+
+  it("routes role changes to updateUser only", async () => {
+    actionUpdateUser.mockResolvedValue({ data: { updateUser: { id: "u1" } } });
+
+    const { result } = renderHook(() => useUsersPage([], "u1", false));
+    await act(async () => {
+      result.current.setUpdateTarget(updateTarget);
+    });
+    await act(async () => {
+      await result.current.handleUpdated({ ...unchangedPayload, role: "Admin" });
+    });
+
+    expect(actionUpdateUser).toHaveBeenCalledWith({
+      variables: {
+        user: { userId: "u1", departmentId: "d1", positionId: "pos1", role: "Admin" },
+      },
+    });
+    expect(actionUpdateProfile).not.toHaveBeenCalled();
+    expect(mockToastSuccess).toHaveBeenCalledWith("userUpdatedSuccess");
+  });
+
+  it("routes department changes to updateUser only", async () => {
+    actionUpdateUser.mockResolvedValue({ data: { updateUser: { id: "u1" } } });
+
+    const { result } = renderHook(() => useUsersPage([], "u1", false));
+    await act(async () => {
+      result.current.setUpdateTarget(updateTarget);
+    });
+    await act(async () => {
+      await result.current.handleUpdated({ ...unchangedPayload, departmentId: null });
+    });
+
+    expect(actionUpdateUser).toHaveBeenCalledWith({
+      variables: { user: { userId: "u1", departmentId: "", positionId: "pos1" } },
+    });
+    expect(actionUpdateProfile).not.toHaveBeenCalled();
+  });
+
+  it("fires both updateProfile and updateUser when both groups change", async () => {
+    actionUpdateProfile.mockResolvedValue({ data: { updateProfile: { id: "p1" } } });
+    actionUpdateUser.mockResolvedValue({ data: { updateUser: { id: "u1" } } });
+
+    const { result } = renderHook(() => useUsersPage([], "u1", false));
+    await act(async () => {
+      result.current.setUpdateTarget(updateTarget);
+    });
+    await act(async () => {
+      await result.current.handleUpdated({
+        ...unchangedPayload,
+        first_name: "Alicia",
+        role: "Admin",
+      });
+    });
+
+    expect(actionUpdateProfile).toHaveBeenCalledWith({
+      variables: { profile: { userId: "u1", first_name: "Alicia", last_name: "Smith" } },
+    });
+    expect(actionUpdateUser).toHaveBeenCalledWith({
+      variables: {
+        user: { userId: "u1", departmentId: "d1", positionId: "pos1", role: "Admin" },
+      },
+    });
+    expect(mockToastSuccess).toHaveBeenCalledWith("userUpdatedSuccess");
+    expect(mockToastWarning).not.toHaveBeenCalled();
+  });
+
+  it("waits for updateProfile to settle before firing updateUser (sequential)", async () => {
+    let resolveProfile: (value: unknown) => void;
+    const profilePromise = new Promise((resolve) => {
+      resolveProfile = resolve;
+    });
+    actionUpdateProfile.mockImplementation(() => profilePromise);
+    actionUpdateUser.mockResolvedValue({ data: { updateUser: { id: "u1" } } });
+
+    const { result } = renderHook(() => useUsersPage([], "u1", false));
+    await act(async () => {
+      result.current.setUpdateTarget(updateTarget);
+    });
+
+    let pending: Promise<void>;
+    await act(async () => {
+      pending = result.current.handleUpdated({
+        ...unchangedPayload,
+        first_name: "Alicia",
+        role: "Admin",
+      });
+    });
+
+    expect(actionUpdateProfile).toHaveBeenCalled();
+    expect(actionUpdateUser).not.toHaveBeenCalled();
+
+    await act(async () => {
+      resolveProfile({ data: { updateProfile: { id: "p1" } } });
+      await pending;
+    });
+
+    expect(actionUpdateUser).toHaveBeenCalled();
+    expect(mockToastSuccess).toHaveBeenCalledWith("userUpdatedSuccess");
+  });
+
+  it("shows a non-blocking partial-failure warning when one group fails", async () => {
+    actionUpdateProfile.mockRejectedValue(new Error("profile update failed"));
+    actionUpdateUser.mockResolvedValue({ data: { updateUser: { id: "u1" } } });
+
+    const { result } = renderHook(() => useUsersPage([], "u1", false));
+    await act(async () => {
+      result.current.setUpdateTarget(updateTarget);
+    });
+    await act(async () => {
+      await result.current.handleUpdated({
+        ...unchangedPayload,
+        first_name: "Alicia",
+        role: "Admin",
+      });
+    });
+
+    await waitFor(() => expect(mockToastWarning).toHaveBeenCalledWith("userUpdatePartial"));
+    expect(mockToastSuccess).not.toHaveBeenCalled();
+    expect(mockToastError).not.toHaveBeenCalled();
+  });
+
+  it("shows an error toast and throws when every mutation fails", async () => {
+    actionUpdateProfile.mockRejectedValue(new Error("profile update failed"));
+    actionUpdateUser.mockRejectedValue(new Error("user update failed"));
+
+    const { result } = renderHook(() => useUsersPage([], "u1", false));
+    await act(async () => {
+      result.current.setUpdateTarget(updateTarget);
+    });
+    await act(async () => {
+      await expect(
+        result.current.handleUpdated({ ...unchangedPayload, first_name: "Alicia", role: "Admin" }),
+      ).rejects.toThrow("updateUserFailed");
+    });
+
+    expect(mockToastError).toHaveBeenCalledWith("updateUserFailed");
+  });
+
+  it("does not fire any mutation when no field changed", async () => {
+    const { result } = renderHook(() => useUsersPage([], "u1", false));
+    await act(async () => {
+      result.current.setUpdateTarget(updateTarget);
+    });
+    await act(async () => {
+      await result.current.handleUpdated(unchangedPayload);
+    });
+
+    expect(actionUpdateProfile).not.toHaveBeenCalled();
+    expect(actionUpdateUser).not.toHaveBeenCalled();
+    expect(mockToastSuccess).not.toHaveBeenCalled();
+  });
+
+  it("sets the update target when the Update action is invoked", async () => {
+    const { result } = renderHook(() => useUsersPage([], "u1", false));
+    await act(async () => {
+      result.current.handleUpdate(updateTarget);
+    });
+    expect(result.current.updateTarget).toBe(updateTarget);
   });
 });
