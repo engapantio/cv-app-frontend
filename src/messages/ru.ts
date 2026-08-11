@@ -182,6 +182,13 @@ export const ru: Messages = {
     userCreatedSuccess: "Пользователь успешно создан",
     userCreatedEmailFailed:
       "Пользователь создан, но не удалось отправить письмо для подтверждения почты.",
+    updateUserFailed: "Не удалось обновить пользователя",
+    userUpdatedSuccess: "Пользователь успешно обновлён",
+    userProfileUpdated: "Профиль обновлён",
+    userDetailsUpdated: "Данные пользователя обновлены",
+    userProfileUpdateFailed: "не удалось обновить профиль",
+    userDetailsUpdateFailed: "не удалось обновить данные пользователя",
+    userUpdatePartial: "{succeeded}, но {failed}.",
     createProjectFailed: "Не удалось создать проект",
     updateProjectFailed: "Не удалось обновить проект",
     deleteProjectFailed: "Не удалось удалить проект",
@@ -222,6 +229,8 @@ export const ru: Messages = {
   },
   dialogs: {
     createUser: "Создать пользователя",
+    updateUser: "Обновить пользователя",
+    updateUserPasswordUnavailable: "Смена пароля пока недоступна.",
     deleteUser: "Удалить пользователя",
     deleteUserConfirm: "Вы уверены, что хотите удалить пользователя {name}?",
     createProject: "Создать проект",
