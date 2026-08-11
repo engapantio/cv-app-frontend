@@ -22,6 +22,7 @@ import { TableEmptyState } from "@/components/shared/table-empty-state";
 import { TablePagination } from "@/components/shared/table-pagination";
 import { TableToolbar } from "@/components/shared/table-toolbar";
 import { useTranslations } from "next-intl";
+import { useProjectsVisibleColumnCount } from "@/hooks/use-projects-visible-column-count";
 import { ProjectRow } from "./project-row";
 import { createProjectColumns } from "../columns";
 import type { ProjectItem } from "../hooks/use-projects-page";
@@ -71,7 +72,7 @@ export function ProjectsTable({
     getPaginationRowModel: getPaginationRowModel(),
   });
 
-  const columnCount = columns.length;
+  const columnCount = useProjectsVisibleColumnCount();
   const rows = table.getRowModel().rows;
 
   return (
