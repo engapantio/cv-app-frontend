@@ -20,10 +20,6 @@ import {
 } from "@tanstack/react-table";
 import type { PositionItem } from "./types";
 
-jest.mock("next-intl", () => ({
-  useTranslations: () => (key: string) => key,
-}));
-
 jest.mock("lucide-react", () => ({
   MoreVertical: () => null,
 }));
@@ -54,12 +50,25 @@ jest.mock("@/components/ui/dropdown-menu", () => ({
   DropdownMenu: ({ children }: { children: ReactNode }) => <>{children}</>,
   DropdownMenuTrigger: ({ render }: { render?: ReactNode }) => render ?? null,
   DropdownMenuContent: ({ children }: { children: ReactNode }) => <>{children}</>,
-  DropdownMenuItem: ({ children, onClick }: { children: ReactNode; onClick?: () => void }) => (
-    <button type="button" onClick={onClick}>
+  DropdownMenuItem: ({
+    children,
+    onClick,
+    disabled,
+  }: {
+    children: ReactNode;
+    onClick?: () => void;
+    disabled?: boolean;
+  }) => (
+    <button type="button" onClick={onClick} disabled={disabled}>
       {children}
     </button>
   ),
 }));
+
+const mockUsePermissions = jest.fn<{ isAdmin: boolean; currentUserId: string | undefined }, []>(
+  () => ({ isAdmin: true, currentUserId: "u1" }),
+);
+jest.mock("@/lib/auth/permissions", () => ({ usePermissions: () => mockUsePermissions() }));
 
 const positions: PositionItem[] = [
   { id: "1", created_at: "2024-01-01T00:00:00Z", name: "Backend Developer" },
@@ -73,7 +82,6 @@ const tb = (key: string) => `buttons.${key}`;
 let createPositionsColumns: (
   t: (key: string) => string,
   tb: (key: string) => string,
-  isAdmin: boolean,
   actions: {
     onOpen: (position: PositionItem) => void;
     onUpdate: (position: PositionItem) => void;
@@ -97,7 +105,8 @@ function buildTableWithColumns(
   isAdmin: boolean,
   state?: { globalFilter?: string; sorting?: SortingState },
 ): { columns: ColumnDef<PositionItem>[]; table: Table<PositionItem> } {
-  const columns = createPositionsColumns(t, tb, isAdmin, {
+  mockUsePermissions.mockReturnValue({ isAdmin, currentUserId: isAdmin ? "u1" : undefined });
+  const columns = createPositionsColumns(t, tb, {
     onOpen: jest.fn(),
     onUpdate: jest.fn(),
     onDelete: jest.fn(),

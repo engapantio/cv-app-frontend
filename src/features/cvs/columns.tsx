@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { RowActions } from "@/components/shared/row-actions";
 import { SortableHeader } from "@/components/shared/sortable-header";
+import { usePermissions } from "@/lib/auth/permissions";
 import type { UserQuery } from "@/gql/generated/graphql";
 
 type CvItem = NonNullable<UserQuery["user"]["cvs"]>[number];
@@ -20,11 +21,63 @@ interface CvActions {
   onDelete: (cv: CvItem) => void;
 }
 
+function ActionsCell({
+  cv,
+  tb,
+  actions,
+  pageOwnerId,
+}: {
+  cv: CvItem;
+  tb: (key: string) => string;
+  actions: CvActions;
+  pageOwnerId?: string | null;
+}) {
+  const { currentUserId, isAdmin } = usePermissions();
+  const isOwn =
+    currentUserId === cv.user?.id || (pageOwnerId != null && currentUserId === pageOwnerId);
+  const canMutate = isOwn || isAdmin;
+
+  return (
+    <RowActions canMutate={canMutate} onOpen={() => actions.onOpen(cv.id)}>
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          render={
+            <Button variant="ghost" size="icon" className="rounded-[20px] cursor-pointer">
+              <MoreVertical className="size-6" />
+            </Button>
+          }
+        />
+        <DropdownMenuContent align="end" className="min-w-32">
+          <DropdownMenuItem
+            onClick={() => actions.onOpen(cv.id)}
+            className="justify-center cursor-pointer"
+          >
+            {tb("open")}
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => actions.onOpen(cv.id)}
+            disabled={!canMutate}
+            className="justify-center cursor-pointer"
+          >
+            {tb("update")}
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => actions.onDelete(cv)}
+            disabled={!canMutate}
+            variant="destructive"
+            className="justify-center cursor-pointer"
+          >
+            {tb("delete")}
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </RowActions>
+  );
+}
+
 export function createCvsColumns(
   t: (key: string) => string,
   tb: (key: string) => string,
-  currentUserId: string | undefined,
-  isAdmin: boolean,
   actions: CvActions,
   userEmail?: string | null,
   pageOwnerId?: string | null,
@@ -54,49 +107,9 @@ export function createCvsColumns(
       header: "",
       enableSorting: false,
       enableGlobalFilter: false,
-      cell: ({ row }) => {
-        const cv = row.original;
-        const isOwn =
-          currentUserId === cv.user?.id || (pageOwnerId != null && currentUserId === pageOwnerId);
-        const canMutate = isOwn || isAdmin;
-
-        return (
-          <RowActions canMutate={canMutate} onOpen={() => actions.onOpen(cv.id)}>
-            <DropdownMenu>
-              <DropdownMenuTrigger
-                render={
-                  <Button variant="ghost" size="icon" className="rounded-[20px] cursor-pointer">
-                    <MoreVertical className="size-6" />
-                  </Button>
-                }
-              />
-              <DropdownMenuContent align="end" className="min-w-32">
-                <DropdownMenuItem
-                  onClick={() => actions.onOpen(cv.id)}
-                  className="justify-center cursor-pointer"
-                >
-                  {tb("open")}
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => actions.onOpen(cv.id)}
-                  disabled={!canMutate}
-                  className="justify-center cursor-pointer"
-                >
-                  {tb("update")}
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => actions.onDelete(cv)}
-                  disabled={!canMutate}
-                  variant="destructive"
-                  className="justify-center cursor-pointer"
-                >
-                  {tb("delete")}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </RowActions>
-        );
-      },
+      cell: ({ row }) => (
+        <ActionsCell cv={row.original} tb={tb} actions={actions} pageOwnerId={pageOwnerId} />
+      ),
     },
   ];
 }

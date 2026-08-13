@@ -11,6 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
+import { usePermissions } from "@/lib/auth/permissions";
 import type { LanguageItem } from "@/features/languages/types";
 import { TableEmptyState } from "@/components/shared/table-empty-state";
 import { TablePagination } from "@/components/shared/table-pagination";
@@ -38,7 +39,6 @@ interface LanguagesTableProps {
   loading: boolean;
   table: Table<LanguageItem>;
   columnCount: number;
-  isAdmin: boolean;
   createOpen: boolean;
   setCreateOpen: (open: boolean) => void;
   deleteTarget: LanguageItem | null;
@@ -71,7 +71,6 @@ export function LanguagesTable({
   loading,
   table,
   columnCount,
-  isAdmin,
   createOpen,
   setCreateOpen,
   deleteTarget,
@@ -90,6 +89,7 @@ export function LanguagesTable({
   const rows = table.getRowModel().rows;
   const tButtons = useTranslations("buttons");
   const tCommon = useTranslations("common");
+  const { isAdmin } = usePermissions();
 
   return (
     <>

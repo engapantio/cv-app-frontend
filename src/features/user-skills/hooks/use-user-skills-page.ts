@@ -27,7 +27,7 @@ export function useUserSkillsPage(
     refetch: refetchUser,
   } = useQuery(UserDocument, {
     variables: { userId },
-    fetchPolicy: "network-only",
+    fetchPolicy: "cache-and-network",
     errorPolicy: "all",
   });
 

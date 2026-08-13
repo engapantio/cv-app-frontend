@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useMemo, useEffect, useRef } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { useQuery, useMutation } from "@apollo/client/react";
 import {
   PositionsDocument,
@@ -10,7 +10,6 @@ import {
   type CreatePositionMutation,
   type UpdatePositionMutation,
 } from "@/gql/generated/graphql";
-import { usePermissions } from "@/lib/auth/permissions";
 import { createPositionsColumns } from "@/features/positions/columns";
 import {
   useReactTable,
@@ -24,24 +23,22 @@ import type { PositionItem } from "@/features/positions/types";
 import { useTranslations } from "next-intl";
 
 export function usePositionsPage(initialPositions: PositionItem[]) {
-  const { isAdmin } = usePermissions();
   const tColumns = useTranslations("columns.positions");
   const tButtons = useTranslations("buttons");
 
   const { data: positionsData, loading } = useQuery(PositionsDocument, {
-    fetchPolicy: "network-only",
+    fetchPolicy: "cache-and-network",
     errorPolicy: "all",
   });
 
   const [positionsList, setPositionsList] = useState<PositionItem[]>(initialPositions);
 
-  const hydratedRef = useRef(false);
-
   useEffect(() => {
-    if (positionsData?.positions && !hydratedRef.current) {
-      hydratedRef.current = true;
+    if (positionsData?.positions) {
       setPositionsList(
-        (positionsData.positions as PositionItem[]).sort((a, b) => a.name.localeCompare(b.name)),
+        (positionsData.positions as PositionItem[])
+          .slice()
+          .sort((a, b) => a.name.localeCompare(b.name)),
       );
     }
   }, [positionsData]);
@@ -86,12 +83,12 @@ export function usePositionsPage(initialPositions: PositionItem[]) {
 
   const columns = useMemo(
     () =>
-      createPositionsColumns(tColumns, tButtons, isAdmin, {
+      createPositionsColumns(tColumns, tButtons, {
         onOpen: handleOpen,
         onUpdate: handleUpdate,
         onDelete: handleDelete,
       }),
-    [isAdmin, handleOpen, handleUpdate, handleDelete, tColumns, tButtons],
+    [handleOpen, handleUpdate, handleDelete, tColumns, tButtons],
   );
 
   // eslint-disable-next-line react-hooks/incompatible-library
@@ -113,7 +110,6 @@ export function usePositionsPage(initialPositions: PositionItem[]) {
     loading: loading && positionsList.length === 0,
     table,
     columnCount,
-    isAdmin,
     createOpen,
     setCreateOpen,
     deleteTarget,

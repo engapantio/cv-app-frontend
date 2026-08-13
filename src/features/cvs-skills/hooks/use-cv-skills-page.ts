@@ -25,7 +25,7 @@ export function useCvSkillsPage(
     refetch: refetchCv,
   } = useQuery(CvDocument, {
     variables: { cvId },
-    fetchPolicy: "network-only",
+    fetchPolicy: "cache-and-network",
     errorPolicy: "all",
   });
 

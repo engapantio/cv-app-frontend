@@ -10,6 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { usePermissions } from "@/lib/auth/permissions";
 import { RowActions } from "@/components/shared/row-actions";
 import { SortableHeader } from "@/components/shared/sortable-header";
 import type { UserItem } from "./types";
@@ -20,11 +21,60 @@ interface UsersActions {
   onDelete: (user: UserItem) => void;
 }
 
+function ActionsCell({
+  user,
+  actions,
+  tb,
+}: {
+  user: UserItem;
+  actions: UsersActions;
+  tb: (key: string) => string;
+}) {
+  const { currentUserId, isAdmin } = usePermissions();
+  const isOwnRow = currentUserId != null && user.id === currentUserId;
+  const canEditRow = isAdmin || isOwnRow;
+  const canDeleteUser = isAdmin && !user.is_verified;
+
+  return (
+    <RowActions canMutate={canEditRow} onOpen={() => actions.onOpen(user)}>
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          render={
+            <Button variant="ghost" size="icon" className="rounded-[20px] cursor-pointer">
+              <MoreVertical className="size-6" />
+            </Button>
+          }
+        />
+        <DropdownMenuContent align="end" className="min-w-32">
+          <DropdownMenuItem
+            onClick={() => actions.onOpen(user)}
+            className="justify-center cursor-pointer"
+          >
+            {tb("open")}
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => actions.onUpdate(user)}
+            className="justify-center cursor-pointer"
+          >
+            {tb("update")}
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => actions.onDelete(user)}
+            disabled={!canDeleteUser}
+            variant="destructive"
+            className="justify-center cursor-pointer"
+          >
+            {tb("delete")}
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </RowActions>
+  );
+}
+
 export function createUsersColumns(
   t: (key: string) => string,
   tb: (key: string) => string,
-  isAdmin: boolean,
-  currentUserId: string | undefined,
   actions: UsersActions,
 ): ColumnDef<UserItem, unknown>[] {
   return [
@@ -100,46 +150,7 @@ export function createUsersColumns(
       enableGlobalFilter: false,
       meta: { className: "w-12" },
       cell: ({ row }) => {
-        const user = row.original;
-        const isOwnRow = currentUserId != null && user.id === currentUserId;
-        const canEditRow = isAdmin || isOwnRow;
-        const canDeleteUser = isAdmin && !user.is_verified;
-
-        return (
-          <RowActions canMutate={canEditRow} onOpen={() => actions.onOpen(user)}>
-            <DropdownMenu>
-              <DropdownMenuTrigger
-                render={
-                  <Button variant="ghost" size="icon" className="rounded-[20px] cursor-pointer">
-                    <MoreVertical className="size-6" />
-                  </Button>
-                }
-              />
-              <DropdownMenuContent align="end" className="min-w-32">
-                <DropdownMenuItem
-                  onClick={() => actions.onOpen(user)}
-                  className="justify-center cursor-pointer"
-                >
-                  {tb("open")}
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => actions.onUpdate(user)}
-                  className="justify-center cursor-pointer"
-                >
-                  {tb("update")}
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => actions.onDelete(user)}
-                  disabled={!canDeleteUser}
-                  variant="destructive"
-                  className="justify-center cursor-pointer"
-                >
-                  {tb("delete")}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </RowActions>
-        );
+        return <ActionsCell user={row.original} actions={actions} tb={tb} />;
       },
       accessorFn: () => null,
     },

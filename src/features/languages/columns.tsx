@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { RowActions } from "@/components/shared/row-actions";
 import { SortableHeader } from "@/components/shared/sortable-header";
+import { usePermissions } from "@/lib/auth/permissions";
 import type { LanguageItem } from "./types";
 
 interface LanguageActions {
@@ -19,10 +20,58 @@ interface LanguageActions {
   onDelete: (language: LanguageItem) => void;
 }
 
+function ActionsCell({
+  language,
+  tb,
+  actions,
+}: {
+  language: LanguageItem;
+  tb: (key: string) => string;
+  actions: LanguageActions;
+}) {
+  const { isAdmin } = usePermissions();
+
+  return (
+    <RowActions canMutate={isAdmin} onOpen={() => actions.onOpen(language)}>
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          render={
+            <Button variant="ghost" size="icon" className="rounded-[20px] cursor-pointer">
+              <MoreVertical className="size-6" />
+            </Button>
+          }
+        />
+        <DropdownMenuContent align="end" className="min-w-32">
+          <DropdownMenuItem
+            onClick={() => actions.onOpen(language)}
+            className="justify-center cursor-pointer"
+          >
+            {tb("open")}
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => actions.onUpdate(language)}
+            disabled={!isAdmin}
+            className="justify-center cursor-pointer"
+          >
+            {tb("update")}
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => actions.onDelete(language)}
+            disabled={!isAdmin}
+            variant="destructive"
+            className="justify-center cursor-pointer"
+          >
+            {tb("delete")}
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </RowActions>
+  );
+}
+
 export function createLanguagesColumns(
   t: (key: string) => string,
   tb: (key: string) => string,
-  isAdmin: boolean,
   actions: LanguageActions,
 ): ColumnDef<LanguageItem>[] {
   return [
@@ -61,45 +110,7 @@ export function createLanguagesColumns(
       header: "",
       enableSorting: false,
       enableGlobalFilter: false,
-      cell: ({ row }) => {
-        const language = row.original;
-        return (
-          <RowActions canMutate={isAdmin} onOpen={() => actions.onOpen(language)}>
-            <DropdownMenu>
-              <DropdownMenuTrigger
-                render={
-                  <Button variant="ghost" size="icon" className="rounded-[20px] cursor-pointer">
-                    <MoreVertical className="size-6" />
-                  </Button>
-                }
-              />
-              <DropdownMenuContent align="end" className="min-w-32">
-                <DropdownMenuItem
-                  onClick={() => actions.onOpen(language)}
-                  className="justify-center cursor-pointer"
-                >
-                  {tb("open")}
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => actions.onUpdate(language)}
-                  disabled={!isAdmin}
-                  className="justify-center cursor-pointer"
-                >
-                  {tb("update")}
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => actions.onDelete(language)}
-                  disabled={!isAdmin}
-                  variant="destructive"
-                  className="justify-center cursor-pointer"
-                >
-                  {tb("delete")}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </RowActions>
-        );
-      },
+      cell: ({ row }) => <ActionsCell language={row.original} tb={tb} actions={actions} />,
     },
   ];
 }

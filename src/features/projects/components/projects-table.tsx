@@ -21,6 +21,7 @@ import {
 import { TableEmptyState } from "@/components/shared/table-empty-state";
 import { TablePagination } from "@/components/shared/table-pagination";
 import { TableToolbar } from "@/components/shared/table-toolbar";
+import { usePermissions } from "@/lib/auth/permissions";
 import { useTranslations } from "next-intl";
 import { useProjectsVisibleColumnCount } from "@/hooks/use-projects-visible-column-count";
 import { ProjectRow } from "./project-row";
@@ -30,7 +31,6 @@ import type { ProjectItem } from "../hooks/use-projects-page";
 interface ProjectsTableProps {
   loading: boolean;
   projects: ProjectItem[];
-  canMutate: boolean;
   globalFilter: string;
   setGlobalFilter: (value: string) => void;
   onCreate: () => void;
@@ -43,7 +43,6 @@ interface ProjectsTableProps {
 export function ProjectsTable({
   loading,
   projects,
-  canMutate,
   globalFilter,
   setGlobalFilter,
   onCreate,
@@ -57,6 +56,7 @@ export function ProjectsTable({
   const tColumns = useTranslations("columns.projects");
   const tButtons = useTranslations("buttons");
   const tCommon = useTranslations("common");
+  const { isAdmin } = usePermissions();
   const columns = useMemo(() => createProjectColumns(tColumns), [tColumns]);
 
   // eslint-disable-next-line react-hooks/incompatible-library -- TanStack Table requires the table instance to be created directly.
@@ -82,7 +82,7 @@ export function ProjectsTable({
         onChange={setGlobalFilter}
         actionLabel={tButtons("createProject")}
         onAction={onCreate}
-        showAction={canMutate}
+        showAction={isAdmin}
       />
 
       <div className="overflow-x-hidden">
@@ -139,7 +139,6 @@ export function ProjectsTable({
                 key={row.original.id}
                 project={row.original}
                 columnCount={columnCount}
-                canMutate={canMutate}
                 isLast={idx === rows.length - 1}
                 onOpen={onOpen}
                 onUpdate={onUpdate}

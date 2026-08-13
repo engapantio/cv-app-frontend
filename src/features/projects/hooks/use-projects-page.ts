@@ -4,30 +4,19 @@ import { useState, useMemo, useCallback } from "react";
 import { useQuery, useMutation } from "@apollo/client/react";
 import {
   ProjectsDocument,
-  SkillsDocument,
   CreateProjectDocument,
   UpdateProjectDocument,
   DeleteProjectDocument,
   type ProjectsQuery,
 } from "@/gql/generated/graphql";
-import { usePermissions } from "@/lib/auth/permissions";
 
 export type ProjectItem = ProjectsQuery["projects"][number];
 
 export function useProjectsPage(initialProjects: ProjectItem[]) {
-  const { data, loading, refetch } = useQuery(ProjectsDocument, {
-    fetchPolicy: "network-only",
+  const { data, loading } = useQuery(ProjectsDocument, {
+    fetchPolicy: "cache-and-network",
     errorPolicy: "all",
   });
-
-  const { data: skillsData } = useQuery(SkillsDocument, {
-    fetchPolicy: "cache-first",
-    errorPolicy: "all",
-  });
-
-  const { isAdmin } = usePermissions();
-
-  const allSkills = useMemo(() => skillsData?.skills?.map((s) => s.name) ?? [], [skillsData]);
 
   const [localProjects, setLocalProjects] = useState<ProjectItem[]>([]);
 
@@ -69,10 +58,9 @@ export function useProjectsPage(initialProjects: ProjectItem[]) {
       if (created) {
         setLocalProjects((prev) => [created as ProjectItem, ...prev]);
       }
-      refetch();
       setCreateOpen(false);
     },
-    [createProject, refetch],
+    [createProject],
   );
 
   const handleUpdate = useCallback(
@@ -94,10 +82,9 @@ export function useProjectsPage(initialProjects: ProjectItem[]) {
           prev.map((p) => (p.id === updated.id ? (updated as ProjectItem) : p)),
         );
       }
-      refetch();
       setUpdateTarget(null);
     },
-    [updateProject, refetch],
+    [updateProject],
   );
 
   const handleDelete = useCallback(
@@ -106,16 +93,13 @@ export function useProjectsPage(initialProjects: ProjectItem[]) {
         variables: { project: { projectId } },
       });
       setLocalProjects((prev) => prev.filter((p) => p.id !== projectId));
-      refetch();
     },
-    [deleteProject, refetch],
+    [deleteProject],
   );
 
   return {
     loading: loading && projects.length === 0,
     projects,
-    allSkills,
-    canMutate: isAdmin,
     globalFilter,
     setGlobalFilter,
     openProject,

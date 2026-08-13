@@ -89,7 +89,7 @@ describe("useUserSkillsPage", () => {
     const { result } = renderHook(() => useUserSkillsPage("u1"));
     expect(mockUseQuery).toHaveBeenCalledWith(
       expect.anything(),
-      expect.objectContaining({ variables: { userId: "u1" }, fetchPolicy: "network-only" }),
+      expect.objectContaining({ variables: { userId: "u1" }, fetchPolicy: "cache-and-network" }),
     );
     await waitFor(() => expect(result.current.hasUser).toBe(true));
     expect(result.current.loading).toBe(false);

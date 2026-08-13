@@ -15,6 +15,11 @@ jest.mock("@/components/shared/table-pagination", () =>
   require("@/test-utils/mocks").mockTablePagination(),
 );
 
+const mockUsePermissions = jest.fn<{ isAdmin: boolean; currentUserId: string | undefined }, []>(
+  () => ({ isAdmin: true, currentUserId: "u1" }),
+);
+jest.mock("@/lib/auth/permissions", () => ({ usePermissions: () => mockUsePermissions() }));
+
 const projects: ProjectItem[] = [
   {
     id: "1",
@@ -41,16 +46,17 @@ const projects: ProjectItem[] = [
 ];
 
 function renderTable({
-  canMutate = true,
+  isAdmin = true,
   loading = false,
   data = projects,
   serverError,
 }: {
-  canMutate?: boolean;
+  isAdmin?: boolean;
   loading?: boolean;
   data?: ProjectItem[];
   serverError?: string | null;
 }) {
+  mockUsePermissions.mockReturnValue({ isAdmin, currentUserId: isAdmin ? "u1" : undefined });
   const actions = { onOpen: jest.fn(), onUpdate: jest.fn(), onDelete: jest.fn() };
 
   function Harness() {
@@ -59,7 +65,6 @@ function renderTable({
       <ProjectsTable
         loading={loading}
         projects={data}
-        canMutate={canMutate}
         globalFilter={globalFilter}
         setGlobalFilter={setGlobalFilter}
         onCreate={jest.fn()}
@@ -91,17 +96,17 @@ describe("ProjectsTable", () => {
   });
 
   it("shows the create action for admins", () => {
-    renderTable({ canMutate: true });
+    renderTable({ isAdmin: true });
     expect(screen.getByText("createProject")).toBeInTheDocument();
   });
 
   it("hides the create action for non-admins", () => {
-    renderTable({ canMutate: false });
+    renderTable({ isAdmin: false });
     expect(screen.queryByText("createProject")).not.toBeInTheDocument();
   });
 
   it("shows only the read-only open action for non-admins", () => {
-    renderTable({ canMutate: false });
+    renderTable({ isAdmin: false });
     expect(screen.getAllByRole("button", { name: "Open" })).toHaveLength(projects.length);
   });
 

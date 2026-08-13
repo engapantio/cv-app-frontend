@@ -11,7 +11,6 @@ import {
 import { SkillsTable } from "./skills-table";
 import { createSkillsColumns } from "../columns";
 import type { SkillItem } from "../types";
-import type { SkillCategoriesQuery } from "@/gql/generated/graphql";
 
 jest.mock("next-intl", () => require("@/test-utils/mocks").mockNextIntl());
 jest.mock("lucide-react", () => require("@/test-utils/mocks").mockLucide());
@@ -25,6 +24,11 @@ jest.mock("@/components/shared/sortable-header", () =>
 jest.mock("@/components/shared/table-pagination", () =>
   require("@/test-utils/mocks").mockTablePagination(),
 );
+
+const mockUsePermissions = jest.fn<{ isAdmin: boolean; currentUserId: string | undefined }, []>(
+  () => ({ isAdmin: true, currentUserId: "u1" }),
+);
+jest.mock("@/lib/auth/permissions", () => ({ usePermissions: () => mockUsePermissions() }));
 
 const skills: SkillItem[] = [
   {
@@ -45,11 +49,6 @@ const skills: SkillItem[] = [
   },
 ];
 
-const categories: SkillCategoriesQuery["skillCategories"] = [
-  { id: "c1", name: "Programming Language", order: 1, parent: null, children: [] },
-  { id: "c2", name: "Design", order: 2, parent: null, children: [] },
-];
-
 function renderTable({
   isAdmin = true,
   loading = false,
@@ -61,12 +60,13 @@ function renderTable({
   data?: SkillItem[];
   serverError?: string | null;
 }) {
+  mockUsePermissions.mockReturnValue({ isAdmin, currentUserId: isAdmin ? "u1" : undefined });
   const t = (key: string) => key.split(".").pop() ?? key;
   const actions = { onOpen: jest.fn(), onUpdate: jest.fn(), onDelete: jest.fn() };
 
   function Harness() {
     const [globalFilter, setGlobalFilter] = useState("");
-    const columns = createSkillsColumns(t, t, isAdmin, actions);
+    const columns = createSkillsColumns(t, t, actions);
     const table = useReactTable({
       data,
       columns,
@@ -82,7 +82,6 @@ function renderTable({
         loading={loading}
         table={table}
         columnCount={columns.length}
-        isAdmin={isAdmin}
         createOpen={false}
         setCreateOpen={jest.fn()}
         deleteTarget={null}
@@ -97,7 +96,6 @@ function renderTable({
         globalFilter={globalFilter}
         setGlobalFilter={setGlobalFilter}
         serverError={serverError}
-        categories={categories}
       />
     );
   }

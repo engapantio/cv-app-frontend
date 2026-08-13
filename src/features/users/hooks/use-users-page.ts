@@ -65,10 +65,7 @@ export function useUsersPage(
   const effectiveUserId = sessionUserId ?? initialUserId ?? null;
   const effectiveIsAdmin = sessionUserId != null ? sessionIsAdmin : initialIsAdmin;
 
-const {
-    data: usersData,
-    loading,
-  } = useQuery<UsersQuery>(UsersDocument, {
+  const { data: usersData, loading } = useQuery<UsersQuery>(UsersDocument, {
     fetchPolicy: "cache-and-network",
     errorPolicy: "all",
   });
@@ -355,13 +352,7 @@ const {
         onUpdate: handleUpdate,
         onDelete: handleDelete,
       }),
-    [
-      handleNavigate,
-      handleUpdate,
-      handleDelete,
-      tColumns,
-      tButtons,
-    ],
+    [handleNavigate, handleUpdate, handleDelete, tColumns, tButtons],
   );
 
   // eslint-disable-next-line react-hooks/incompatible-library

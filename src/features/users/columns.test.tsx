@@ -63,6 +63,11 @@ jest.mock("@/components/shared/sortable-header", () => ({
   SortableHeader: ({ label }: { label: string }) => <span>{label}</span>,
 }));
 
+const mockUsePermissions = jest.fn<{ isAdmin: boolean; currentUserId: string | undefined }, []>(
+  () => ({ isAdmin: true, currentUserId: "u1" }),
+);
+jest.mock("@/lib/auth/permissions", () => ({ usePermissions: () => mockUsePermissions() }));
+
 const baseUser = {
   created_at: "2024-01-01T00:00:00Z",
   is_verified: true,
@@ -110,8 +115,6 @@ interface UsersActionsShape {
 let createUsersColumns: (
   t: (key: string) => string,
   tb: (key: string) => string,
-  isAdmin: boolean,
-  currentUserId: string | undefined,
   actions: UsersActionsShape,
 ) => ColumnDef<UserItem, unknown>[];
 
@@ -125,7 +128,8 @@ function buildTable(
   currentUserId: string | undefined,
   actions: UsersActionsShape,
 ): Table<UserItem> {
-  const columns = createUsersColumns(t, tb, isAdmin, currentUserId, actions);
+  mockUsePermissions.mockReturnValue({ isAdmin, currentUserId: currentUserId ?? undefined });
+  const columns = createUsersColumns(t, tb, actions);
   let captured: Table<UserItem> | undefined;
 
   function TableBuilder() {

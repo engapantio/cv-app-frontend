@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useMemo, useEffect, useRef } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { useQuery, useMutation } from "@apollo/client/react";
 import {
   LanguagesDocument,
@@ -10,7 +10,6 @@ import {
   type CreateLanguageMutation,
   type UpdateLanguageMutation,
 } from "@/gql/generated/graphql";
-import { usePermissions } from "@/lib/auth/permissions";
 import { createLanguagesColumns } from "@/features/languages/columns";
 import {
   useReactTable,
@@ -24,25 +23,22 @@ import type { LanguageItem } from "@/features/languages/types";
 import { useTranslations } from "next-intl";
 
 export function useLanguagesPage(initialLanguages: LanguageItem[]) {
-  const { isAdmin } = usePermissions();
   const tColumns = useTranslations("columns.languages");
   const tButtons = useTranslations("buttons");
 
   const { data: languagesData, loading } = useQuery(LanguagesDocument, {
-    fetchPolicy: "network-only",
+    fetchPolicy: "cache-and-network",
     errorPolicy: "all",
   });
 
   const [languagesList, setLanguagesList] = useState<LanguageItem[]>(initialLanguages);
 
-  const hydratedRef = useRef(false);
-
   useEffect(() => {
-    if (languagesData?.languages && !hydratedRef.current) {
-      hydratedRef.current = true;
+    if (languagesData?.languages) {
       setLanguagesList(
         languagesData.languages
           .filter((l): l is NonNullable<typeof l> => l !== null)
+          .slice()
           .sort((a, b) => a.name.localeCompare(b.name)),
       );
     }
@@ -88,12 +84,12 @@ export function useLanguagesPage(initialLanguages: LanguageItem[]) {
 
   const columns = useMemo(
     () =>
-      createLanguagesColumns(tColumns, tButtons, isAdmin, {
+      createLanguagesColumns(tColumns, tButtons, {
         onOpen: handleOpen,
         onUpdate: handleUpdate,
         onDelete: handleDelete,
       }),
-    [isAdmin, handleOpen, handleUpdate, handleDelete, tColumns, tButtons],
+    [handleOpen, handleUpdate, handleDelete, tColumns, tButtons],
   );
 
   // eslint-disable-next-line react-hooks/incompatible-library
@@ -115,7 +111,6 @@ export function useLanguagesPage(initialLanguages: LanguageItem[]) {
     loading: loading && languagesList.length === 0,
     table,
     columnCount,
-    isAdmin,
     createOpen,
     setCreateOpen,
     deleteTarget,

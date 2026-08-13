@@ -11,6 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
+import { usePermissions } from "@/lib/auth/permissions";
 import { useTranslations } from "next-intl";
 import type { UserItem } from "@/features/users/types";
 import type { CreateUserPayload, UpdateUserPayload } from "@/features/users/hooks/use-users-page";
@@ -35,8 +36,6 @@ interface UsersTableProps {
   loading: boolean;
   table: Table<UserItem>;
   columnCount: number;
-  isAdmin: boolean;
-  currentUserId: string | null;
   createOpen: boolean;
   setCreateOpen: (open: boolean) => void;
   updateTarget: UserItem | null;
@@ -49,8 +48,6 @@ interface UsersTableProps {
   globalFilter: string;
   setGlobalFilter: (value: string) => void;
   serverError?: string | null;
-  departments: { id: string; name: string }[];
-  positions: { id: string; name: string }[];
   creating: boolean;
   updating: boolean;
 }
@@ -59,8 +56,6 @@ export function UsersTable({
   loading,
   table,
   columnCount,
-  isAdmin,
-  currentUserId,
   createOpen,
   setCreateOpen,
   updateTarget,
@@ -73,13 +68,12 @@ export function UsersTable({
   globalFilter,
   setGlobalFilter,
   serverError,
-  departments,
-  positions,
   creating,
   updating,
 }: UsersTableProps) {
   const rows = table.getRowModel().rows;
   const t = useTranslations();
+  const { isAdmin } = usePermissions();
 
   return (
     <>
@@ -191,8 +185,6 @@ export function UsersTable({
         <CreateUserDialog
           open={createOpen}
           onOpenChange={setCreateOpen}
-          departments={departments}
-          positions={positions}
           onConfirm={handleCreated}
           loading={creating}
         />
@@ -203,9 +195,6 @@ export function UsersTable({
           key={"update-" + updateTarget.id}
           target={updateTarget}
           onClose={() => setUpdateTarget(null)}
-          currentUserId={currentUserId}
-          departments={departments}
-          positions={positions}
           onConfirm={handleUpdated}
           loading={updating}
         />

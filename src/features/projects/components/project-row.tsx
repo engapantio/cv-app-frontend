@@ -4,6 +4,7 @@ import { MoreVertical } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { formatDate } from "@/lib/utils/date";
+import { usePermissions } from "@/lib/auth/permissions";
 import { Pill } from "@/components/shared/pill";
 import { Button } from "@/components/ui/button";
 import { RowActions } from "@/components/shared/row-actions";
@@ -18,7 +19,6 @@ import type { ProjectItem } from "../hooks/use-projects-page";
 interface ProjectRowProps {
   project: ProjectItem;
   columnCount: number;
-  canMutate: boolean;
   isLast: boolean;
   onOpen: (project: ProjectItem) => void;
   onUpdate: (project: ProjectItem) => void;
@@ -28,7 +28,6 @@ interface ProjectRowProps {
 export function ProjectRow({
   project,
   columnCount,
-  canMutate,
   isLast,
   onOpen,
   onUpdate,
@@ -36,6 +35,8 @@ export function ProjectRow({
 }: ProjectRowProps) {
   const tButtons = useTranslations("buttons");
   const tCommon = useTranslations("common");
+  const { isAdmin } = usePermissions();
+  const canMutate = isAdmin;
 
   return (
     <tbody

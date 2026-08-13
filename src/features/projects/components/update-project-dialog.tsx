@@ -20,12 +20,12 @@ import {
   Calendar,
 } from "@/components/ui";
 import type { ProjectItem } from "../hooks/use-projects-page";
+import { useSkillsList } from "@/lib/apollo/use-skills-list";
 
 interface UpdateProjectDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   project: ProjectItem | null;
-  allSkills: string[];
   onConfirm: (data: {
     projectId: string;
     name: string;
@@ -40,18 +40,18 @@ interface UpdateProjectDialogProps {
 
 function UpdateProjectForm({
   project,
-  allSkills,
   onConfirm,
   onOpenChange,
   loading,
 }: {
   project: ProjectItem;
-  allSkills: string[];
   onConfirm: UpdateProjectDialogProps["onConfirm"];
   onOpenChange: (open: boolean) => void;
   loading: boolean;
 }) {
   const t = useTranslations();
+  const { data: skillsData } = useSkillsList();
+  const allSkills = skillsData?.skills?.map((s) => s.name) ?? [];
   const [name, setName] = useState(project.name);
   const [domain, setDomain] = useState(project.domain);
   const [startDate, setStartDate] = useState<Date | undefined>(
@@ -279,7 +279,6 @@ export function UpdateProjectDialog({
   open,
   onOpenChange,
   project,
-  allSkills,
   onConfirm,
   loading,
 }: UpdateProjectDialogProps) {
@@ -293,7 +292,6 @@ export function UpdateProjectDialog({
         >
           <UpdateProjectForm
             project={project}
-            allSkills={allSkills}
             onConfirm={onConfirm}
             onOpenChange={onOpenChange}
             loading={loading}

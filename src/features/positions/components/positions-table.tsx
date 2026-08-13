@@ -11,6 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
+import { usePermissions } from "@/lib/auth/permissions";
 import type { PositionItem } from "@/features/positions/types";
 import { TableEmptyState } from "@/components/shared/table-empty-state";
 import { TablePagination } from "@/components/shared/table-pagination";
@@ -38,7 +39,6 @@ interface PositionsTableProps {
   loading: boolean;
   table: Table<PositionItem>;
   columnCount: number;
-  isAdmin: boolean;
   createOpen: boolean;
   setCreateOpen: (open: boolean) => void;
   deleteTarget: PositionItem | null;
@@ -59,7 +59,6 @@ export function PositionsTable({
   loading,
   table,
   columnCount,
-  isAdmin,
   createOpen,
   setCreateOpen,
   deleteTarget,
@@ -78,6 +77,7 @@ export function PositionsTable({
   const rows = table.getRowModel().rows;
   const tButtons = useTranslations("buttons");
   const tCommon = useTranslations("common");
+  const { isAdmin } = usePermissions();
 
   return (
     <>

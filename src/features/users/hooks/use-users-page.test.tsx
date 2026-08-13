@@ -44,7 +44,15 @@ const payload: CreateUserPayload = {
 };
 
 const createUserResult = {
-  data: { createUser: { id: "42", created_at: "", email: "new@example.com", is_verified: false, role: "Employee" } },
+  data: {
+    createUser: {
+      id: "42",
+      created_at: "",
+      email: "new@example.com",
+      is_verified: false,
+      role: "Employee",
+    },
+  },
 };
 
 const createUserVariables = {

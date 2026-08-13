@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useMemo, useEffect, useRef } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { useQuery, useMutation } from "@apollo/client/react";
 import {
   DepartmentsDocument,
@@ -10,7 +10,6 @@ import {
   type CreateDepartmentMutation,
   type UpdateDepartmentMutation,
 } from "@/gql/generated/graphql";
-import { usePermissions } from "@/lib/auth/permissions";
 import { createDepartmentsColumns } from "@/features/departments/columns";
 import {
   useReactTable,
@@ -24,26 +23,22 @@ import type { DepartmentItem } from "@/features/departments/types";
 import { useTranslations } from "next-intl";
 
 export function useDepartmentsPage(initialDepartments: DepartmentItem[]) {
-  const { isAdmin } = usePermissions();
   const tColumns = useTranslations("columns.departments");
   const tButtons = useTranslations("buttons");
 
   const { data: departmentsData, loading } = useQuery(DepartmentsDocument, {
-    fetchPolicy: "network-only",
+    fetchPolicy: "cache-and-network",
     errorPolicy: "all",
   });
 
   const [departmentsList, setDepartmentsList] = useState<DepartmentItem[]>(initialDepartments);
 
-  const hydratedRef = useRef(false);
-
   useEffect(() => {
-    if (departmentsData?.departments && !hydratedRef.current) {
-      hydratedRef.current = true;
+    if (departmentsData?.departments) {
       setDepartmentsList(
-        (departmentsData.departments as DepartmentItem[]).sort((a, b) =>
-          a.name.localeCompare(b.name),
-        ),
+        (departmentsData.departments as DepartmentItem[])
+          .slice()
+          .sort((a, b) => a.name.localeCompare(b.name)),
       );
     }
   }, [departmentsData]);
@@ -91,12 +86,12 @@ export function useDepartmentsPage(initialDepartments: DepartmentItem[]) {
 
   const columns = useMemo(
     () =>
-      createDepartmentsColumns(tColumns, tButtons, isAdmin, {
+      createDepartmentsColumns(tColumns, tButtons, {
         onOpen: handleOpen,
         onUpdate: handleUpdate,
         onDelete: handleDelete,
       }),
-    [isAdmin, handleOpen, handleUpdate, handleDelete, tColumns, tButtons],
+    [handleOpen, handleUpdate, handleDelete, tColumns, tButtons],
   );
 
   // eslint-disable-next-line react-hooks/incompatible-library
@@ -118,7 +113,6 @@ export function useDepartmentsPage(initialDepartments: DepartmentItem[]) {
     loading: loading && departmentsList.length === 0,
     table,
     columnCount,
-    isAdmin,
     createOpen,
     setCreateOpen,
     deleteTarget,

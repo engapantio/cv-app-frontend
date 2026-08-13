@@ -5,10 +5,8 @@ import { useProjectsPage } from "./use-projects-page";
 jest.mock("@apollo/client/react", () => ({ useQuery: jest.fn(), useMutation: jest.fn() }));
 jest.mock("next-intl", () => require("@/test-utils/mocks").mockNextIntl());
 jest.mock("@/lib/auth/permissions", () => ({
-  usePermissions: () => ({ isAdmin: mockIsAdmin(), user: { id: "admin-1", role: "Admin" } }),
+  usePermissions: () => ({ isAdmin: true, user: { id: "admin-1", role: "Admin" } }),
 }));
-
-const mockIsAdmin = jest.fn(() => true);
 
 const mockUseQuery = useQuery as unknown as jest.Mock;
 const mockUseMutation = useMutation as unknown as jest.Mock;
@@ -41,7 +39,6 @@ const projects = [
 
 beforeEach(() => {
   jest.clearAllMocks();
-  mockIsAdmin.mockReturnValue(true);
   mockUseMutation.mockReturnValue([jest.fn(), { loading: false }]);
   mockUseQuery.mockReturnValue({
     data: { projects, skills: [{ name: "React" }] },
@@ -68,14 +65,6 @@ describe("useProjectsPage", () => {
     const { result } = renderHook(() => useProjectsPage([]));
     await waitFor(() => expect(result.current.projects).toHaveLength(2));
     expect(result.current.projects.map((p) => p.name)).toEqual(["Beta", "Alpha"]);
-  });
-
-  it("exposes canMutate from admin permissions", () => {
-    const { result } = renderHook(() => useProjectsPage([]));
-    expect(result.current.canMutate).toBe(true);
-    mockIsAdmin.mockReturnValue(false);
-    const { result: employeeResult } = renderHook(() => useProjectsPage([]));
-    expect(employeeResult.current.canMutate).toBe(false);
   });
 
   it("merges a locally created project on top of server rows", async () => {
@@ -115,7 +104,6 @@ describe("useProjectsPage", () => {
     await waitFor(() =>
       expect(result.current.projects.map((p) => p.name)).toEqual(["Gamma", "Beta", "Alpha"]),
     );
-    expect(mockRefetch).toHaveBeenCalled();
   });
 
   it("removes a locally created project on delete and refetches", async () => {
@@ -161,6 +149,5 @@ describe("useProjectsPage", () => {
     });
 
     expect(result.current.projects.map((p) => p.id)).toEqual(["2", "1"]);
-    expect(mockRefetch).toHaveBeenCalled();
   });
 });

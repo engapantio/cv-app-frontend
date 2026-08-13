@@ -30,6 +30,9 @@ jest.mock("@/components/shared/table-pagination", () =>
   require("@/test-utils/mocks").mockTablePagination(),
 );
 
+const mockUsePermissions = jest.fn();
+jest.mock("@/lib/auth/permissions", () => ({ usePermissions: () => mockUsePermissions() }));
+
 const baseUser = {
   created_at: "2024-01-01T00:00:00Z",
   is_verified: true,
@@ -89,9 +92,11 @@ function renderTable({
   const t = (key: string) => key.split(".").pop() ?? key;
   const actions = { onOpen: jest.fn(), onUpdate: jest.fn(), onDelete: jest.fn() };
 
+  mockUsePermissions.mockReturnValue({ isAdmin, currentUserId });
+
   function Harness() {
     const [globalFilter, setGlobalFilter] = useState("");
-    const columns = createUsersColumns(t, t, isAdmin, currentUserId, actions);
+    const columns = createUsersColumns(t, t, actions);
     const table = useReactTable({
       data,
       columns,
@@ -107,8 +112,6 @@ function renderTable({
         loading={loading}
         table={table}
         columnCount={columns.length}
-        isAdmin={isAdmin}
-        currentUserId={currentUserId}
         createOpen={false}
         setCreateOpen={jest.fn()}
         updateTarget={null}
@@ -121,8 +124,6 @@ function renderTable({
         globalFilter={globalFilter}
         setGlobalFilter={setGlobalFilter}
         serverError={serverError}
-        departments={[]}
-        positions={[]}
         creating={false}
         updating={false}
       />

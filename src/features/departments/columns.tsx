@@ -9,6 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { usePermissions } from "@/lib/auth/permissions";
 import { RowActions } from "@/components/shared/row-actions";
 import { SortableHeader } from "@/components/shared/sortable-header";
 import type { DepartmentItem } from "./types";
@@ -19,10 +20,58 @@ interface DepartmentActions {
   onDelete: (department: DepartmentItem) => void;
 }
 
+function ActionsCell({
+  department,
+  tb,
+  actions,
+}: {
+  department: DepartmentItem;
+  tb: (key: string) => string;
+  actions: DepartmentActions;
+}) {
+  const { isAdmin } = usePermissions();
+
+  return (
+    <RowActions canMutate={isAdmin} onOpen={() => actions.onOpen(department)}>
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          render={
+            <Button variant="ghost" size="icon" className="rounded-[20px] cursor-pointer">
+              <MoreVertical className="size-6" />
+            </Button>
+          }
+        />
+        <DropdownMenuContent align="end" className="min-w-32">
+          <DropdownMenuItem
+            onClick={() => actions.onOpen(department)}
+            className="justify-center cursor-pointer"
+          >
+            {tb("open")}
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => actions.onUpdate(department)}
+            disabled={!isAdmin}
+            className="justify-center cursor-pointer"
+          >
+            {tb("update")}
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => actions.onDelete(department)}
+            disabled={!isAdmin}
+            variant="destructive"
+            className="justify-center cursor-pointer"
+          >
+            {tb("delete")}
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </RowActions>
+  );
+}
+
 export function createDepartmentsColumns(
   t: (key: string) => string,
   tb: (key: string) => string,
-  isAdmin: boolean,
   actions: DepartmentActions,
 ): ColumnDef<DepartmentItem>[] {
   return [
@@ -47,45 +96,7 @@ export function createDepartmentsColumns(
       header: "",
       enableSorting: false,
       enableGlobalFilter: false,
-      cell: ({ row }) => {
-        const department = row.original;
-        return (
-          <RowActions canMutate={isAdmin} onOpen={() => actions.onOpen(department)}>
-            <DropdownMenu>
-              <DropdownMenuTrigger
-                render={
-                  <Button variant="ghost" size="icon" className="rounded-[20px] cursor-pointer">
-                    <MoreVertical className="size-6" />
-                  </Button>
-                }
-              />
-              <DropdownMenuContent align="end" className="min-w-32">
-                <DropdownMenuItem
-                  onClick={() => actions.onOpen(department)}
-                  className="justify-center cursor-pointer"
-                >
-                  {tb("open")}
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => actions.onUpdate(department)}
-                  disabled={!isAdmin}
-                  className="justify-center cursor-pointer"
-                >
-                  {tb("update")}
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => actions.onDelete(department)}
-                  disabled={!isAdmin}
-                  variant="destructive"
-                  className="justify-center cursor-pointer"
-                >
-                  {tb("delete")}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </RowActions>
-        );
-      },
+      cell: ({ row }) => <ActionsCell department={row.original} tb={tb} actions={actions} />,
     },
   ];
 }

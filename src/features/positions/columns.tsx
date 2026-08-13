@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { RowActions } from "@/components/shared/row-actions";
 import { SortableHeader } from "@/components/shared/sortable-header";
+import { usePermissions } from "@/lib/auth/permissions";
 import type { PositionItem } from "./types";
 
 interface PositionActions {
@@ -19,10 +20,58 @@ interface PositionActions {
   onDelete: (position: PositionItem) => void;
 }
 
+function ActionsCell({
+  position,
+  tb,
+  actions,
+}: {
+  position: PositionItem;
+  tb: (key: string) => string;
+  actions: PositionActions;
+}) {
+  const { isAdmin } = usePermissions();
+
+  return (
+    <RowActions canMutate={isAdmin} onOpen={() => actions.onOpen(position)}>
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          render={
+            <Button variant="ghost" size="icon" className="rounded-[20px] cursor-pointer">
+              <MoreVertical className="size-6" />
+            </Button>
+          }
+        />
+        <DropdownMenuContent align="end" className="min-w-32">
+          <DropdownMenuItem
+            onClick={() => actions.onOpen(position)}
+            className="justify-center cursor-pointer"
+          >
+            {tb("open")}
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => actions.onUpdate(position)}
+            disabled={!isAdmin}
+            className="justify-center cursor-pointer"
+          >
+            {tb("update")}
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => actions.onDelete(position)}
+            disabled={!isAdmin}
+            variant="destructive"
+            className="justify-center cursor-pointer"
+          >
+            {tb("delete")}
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </RowActions>
+  );
+}
+
 export function createPositionsColumns(
   t: (key: string) => string,
   tb: (key: string) => string,
-  isAdmin: boolean,
   actions: PositionActions,
 ): ColumnDef<PositionItem>[] {
   return [
@@ -47,45 +96,7 @@ export function createPositionsColumns(
       header: "",
       enableSorting: false,
       enableGlobalFilter: false,
-      cell: ({ row }) => {
-        const position = row.original;
-        return (
-          <RowActions canMutate={isAdmin} onOpen={() => actions.onOpen(position)}>
-            <DropdownMenu>
-              <DropdownMenuTrigger
-                render={
-                  <Button variant="ghost" size="icon" className="rounded-[20px] cursor-pointer">
-                    <MoreVertical className="size-6" />
-                  </Button>
-                }
-              />
-              <DropdownMenuContent align="end" className="min-w-32">
-                <DropdownMenuItem
-                  onClick={() => actions.onOpen(position)}
-                  className="justify-center cursor-pointer"
-                >
-                  {tb("open")}
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => actions.onUpdate(position)}
-                  disabled={!isAdmin}
-                  className="justify-center cursor-pointer"
-                >
-                  {tb("update")}
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => actions.onDelete(position)}
-                  disabled={!isAdmin}
-                  variant="destructive"
-                  className="justify-center cursor-pointer"
-                >
-                  {tb("delete")}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </RowActions>
-        );
-      },
+      cell: ({ row }) => <ActionsCell position={row.original} tb={tb} actions={actions} />,
     },
   ];
 }
