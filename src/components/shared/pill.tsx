@@ -14,9 +14,8 @@ export function Pill({ text, variant = "muted" }: PillProps) {
         "inline-block px-3 py-1 rounded-full text-sm truncate max-w-[25%] min-w-0 select-none",
         variant === "muted" && "bg-muted text-muted-foreground",
         variant === "responsibility" &&
-          "bg-muted text-muted-foreground dark:bg-[#555555] dark:text-white",
-        variant === "transparent" &&
-          "bg-transparent text-foreground border border-muted-foreground",
+          "bg-responsibility text-foreground font-normal text-[13px] leading-[143%] tracking-[0.01em]",
+        variant === "transparent" && "bg-transparent text-foreground border border-table-border",
       )}
       title={text}
     >

@@ -103,7 +103,7 @@ export function LanguagesTable({
         />
 
         <div className="overflow-x-hidden">
-          <UITable className="table-fixed [&_tr]:border-b-border">
+          <UITable className="table-fixed">
             <colgroup>
               <col />
               <col />
@@ -164,7 +164,7 @@ export function LanguagesTable({
                   )}
                 >
                   <TableRow
-                    className="cursor-pointer border-b-0 group-hover:bg-muted/50 dark:group-hover:bg-white/15"
+                    className="cursor-pointer border-b-0 group-hover:bg-row-hover dark:group-hover:bg-white/15"
                     onClick={() => setOpenTarget(row.original)}
                   >
                     {row

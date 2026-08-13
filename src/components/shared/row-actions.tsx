@@ -22,7 +22,7 @@ export function RowActions({ canMutate, onOpen, children }: RowActionsProps) {
           onClick={onOpen}
           aria-label={t("open")}
         >
-          <ChevronRight className="size-6" />
+          <ChevronRight className="size-6 text-[#767676]" />
         </Button>
       </div>
     );

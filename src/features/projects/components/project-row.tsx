@@ -41,28 +41,30 @@ export function ProjectRow({
   return (
     <tbody
       className={cn(
-        "hover:bg-muted/50 dark:hover:bg-white/15",
+        "hover:bg-row-hover dark:hover:bg-white/15",
         !isLast && "border-b border-b-table-border",
       )}
     >
       <tr className="cursor-pointer" onClick={() => onOpen(project)}>
-        <td className="py-3 px-4 text-sm font-medium align-middle">{project.name}</td>
-        <td className="py-3 px-4 text-sm font-medium hidden max-md:hidden md:table-cell align-middle">
+        <td className="py-3 px-4 text-sm font-normal align-middle min-[1440px]:tracking-[0.01em] min-[1440px]:leading-[143%]">
+          {project.name}
+        </td>
+        <td className="py-3 px-4 text-sm font-normal hidden max-md:hidden md:table-cell align-middle min-[1440px]:tracking-[0.01em] min-[1440px]:leading-[143%]">
           {project.domain}
         </td>
-        <td className="py-3 px-4 text-sm font-medium hidden xl:table-cell align-middle">
+        <td className="py-3 px-4 text-sm font-normal hidden xl:table-cell align-middle min-[1440px]:tracking-[0.01em] min-[1440px]:leading-[143%]">
           {formatDate(project.start_date)}
         </td>
-        <td className="py-3 px-4 text-sm font-medium hidden xl:table-cell align-middle">
+        <td className="py-3 px-4 text-sm font-normal hidden xl:table-cell align-middle min-[1440px]:tracking-[0.01em] min-[1440px]:leading-[143%]">
           {formatDate(project.end_date, tCommon("tillNow"))}
         </td>
-        <td className="py-3 px-4 w-12 align-middle">
+        <td className="py-3 px-4 w-12 align-middle min-[1440px]:tracking-[0.01em] min-[1440px]:leading-[143%]">
           <RowActions canMutate={canMutate} onOpen={() => onOpen(project)}>
             <DropdownMenu>
               <DropdownMenuTrigger
                 render={
                   <Button variant="ghost" size="icon" className="rounded-[20px] cursor-pointer">
-                    <MoreVertical className="size-6" />
+                    <MoreVertical className="size-6 text-muted-solid dark:text-white" />
                   </Button>
                 }
               />
@@ -96,13 +98,16 @@ export function ProjectRow({
       <tr className="cursor-pointer" onClick={() => onOpen(project)}>
         <td
           colSpan={columnCount}
-          className="px-4 pb-2 pt-0 text-sm text-muted-foreground whitespace-normal wrap-break-word"
+          className="px-4 pb-4 pt-0 text-sm font-normal text-description leading-[143%] tracking-[0.01em] whitespace-normal wrap-break-word"
         >
           {project.description}
         </td>
       </tr>
       <tr className="cursor-pointer" onClick={() => onOpen(project)}>
-        <td colSpan={columnCount} className="px-4 pb-3 pt-0">
+        <td
+          colSpan={columnCount}
+          className="px-4 pb-4 pt-0 min-[1440px]:tracking-[0.01em] min-[1440px]:leading-[143%]"
+        >
           <div className="flex flex-wrap gap-1">
             {project.environment.map((env, index) => (
               <Pill key={index} text={env} variant="transparent" />

@@ -65,7 +65,7 @@ export function DataTable<T, V>({
       <SearchBar value={globalFilter} onChange={setGlobalFilter} />
 
       <div>
-        <Table className="table-fixed [&_tr]:border-b-border">
+        <Table className="table-fixed">
           <colgroup>
             {table.getVisibleLeafColumns().map((column) => (
               <col
