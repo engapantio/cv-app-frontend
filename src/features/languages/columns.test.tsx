@@ -1,8 +1,6 @@
 import { render, screen } from "@testing-library/react";
+import { flexRender, type SortingState, type Table } from "@tanstack/react-table";
 import {
-  flexRender,
-  type SortingState,
-  type Table,
   getCoreRowModel,
   getFilteredRowModel,
   getSortedRowModel,
@@ -11,7 +9,6 @@ import {
 import { createLanguagesColumns } from "./columns";
 import type { LanguageItem } from "./types";
 
-jest.mock("next-intl", () => require("@/test-utils/mocks").mockNextIntl());
 jest.mock("lucide-react", () => require("@/test-utils/mocks").mockLucide());
 jest.mock("@/components/shared/row-actions", () => require("@/test-utils/mocks").mockRowActions());
 jest.mock("@/components/shared/sortable-header", () =>
@@ -19,6 +16,11 @@ jest.mock("@/components/shared/sortable-header", () =>
 );
 jest.mock("@/components/ui/button", () => require("@/test-utils/ui-mock"));
 jest.mock("@/components/ui/dropdown-menu", () => require("@/test-utils/ui-mock"));
+
+const mockUsePermissions = jest.fn<{ isAdmin: boolean; currentUserId: string | undefined }, []>(
+  () => ({ isAdmin: true, currentUserId: "u1" }),
+);
+jest.mock("@/lib/auth/permissions", () => ({ usePermissions: () => mockUsePermissions() }));
 
 const languages: LanguageItem[] = [
   { id: "1", created_at: "", iso2: "en", name: "English", native_name: "English" },
@@ -32,7 +34,8 @@ function buildTableWithColumns(
   isAdmin: boolean,
   state?: { globalFilter?: string; sorting?: SortingState },
 ) {
-  const columns = createLanguagesColumns(t, tb, isAdmin, {
+  mockUsePermissions.mockReturnValue({ isAdmin, currentUserId: isAdmin ? "u1" : undefined });
+  const columns = createLanguagesColumns(t, tb, {
     onOpen: jest.fn(),
     onUpdate: jest.fn(),
     onDelete: jest.fn(),

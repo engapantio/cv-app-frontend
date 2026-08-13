@@ -4,15 +4,27 @@ import { CreateProjectDialog } from "./create-project-dialog";
 import { UpdateProjectDialog } from "./update-project-dialog";
 import { DeleteProjectDialog } from "./delete-project-dialog";
 import type { ProjectItem } from "../hooks/use-projects-page";
+import { useSkillsList } from "@/lib/apollo/use-skills-list";
 
 jest.mock("next-intl", () => require("@/test-utils/mocks").mockNextIntl());
 jest.mock("lucide-react", () => require("@/test-utils/mocks").mockLucide());
 jest.mock("@/components/ui", () => require("@/test-utils/ui-mock"));
+jest.mock("@/lib/apollo/use-skills-list", () => ({ useSkillsList: jest.fn() }));
+
+const mockUseSkillsList = useSkillsList as unknown as jest.Mock;
 
 const mockToastError = jest.fn();
 jest.mock("sonner", () => ({
   toast: { error: (...args: unknown[]) => mockToastError(...args) },
 }));
+
+beforeEach(() => {
+  jest.clearAllMocks();
+  mockUseSkillsList.mockReturnValue({
+    data: { skills: [{ name: "React" }, { name: "Node" }] },
+    loading: false,
+  });
+});
 
 const project: ProjectItem = {
   id: "7",
@@ -37,13 +49,7 @@ async function fillCreateFields(user: ReturnType<typeof userEvent.setup>) {
 describe("CreateProjectDialog", () => {
   it("keeps submit disabled until required fields are provided", () => {
     render(
-      <CreateProjectDialog
-        open
-        onOpenChange={jest.fn()}
-        allSkills={[]}
-        onConfirm={jest.fn()}
-        loading={false}
-      />,
+      <CreateProjectDialog open onOpenChange={jest.fn()} onConfirm={jest.fn()} loading={false} />,
     );
     expect(screen.getByRole("button", { name: "create" })).toBeDisabled();
   });
@@ -56,7 +62,6 @@ describe("CreateProjectDialog", () => {
       <CreateProjectDialog
         open
         onOpenChange={onOpenChange}
-        allSkills={["React"]}
         onConfirm={onConfirm}
         loading={false}
       />,
@@ -85,25 +90,13 @@ describe("CreateProjectDialog", () => {
     const user = userEvent.setup();
     const onConfirm = jest.fn().mockResolvedValue(undefined);
     const { rerender } = render(
-      <CreateProjectDialog
-        open
-        onOpenChange={jest.fn()}
-        allSkills={[]}
-        onConfirm={onConfirm}
-        loading={false}
-      />,
+      <CreateProjectDialog open onOpenChange={jest.fn()} onConfirm={onConfirm} loading={false} />,
     );
     await fillCreateFields(user);
     await user.click(screen.getByRole("button", { name: "create" }));
     await waitFor(() => expect(onConfirm).toHaveBeenCalled());
     rerender(
-      <CreateProjectDialog
-        open
-        onOpenChange={jest.fn()}
-        allSkills={[]}
-        onConfirm={onConfirm}
-        loading={false}
-      />,
+      <CreateProjectDialog open onOpenChange={jest.fn()} onConfirm={onConfirm} loading={false} />,
     );
   });
 
@@ -111,13 +104,7 @@ describe("CreateProjectDialog", () => {
     const user = userEvent.setup();
     const onConfirm = jest.fn().mockResolvedValue(undefined);
     render(
-      <CreateProjectDialog
-        open
-        onOpenChange={jest.fn()}
-        allSkills={["React", "Node"]}
-        onConfirm={onConfirm}
-        loading={false}
-      />,
+      <CreateProjectDialog open onOpenChange={jest.fn()} onConfirm={onConfirm} loading={false} />,
     );
     await fillCreateFields(user);
     await user.click(screen.getByLabelText("React"));
@@ -135,7 +122,6 @@ describe("UpdateProjectDialog", () => {
         open
         onOpenChange={jest.fn()}
         project={project}
-        allSkills={[]}
         onConfirm={jest.fn()}
         loading={false}
       />,
@@ -152,7 +138,6 @@ describe("UpdateProjectDialog", () => {
         open
         onOpenChange={jest.fn()}
         project={project}
-        allSkills={[]}
         onConfirm={jest.fn()}
         loading={false}
       />,
@@ -168,7 +153,6 @@ describe("UpdateProjectDialog", () => {
         open
         onOpenChange={jest.fn()}
         project={project}
-        allSkills={[]}
         onConfirm={onConfirm}
         loading={false}
       />,

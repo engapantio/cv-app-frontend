@@ -6,12 +6,8 @@ jest.mock("@apollo/client/react", () => ({ useQuery: jest.fn(), useMutation: jes
 jest.mock("next-intl", () => require("@/test-utils/mocks").mockNextIntl());
 jest.mock("lucide-react", () => require("@/test-utils/mocks").mockLucide());
 jest.mock("@/lib/auth/permissions", () => ({
-  usePermissions: () => ({ isAdmin: mockIsAdmin(), user: mockUser() }),
+  usePermissions: () => ({ isAdmin: true, user: { id: "admin-1", role: "Admin" } }),
 }));
-
-let isAdminValue = true;
-const mockIsAdmin = jest.fn(() => isAdminValue);
-const mockUser = jest.fn(() => ({ id: "admin-1", role: "Admin" }));
 
 jest.mock("@/components/ui/button", () => require("@/test-utils/ui-mock"));
 jest.mock("@/components/ui/dropdown-menu", () => require("@/test-utils/ui-mock"));
@@ -42,7 +38,6 @@ const languages = [
 
 beforeEach(() => {
   jest.clearAllMocks();
-  isAdminValue = true;
   mockUseMutation.mockReturnValue([jest.fn(), { loading: false }]);
   mockUseQuery.mockReturnValue({ data: { languages }, loading: false });
 });
@@ -66,14 +61,6 @@ describe("useLanguagesPage", () => {
       ]),
     );
     expect(result.current.languagesList.map((l) => l.id)).toEqual(["9"]);
-  });
-
-  it("exposes isAdmin from permissions", () => {
-    const { result } = renderHook(() => useLanguagesPage([]));
-    expect(result.current.isAdmin).toBe(true);
-    isAdminValue = false;
-    const { result: employeeResult } = renderHook(() => useLanguagesPage([]));
-    expect(employeeResult.current.isAdmin).toBe(false);
   });
 
   it("filters rows by language name via the global filter", async () => {

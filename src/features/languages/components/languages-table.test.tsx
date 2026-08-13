@@ -25,6 +25,11 @@ jest.mock("@/components/shared/table-pagination", () =>
   require("@/test-utils/mocks").mockTablePagination(),
 );
 
+const mockUsePermissions = jest.fn<{ isAdmin: boolean; currentUserId: string | undefined }, []>(
+  () => ({ isAdmin: true, currentUserId: "u1" }),
+);
+jest.mock("@/lib/auth/permissions", () => ({ usePermissions: () => mockUsePermissions() }));
+
 const languages: LanguageItem[] = [
   { id: "1", created_at: "", iso2: "en", name: "English", native_name: "English" },
   { id: "2", created_at: "", iso2: "de", name: "German", native_name: "Deutsch" },
@@ -43,12 +48,13 @@ function renderTable({
   serverError?: string | null;
   initialFilter?: string;
 }) {
+  mockUsePermissions.mockReturnValue({ isAdmin, currentUserId: isAdmin ? "u1" : undefined });
   const t = (key: string) => key.split(".").pop() ?? key;
   const actions = { onOpen: jest.fn(), onUpdate: jest.fn(), onDelete: jest.fn() };
 
   function Harness() {
     const [globalFilter, setGlobalFilter] = useState(initialFilter);
-    const columns = createLanguagesColumns(t, t, isAdmin, actions);
+    const columns = createLanguagesColumns(t, t, actions);
     const table = useReactTable({
       data,
       columns,
@@ -64,7 +70,6 @@ function renderTable({
         loading={loading}
         table={table}
         columnCount={columns.length}
-        isAdmin={isAdmin}
         createOpen={false}
         setCreateOpen={jest.fn()}
         deleteTarget={null}

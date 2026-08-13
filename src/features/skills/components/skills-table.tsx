@@ -11,8 +11,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
+import { usePermissions } from "@/lib/auth/permissions";
 import type { SkillItem } from "@/features/skills/types";
-import type { SkillCategoriesQuery } from "@/gql/generated/graphql";
 import { TableEmptyState } from "@/components/shared/table-empty-state";
 import { TablePagination } from "@/components/shared/table-pagination";
 import { TableToolbar } from "@/components/shared/table-toolbar";
@@ -39,7 +39,6 @@ interface SkillsTableProps {
   loading: boolean;
   table: Table<SkillItem>;
   columnCount: number;
-  isAdmin: boolean;
   createOpen: boolean;
   setCreateOpen: (open: boolean) => void;
   deleteTarget: SkillItem | null;
@@ -66,14 +65,12 @@ interface SkillsTableProps {
   globalFilter: string;
   setGlobalFilter: (value: string) => void;
   serverError?: string | null;
-  categories: SkillCategoriesQuery["skillCategories"];
 }
 
 export function SkillsTable({
   loading,
   table,
   columnCount,
-  isAdmin,
   createOpen,
   setCreateOpen,
   deleteTarget,
@@ -88,11 +85,11 @@ export function SkillsTable({
   globalFilter,
   setGlobalFilter,
   serverError,
-  categories,
 }: SkillsTableProps) {
   const rows = table.getRowModel().rows;
   const tButtons = useTranslations("buttons");
   const tCommon = useTranslations("common");
+  const { isAdmin } = usePermissions();
 
   return (
     <>
@@ -206,7 +203,6 @@ export function SkillsTable({
         <CreateSkillDialog
           open={createOpen}
           onOpenChange={setCreateOpen}
-          categories={categories}
           onCreated={handleCreated}
         />
       )}
@@ -216,7 +212,6 @@ export function SkillsTable({
           key={"update-" + updateTarget.id}
           target={updateTarget}
           onClose={() => setUpdateTarget(null)}
-          categories={categories}
           onUpdated={handleUpdated}
         />
       )}

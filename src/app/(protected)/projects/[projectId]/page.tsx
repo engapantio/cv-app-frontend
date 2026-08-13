@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useQuery, useMutation } from "@apollo/client/react";
 import { ChevronRight } from "lucide-react";
 import { format } from "date-fns";
-import { ProjectDocument, SkillsDocument, UpdateProjectDocument } from "@/gql/generated/graphql";
+import { ProjectDocument, UpdateProjectDocument } from "@/gql/generated/graphql";
 import { usePermissions } from "@/lib/auth/permissions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,17 +21,11 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ projec
 
   const { data, loading, error } = useQuery(ProjectDocument, {
     variables: { projectId },
-    fetchPolicy: "network-only",
+    fetchPolicy: "cache-and-network",
     errorPolicy: "none",
     skip: !projectIdValid,
   });
 
-  const { data: skillsData } = useQuery(SkillsDocument, {
-    fetchPolicy: "cache-first",
-    errorPolicy: "all",
-  });
-
-  const allSkills = skillsData?.skills?.map((s) => s.name) ?? [];
   const project = data?.project;
 
   const [updateOpen, setUpdateOpen] = useState(false);
@@ -190,7 +184,6 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ projec
         open={updateOpen}
         onOpenChange={setUpdateOpen}
         project={project}
-        allSkills={allSkills}
         onConfirm={handleUpdate}
         loading={false}
       />

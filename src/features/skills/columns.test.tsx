@@ -11,7 +11,6 @@ import {
 import { createSkillsColumns } from "./columns";
 import type { SkillItem } from "./types";
 
-jest.mock("next-intl", () => require("@/test-utils/mocks").mockNextIntl());
 jest.mock("lucide-react", () => require("@/test-utils/mocks").mockLucide());
 jest.mock("@/components/shared/row-actions", () => require("@/test-utils/mocks").mockRowActions());
 jest.mock("@/components/shared/sortable-header", () =>
@@ -19,6 +18,11 @@ jest.mock("@/components/shared/sortable-header", () =>
 );
 jest.mock("@/components/ui/button", () => require("@/test-utils/ui-mock"));
 jest.mock("@/components/ui/dropdown-menu", () => require("@/test-utils/ui-mock"));
+
+const mockUsePermissions = jest.fn<{ isAdmin: boolean; currentUserId: string | undefined }, []>(
+  () => ({ isAdmin: true, currentUserId: "u1" }),
+);
+jest.mock("@/lib/auth/permissions", () => ({ usePermissions: () => mockUsePermissions() }));
 
 const skills: SkillItem[] = [
   {
@@ -46,7 +50,8 @@ function buildTableWithColumns(
   isAdmin: boolean,
   state?: { globalFilter?: string; sorting?: SortingState },
 ) {
-  const columns = createSkillsColumns(t, tb, isAdmin, {
+  mockUsePermissions.mockReturnValue({ isAdmin, currentUserId: isAdmin ? "u1" : undefined });
+  const columns = createSkillsColumns(t, tb, {
     onOpen: jest.fn(),
     onUpdate: jest.fn(),
     onDelete: jest.fn(),

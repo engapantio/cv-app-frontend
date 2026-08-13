@@ -44,8 +44,6 @@ export default function ProjectsClient({
   const {
     loading,
     projects,
-    allSkills,
-    canMutate,
     globalFilter,
     setGlobalFilter,
     openProject,
@@ -69,7 +67,6 @@ export default function ProjectsClient({
       <ProjectsTable
         loading={loading}
         projects={projects}
-        canMutate={canMutate}
         globalFilter={globalFilter}
         setGlobalFilter={setGlobalFilter}
         serverError={serverError}
@@ -93,7 +90,6 @@ export default function ProjectsClient({
         <CreateProjectDialog
           open={createOpen}
           onOpenChange={setCreateOpen}
-          allSkills={allSkills}
           onConfirm={handleCreate}
           loading={creating}
         />
@@ -106,7 +102,6 @@ export default function ProjectsClient({
             if (!open) setUpdateTarget(null);
           }}
           project={updateTarget}
-          allSkills={allSkills}
           onConfirm={handleUpdate}
           loading={updating}
         />

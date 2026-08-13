@@ -7,7 +7,7 @@ import { usePermissions } from "@/lib/auth/permissions";
 export function useCvDetails(cvId: string) {
   const { data, loading } = useQuery(CvDocument, {
     variables: { cvId },
-    fetchPolicy: "network-only",
+    fetchPolicy: "cache-and-network",
     errorPolicy: "all",
   });
 

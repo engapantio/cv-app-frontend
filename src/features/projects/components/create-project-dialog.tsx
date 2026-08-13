@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { DialogActions, EnvPill, FloatingField } from "@/components/shared";
 import { cn } from "@/lib/utils";
+import { useSkillsList } from "@/lib/apollo/use-skills-list";
 import {
   Button,
   Dialog,
@@ -24,7 +25,6 @@ import {
 interface CreateProjectDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  allSkills: string[];
   onConfirm: (data: {
     name: string;
     domain: string;
@@ -39,11 +39,12 @@ interface CreateProjectDialogProps {
 export function CreateProjectDialog({
   open,
   onOpenChange,
-  allSkills,
   onConfirm,
   loading,
 }: CreateProjectDialogProps) {
   const t = useTranslations();
+  const { data: skillsData } = useSkillsList();
+  const allSkills = skillsData?.skills?.map((s) => s.name) ?? [];
   const [name, setName] = useState("");
   const [domain, setDomain] = useState("");
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);

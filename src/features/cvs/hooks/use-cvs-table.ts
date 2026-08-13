@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useCallback, useEffect, useRef } from "react";
+import { useMemo, useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@apollo/client/react";
 import type { DocumentNode } from "graphql";
@@ -42,7 +42,7 @@ export function useCvsTable({
 
   const { data, loading } = useQuery(query, {
     variables,
-    fetchPolicy: "network-only",
+    fetchPolicy: "cache-and-network",
     errorPolicy: "all",
   });
 
@@ -50,17 +50,14 @@ export function useCvsTable({
 
   const [cvsList, setCvsList] = useState<CvItem[]>(initialCvs);
 
-  const hydratedRef = useRef(false);
-
   useEffect(() => {
-    if (data && !hydratedRef.current && getData) {
+    if (data && getData) {
       const fetched = getData(data);
-      if (fetched.length > 0) {
-        hydratedRef.current = true;
+      if (fetched.length > 0 || initialCvs.length === 0) {
         setCvsList(fetched);
       }
     }
-  }, [data, getData]);
+  }, [data, getData, initialCvs.length]);
 
   const [deleteTarget, setDeleteTarget] = useState<CvItem | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
@@ -99,8 +96,6 @@ export function useCvsTable({
       createCvsColumns(
         tColumns,
         tButtons,
-        currentUserId,
-        isAdmin,
         {
           onOpen: handleOpen,
           onDelete: handleDelete,
@@ -108,7 +103,7 @@ export function useCvsTable({
         userEmail,
         userId,
       ),
-    [currentUserId, isAdmin, handleOpen, handleDelete, userEmail, userId, tColumns, tButtons],
+    [handleOpen, handleDelete, userEmail, userId, tColumns, tButtons],
   );
 
   // eslint-disable-next-line react-hooks/incompatible-library
@@ -127,7 +122,7 @@ export function useCvsTable({
   const columnCount = columns.length;
 
   return {
-    loading: loading && cvsList.length === 0,
+    loading: loading && cvsList.length === 0 && initialCvs.length > 0,
     table,
     rows: table.getRowModel().rows,
     columnCount,

@@ -10,6 +10,7 @@ import {
   type SkillCategoriesQuery,
 } from "@/gql/generated/graphql";
 import { THEMES } from "@/lib/constants/themes";
+import { usePermissions } from "@/lib/auth/permissions";
 import { CvSection } from "@/features/cvs/components/preview/CvSection";
 import { LanguageList } from "@/features/cvs/components/preview/LanguageList";
 import { DomainList } from "@/features/cvs/components/preview/DomainList";
@@ -38,6 +39,7 @@ export function CvPreviewClient({
 }: Props) {
   const [exportPdf, { loading: exporting }] = useMutation(ExportPdfDocument);
   const t = useTranslations();
+  const { currentUserId, isAdmin } = usePermissions();
 
   const previewLabels = useMemo(
     () => ({
@@ -232,6 +234,8 @@ export function CvPreviewClient({
   const cv = initialCv;
   const fullName = cv.user?.profile?.full_name ?? t("common.unknown");
   const positionName = cv.user?.position_name ?? "";
+  const cvOwnerId = cv.user?.id;
+  const canExport = isAdmin || (cvOwnerId != null && currentUserId === cvOwnerId);
 
   const fgStyle = { color: "var(--foreground)" } as const;
 
@@ -248,19 +252,21 @@ export function CvPreviewClient({
             </p>
           )}
         </div>
-        <button
-          type="button"
-          onClick={handleExportPdf}
-          disabled={exporting}
-          className="shrink-0 h-10 px-4 rounded-full border text-sm font-medium uppercase tracking-[0.4px] bg-transparent hover:bg-muted cursor-pointer disabled:opacity-50"
-          style={{
-            borderColor: "rgba(198, 48, 49, 0.5)",
-            color: "#c63031",
-            minWidth: 160,
-          }}
-        >
-          {exporting ? t("buttons.exporting") : t("buttons.exportPdf")}
-        </button>
+        {canExport && (
+          <button
+            type="button"
+            onClick={handleExportPdf}
+            disabled={exporting}
+            className="shrink-0 h-10 px-4 rounded-full border text-sm font-medium uppercase tracking-[0.4px] bg-transparent hover:bg-muted cursor-pointer disabled:opacity-50"
+            style={{
+              borderColor: "rgba(198, 48, 49, 0.5)",
+              color: "#c63031",
+              minWidth: 160,
+            }}
+          >
+            {exporting ? t("buttons.exporting") : t("buttons.exportPdf")}
+          </button>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-[284px_1fr] min-[1440px]:grid-cols-[284px_568px] gap-x-4 gap-y-0">

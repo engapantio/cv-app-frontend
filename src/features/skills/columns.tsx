@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { RowActions } from "@/components/shared/row-actions";
 import { SortableHeader } from "@/components/shared/sortable-header";
+import { usePermissions } from "@/lib/auth/permissions";
 import type { SkillItem } from "./types";
 
 interface SkillActions {
@@ -19,10 +20,58 @@ interface SkillActions {
   onDelete: (skill: SkillItem) => void;
 }
 
+function ActionsCell({
+  skill,
+  tb,
+  actions,
+}: {
+  skill: SkillItem;
+  tb: (key: string) => string;
+  actions: SkillActions;
+}) {
+  const { isAdmin } = usePermissions();
+
+  return (
+    <RowActions canMutate={isAdmin} onOpen={() => actions.onOpen(skill)}>
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          render={
+            <Button variant="ghost" size="icon" className="rounded-[20px] cursor-pointer">
+              <MoreVertical className="size-6" />
+            </Button>
+          }
+        />
+        <DropdownMenuContent align="end" className="min-w-32">
+          <DropdownMenuItem
+            onClick={() => actions.onOpen(skill)}
+            className="justify-center cursor-pointer"
+          >
+            {tb("open")}
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => actions.onUpdate(skill)}
+            disabled={!isAdmin}
+            className="justify-center cursor-pointer"
+          >
+            {tb("update")}
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => actions.onDelete(skill)}
+            disabled={!isAdmin}
+            variant="destructive"
+            className="justify-center cursor-pointer"
+          >
+            {tb("delete")}
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </RowActions>
+  );
+}
+
 export function createSkillsColumns(
   t: (key: string) => string,
   tb: (key: string) => string,
-  isAdmin: boolean,
   actions: SkillActions,
 ): ColumnDef<SkillItem>[] {
   return [
@@ -61,45 +110,7 @@ export function createSkillsColumns(
       header: "",
       enableSorting: false,
       enableGlobalFilter: false,
-      cell: ({ row }) => {
-        const skill = row.original;
-        return (
-          <RowActions canMutate={isAdmin} onOpen={() => actions.onOpen(skill)}>
-            <DropdownMenu>
-              <DropdownMenuTrigger
-                render={
-                  <Button variant="ghost" size="icon" className="rounded-[20px] cursor-pointer">
-                    <MoreVertical className="size-6" />
-                  </Button>
-                }
-              />
-              <DropdownMenuContent align="end" className="min-w-32">
-                <DropdownMenuItem
-                  onClick={() => actions.onOpen(skill)}
-                  className="justify-center cursor-pointer"
-                >
-                  {tb("open")}
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => actions.onUpdate(skill)}
-                  disabled={!isAdmin}
-                  className="justify-center cursor-pointer"
-                >
-                  {tb("update")}
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => actions.onDelete(skill)}
-                  disabled={!isAdmin}
-                  variant="destructive"
-                  className="justify-center cursor-pointer"
-                >
-                  {tb("delete")}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </RowActions>
-        );
-      },
+      cell: ({ row }) => <ActionsCell skill={row.original} tb={tb} actions={actions} />,
     },
   ];
 }
