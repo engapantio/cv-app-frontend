@@ -41,7 +41,7 @@ function ActionsCell({
         <DropdownMenuTrigger
           render={
             <Button variant="ghost" size="icon" className="rounded-[20px] cursor-pointer">
-              <MoreVertical className="size-6" />
+              <MoreVertical className="size-6 text-[#767676] dark:text-white" />
             </Button>
           }
         />
@@ -126,7 +126,7 @@ export function createUsersColumns(
       header: ({ column }) => <SortableHeader column={column} label={t("email")} />,
       accessorKey: "email",
       enableSorting: true,
-      meta: { className: "max-[1439px]:hidden" },
+      meta: { className: "max-[1439px]:hidden min-[1440px]:w-[28%]" },
     },
     {
       id: "department_name",
@@ -134,7 +134,7 @@ export function createUsersColumns(
       cell: ({ row }) => row.original.department_name || "",
       accessorKey: "department_name",
       enableSorting: true,
-      meta: { className: "max-md:hidden" },
+      meta: { className: "max-md:hidden min-[1440px]:w-[12%]" },
     },
     {
       id: "position_name",

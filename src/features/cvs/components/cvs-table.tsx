@@ -141,14 +141,14 @@ export function CvsTable({
                   )}
                 >
                   <TableRow
-                    className="cursor-pointer border-b-0 group-hover:bg-muted/50 dark:group-hover:bg-white/15"
+                    className="cursor-pointer border-b-0 group-hover:bg-row-hover dark:group-hover:bg-white/15"
                     onClick={() => handleOpen(row.original.id)}
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell
                         key={cell.id}
                         className={cn(
-                          "max-md:py-2 md:max-[1439px]:py-3 min-[1440px]:py-4 font-semibold",
+                          "max-md:py-2 md:max-[1439px]:py-3 min-[1440px]:py-4",
                           (cell.column.columnDef.meta as { className?: string } | undefined)
                             ?.className ?? "",
                         )}
@@ -158,12 +158,12 @@ export function CvsTable({
                     ))}
                   </TableRow>
                   <TableRow
-                    className="cursor-pointer border-b-0 group-hover:bg-muted/50 dark:group-hover:bg-white/15"
+                    className="cursor-pointer border-b-0 group-hover:bg-row-hover dark:group-hover:bg-white/15"
                     onClick={() => handleOpen(row.original.id)}
                   >
                     <TableCell
                       colSpan={columnCount}
-                      className="text-muted-foreground max-md:text-sm max-md:leading-7 max-md:pt-1 max-md:pb-4 md:max-[1439px]:text-base md:max-[1439px]:leading-8 md:max-[1439px]:pt-2 md:max-[1439px]:pb-5 min-[1440px]:text-lg min-[1440px]:leading-9 min-[1440px]:pt-3 min-[1440px]:pb-6 whitespace-normal wrap-break-word"
+                      className="text-description max-md:text-sm max-md:leading-7 max-md:pt-1 max-md:pb-4 md:max-[1439px]:text-base md:max-[1439px]:leading-5 md:max-[1439px]:pt-2 md:max-[1439px]:pb-5 min-[1440px]:text-base min-[1440px]:leading-5 min-[1440px]:pt-3 min-[1440px]:pb-5 whitespace-normal wrap-break-word"
                     >
                       {row.original.description}
                     </TableCell>

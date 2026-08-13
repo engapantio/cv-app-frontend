@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { AppSidebar, Container } from "../shared";
 import { cn } from "@/lib/utils";
+import { ServerUserProvider } from "@/lib/auth/server-user-context";
 import type { SessionUser } from "@/lib/auth/cookies";
 
 export function ProtectedShell({
@@ -28,7 +29,7 @@ export function ProtectedShell({
             isSidebarOpen && "min-[1440px]:ml-48",
           )}
         >
-          {children}
+          <ServerUserProvider user={initialUser}>{children}</ServerUserProvider>
         </main>
       </Container>
     </div>

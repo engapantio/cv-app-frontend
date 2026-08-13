@@ -22,16 +22,16 @@ const config: Config = {
     "<rootDir>/.next/",
     "<rootDir>/node_modules/",
     "<rootDir>/coverage/",
-    "<rooDir>/src/messages",
+    "<rootDir>/src/messages",
     "<rootDir>/src/components/ui",
   ],
 
   coverageThreshold: {
     global: {
-      statements: 33,
-      branches: 33,
-      functions: 33,
-      lines: 33,
+      statements: 76,
+      branches: 77,
+      functions: 40,
+      lines: 76,
     },
   },
 
@@ -44,6 +44,10 @@ const config: Config = {
     "!src/app/**/loading.tsx",
     "!src/app/**/error.tsx",
     "!src/app/**/not-found.tsx",
+    "!src/messages/**/*.ts",
+    "!src/gql/generated/gql.ts",
+    "!src/gql/generated/fragment-masking.ts",
+    "!src/i18n/messages.ts",
     "!src/proxy.ts",
   ],
 };

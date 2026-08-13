@@ -87,7 +87,7 @@ export function UsersTable({
         />
 
         <div className="overflow-x-hidden">
-          <UITable className="table-fixed [&_tr]:border-b-border">
+          <UITable className="table-fixed">
             <colgroup>
               {table.getVisibleLeafColumns().map((column) => (
                 <col
@@ -153,7 +153,7 @@ export function UsersTable({
                       "[&_tr:last-child]:border-b [&_tr:last-child]:border-b-table-border",
                   )}
                 >
-                  <TableRow className="border-b-0 group-hover:bg-muted/50 dark:group-hover:bg-white/15">
+                  <TableRow className="border-b-0 group-hover:bg-row-hover dark:group-hover:bg-white/15">
                     {row.getVisibleCells().map((cell) => (
                       <TableCell
                         key={cell.id}

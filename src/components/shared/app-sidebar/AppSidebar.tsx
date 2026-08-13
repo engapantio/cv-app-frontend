@@ -139,7 +139,7 @@ export function AppSidebar({ isSidebarOpen, setIsSidebarOpen, initialUser }: App
       return (
         <>
           {beforeDepartments}
-          <div className="border-b border-border" />
+          <div className="border-b border-b-table-border" />
           {afterDepartments}
         </>
       );

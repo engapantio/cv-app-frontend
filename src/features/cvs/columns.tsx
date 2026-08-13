@@ -43,7 +43,7 @@ function ActionsCell({
         <DropdownMenuTrigger
           render={
             <Button variant="ghost" size="icon" className="rounded-[20px] cursor-pointer">
-              <MoreVertical className="size-6" />
+              <MoreVertical className="size-6 text-[#767676] dark:text-white" />
             </Button>
           }
         />
