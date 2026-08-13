@@ -34,12 +34,7 @@ const inputClasses =
 const selectClassName =
   "border-0 w-full bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none data-[size=default]:h-12 py-1 text-sm";
 
-export function UpdateUserDialog({
-  target,
-  onClose,
-  onConfirm,
-  loading,
-}: UpdateUserDialogProps) {
+export function UpdateUserDialog({ target, onClose, onConfirm, loading }: UpdateUserDialogProps) {
   const t = useTranslations();
   const { currentUserId } = usePermissions();
   const { data: departmentsData } = useDepartmentsList();

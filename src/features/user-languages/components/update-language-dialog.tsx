@@ -3,18 +3,17 @@
 import { useState, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import {
-  Button,
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui";
+import { DialogActions } from "@/components/shared/dialog-actions";
 import type { Proficiency } from "@/gql/generated/graphql";
 import { PROFICIENCY_OPTIONS } from "../utils/proficiency-mapping";
 
@@ -97,25 +96,14 @@ export function UpdateLanguageDialog({
             </Select>
           </div>
         </div>
-        <DialogFooter className="gap-3 border-t-0 bg-transparent mx-0 mb-0 py-0">
-          <Button
-            type="button"
-            variant="ghost"
-            className="uppercase min-w-30 border border-border py-1.5"
-            onClick={() => onOpenChange(false)}
-          >
-            {t("buttons.cancel")}
-          </Button>
-          <Button
-            type="button"
-            className="uppercase text-white min-w-30 py-1.5"
-            style={{ backgroundColor: "#e53935" }}
-            disabled={loading || !isDirty}
-            onClick={handleConfirm}
-          >
-            {loading ? t("buttons.updating") : t("buttons.confirm")}
-          </Button>
-        </DialogFooter>
+        <DialogActions
+          submitLabel={t("buttons.confirm")}
+          loadingLabel={t("buttons.updating")}
+          loading={loading}
+          disabled={loading || !isDirty}
+          onCancel={() => onOpenChange(false)}
+          onSubmit={handleConfirm}
+        />
       </DialogContent>
     </Dialog>
   );

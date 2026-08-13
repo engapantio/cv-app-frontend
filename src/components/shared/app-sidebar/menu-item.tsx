@@ -27,12 +27,12 @@ export function MenuItem({
 }) {
   const baseClasses = cn(
     "w-full text-icon",
-    isMobile ? "p-5 w-auto! shrink-0" : "py-8",
+    isMobile ? "p-5 w-auto! shrink-0" : "px-4 py-4 h-auto",
     isActive &&
       (isMobile
         ? "bg-sidebar-accent rounded-full text-foreground"
-        : "bg-sidebar-accent rounded-r-full rounded-l-none text-foreground"),
-    !isMobile && "hover:rounded-r-full rounded-l-none",
+        : "bg-sidebar-accent rounded-r-[200px] rounded-l-none text-foreground"),
+    !isMobile && "hover:rounded-r-[200px] rounded-l-none",
   );
 
   return (
@@ -48,7 +48,7 @@ export function MenuItem({
       }
     >
       <item.icon className="h-4 w-4" />
-      <span>{label}</span>
+      <span className="font-normal text-base leading-normal tracking-[0.01em]">{label}</span>
     </SidebarMenuButton>
   );
 }

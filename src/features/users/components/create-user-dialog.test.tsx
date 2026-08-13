@@ -68,14 +68,7 @@ describe("CreateUserDialog password visibility toggle", () => {
   });
 
   it("disables the toggle while the dialog is loading", () => {
-    render(
-      <CreateUserDialog
-        open
-        onOpenChange={jest.fn()}
-        onConfirm={jest.fn()}
-        loading
-      />,
-    );
+    render(<CreateUserDialog open onOpenChange={jest.fn()} onConfirm={jest.fn()} loading />);
     expect(screen.getByRole("button", { name: "show" })).toBeDisabled();
   });
 });

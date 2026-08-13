@@ -15,11 +15,7 @@ import {
 import { toast } from "sonner";
 import { syncSessionProfileFromUpdate } from "@/lib/auth/session";
 import { buildUserUpdateOperations } from "@/lib/user-updates";
-import {
-  UpdateProfileDocument,
-  UpdateUserDocument,
-  UserDocument,
-} from "@/gql/generated/graphql";
+import { UpdateProfileDocument, UpdateUserDocument, UserDocument } from "@/gql/generated/graphql";
 import { useMutation, useApolloClient } from "@apollo/client/react";
 import { useDepartmentsList } from "@/lib/apollo/use-departments-list";
 import { usePositionsList } from "@/lib/apollo/use-positions-list";

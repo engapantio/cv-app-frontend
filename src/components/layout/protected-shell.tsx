@@ -24,7 +24,7 @@ export function ProtectedShell({
       <Container padding={false}>
         <main
           className={cn(
-            "transition-all duration-300 ease-in-out px-4 pb-20 pt-2 md:px-8 md:max-[1439px]:pb-44 min-[1440px]:pb-8",
+            "transition-all duration-300 ease-in-out px-4 pb-20 pt-2 md:max-[1439px]:px-6 md:max-[1439px]:pb-44 min-[1440px]:px-6 min-[1440px]:pb-8",
             isSidebarOpen && "min-[1440px]:ml-48",
           )}
         >

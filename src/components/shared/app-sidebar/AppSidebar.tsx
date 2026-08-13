@@ -54,6 +54,25 @@ const isActivePath = (pathname: string, href: string): boolean => {
   return false;
 };
 
+const pathToActiveKey = (pathname: string): string | null => {
+  if (pathname === "/cvs" || pathname.startsWith("/cvs/")) return "nav.cvs";
+  if (pathname === "/users" || pathname === "/users/") return "nav.employees";
+  if (pathname.startsWith("/users/")) {
+    const segment = pathname.split("/").pop() ?? "";
+    switch (segment) {
+      case "skills":
+        return "nav.skills";
+      case "languages":
+        return "nav.languages";
+      case "cvs":
+        return "nav.cvs";
+      default:
+        return "nav.employees";
+    }
+  }
+  return null;
+};
+
 export function AppSidebar({ isSidebarOpen, setIsSidebarOpen, initialUser }: AppSidebarProps) {
   const pathname = usePathname();
   const { user, loading: sessionLoading } = useSession();
@@ -75,6 +94,7 @@ export function AppSidebar({ isSidebarOpen, setIsSidebarOpen, initialUser }: App
   const employeePersonalLinks: Record<string, string> = {
     "nav.skills": `/users/${userId}/skills`,
     "nav.languages": `/users/${userId}/languages`,
+    "nav.cvs": `/users/${userId}/cvs`,
   };
 
   const menuItems: MenuItemData[] = (isAdmin ? adminMenuItems : employeeMenuItems).map((item) => {
@@ -95,19 +115,23 @@ export function AppSidebar({ isSidebarOpen, setIsSidebarOpen, initialUser }: App
     ));
   };
 
+  const activeKey = pathToActiveKey(pathname);
+
+  const renderMenuItem = (item: MenuItemData, isMobile: boolean) => (
+    <MenuItem
+      key={item.href}
+      item={item}
+      label={t(item.labelKey)}
+      isActive={activeKey != null ? item.labelKey === activeKey : isActivePath(pathname, item.href)}
+      isMobile={isMobile}
+      onClick={() => {}}
+    />
+  );
+
   const renderMenuItems = (isMobile: boolean, showDivider = false) => {
     if (loading) return renderMenuSkeleton(isMobile);
 
-    const items = menuItems.map((item) => (
-      <MenuItem
-        key={item.href}
-        item={item}
-        label={t(item.labelKey)}
-        isActive={isActivePath(pathname, item.href)}
-        isMobile={isMobile}
-        onClick={() => {}}
-      />
-    ));
+    const items = menuItems.map((item) => renderMenuItem(item, isMobile));
 
     if (showDivider && isAdmin) {
       const beforeDepartments = items.slice(0, 3);
@@ -115,7 +139,7 @@ export function AppSidebar({ isSidebarOpen, setIsSidebarOpen, initialUser }: App
       return (
         <>
           {beforeDepartments}
-          <div className="border-b border-border my-0" />
+          <div className="border-b border-border" />
           {afterDepartments}
         </>
       );
@@ -168,7 +192,7 @@ export function AppSidebar({ isSidebarOpen, setIsSidebarOpen, initialUser }: App
         }}
       >
         <SidebarContent>
-          <SidebarMenu className="mt-10 gap-2">{renderMenuItems(false, true)}</SidebarMenu>
+          <SidebarMenu className="mt-10 space-y-3.5">{renderMenuItems(false, true)}</SidebarMenu>
         </SidebarContent>
         <SidebarFooter>
           <ProfileSection
@@ -191,22 +215,54 @@ export function AppSidebar({ isSidebarOpen, setIsSidebarOpen, initialUser }: App
   };
 
   const renderMobileFooter = () => {
+    const avatarElement = (
+      <ProfileSection
+        loading={loading}
+        fullName={fullName}
+        email={email}
+        avatar={avatar}
+        initial={initial}
+        compact
+        showLanguageSwitcher={false}
+        userId={userId}
+        menuSide="top"
+      />
+    );
+
+    const footerItems = menuItems.filter((item) => item.labelKey !== "nav.cvs");
+
+    let menuContent: React.ReactNode;
+    if (loading) {
+      menuContent = (
+        <>
+          {renderMenuSkeleton(true)}
+          {avatarElement}
+        </>
+      );
+    } else if (isAdmin) {
+      menuContent = (
+        <>
+          <div className="flex justify-center items-center gap-1">
+            {footerItems.slice(0, 3).map((item) => renderMenuItem(item, true))}
+          </div>
+          <div className="flex justify-center items-center gap-1">
+            {footerItems.slice(3).map((item) => renderMenuItem(item, true))}
+            {avatarElement}
+          </div>
+        </>
+      );
+    } else {
+      menuContent = (
+        <div className="flex justify-center items-center gap-1">
+          {footerItems.map((item) => renderMenuItem(item, true))}
+          {avatarElement}
+        </div>
+      );
+    }
+
     return (
       <footer className="fixed bottom-0 left-0 right-0 z-40 bg-background border-t border-border px-2 py-2 flex flex-col items-center gap-1 min-[1440px]:hidden">
-        <div className="flex flex-wrap justify-center items-center gap-1">
-          {renderMenuItems(true)}
-        </div>
-        <ProfileSection
-          loading={loading}
-          fullName={fullName}
-          email={email}
-          avatar={avatar}
-          initial={initial}
-          compact
-          showLanguageSwitcher={false}
-          userId={userId}
-          menuSide="top"
-        />
+        {menuContent}
       </footer>
     );
   };

@@ -1,4 +1,11 @@
-import { ApolloClient, ApolloLink, InMemoryCache, gql, type DocumentNode, type Reference } from "@apollo/client";
+import {
+  ApolloClient,
+  ApolloLink,
+  InMemoryCache,
+  gql,
+  type DocumentNode,
+  type Reference,
+} from "@apollo/client";
 import { ApolloProvider, useQuery } from "@apollo/client/react";
 import { MockLink } from "@apollo/client/testing";
 import { act, render, screen, waitFor } from "@testing-library/react";
@@ -51,25 +58,90 @@ const fieldConfigs: {
     typename: "Department",
     initial: { id: "d1", created_at: "", name: "Engineering", __typename: "Department" },
     added: { id: "d2", created_at: "", name: "HR", __typename: "Department" },
-    fragment: gql`fragment NewDepartment on Department { id created_at name }`,
+    fragment: gql`
+      fragment NewDepartment on Department {
+        id
+        created_at
+        name
+      }
+    `,
     name: "Departments",
   },
   {
     query: SkillsDocument,
     field: "skills",
     typename: "Skill",
-    initial: { id: "s1", created_at: "", name: "TypeScript", category_name: null, category_parent_name: null, category: null, __typename: "Skill" },
-    added: { id: "s2", created_at: "", name: "Rust", category_name: null, category_parent_name: null, category: null, __typename: "Skill" },
-    fragment: gql`fragment NewSkill on Skill { __typename id created_at name category_name category_parent_name category { __typename id name order parent { __typename id name order } } }`,
+    initial: {
+      id: "s1",
+      created_at: "",
+      name: "TypeScript",
+      category_name: null,
+      category_parent_name: null,
+      category: null,
+      __typename: "Skill",
+    },
+    added: {
+      id: "s2",
+      created_at: "",
+      name: "Rust",
+      category_name: null,
+      category_parent_name: null,
+      category: null,
+      __typename: "Skill",
+    },
+    fragment: gql`
+      fragment NewSkill on Skill {
+        __typename
+        id
+        created_at
+        name
+        category_name
+        category_parent_name
+        category {
+          __typename
+          id
+          name
+          order
+          parent {
+            __typename
+            id
+            name
+            order
+          }
+        }
+      }
+    `,
     name: "Skills",
   },
   {
     query: LanguagesDocument,
     field: "languages",
     typename: "Language",
-    initial: { id: "l1", created_at: "", iso2: "en", name: "English", native_name: null, __typename: "Language" },
-    added: { id: "l2", created_at: "", iso2: "de", name: "German", native_name: null, __typename: "Language" },
-    fragment: gql`fragment NewLanguage on Language { id created_at iso2 name native_name }`,
+    initial: {
+      id: "l1",
+      created_at: "",
+      iso2: "en",
+      name: "English",
+      native_name: null,
+      __typename: "Language",
+    },
+    added: {
+      id: "l2",
+      created_at: "",
+      iso2: "de",
+      name: "German",
+      native_name: null,
+      __typename: "Language",
+    },
+    fragment: gql`
+      fragment NewLanguage on Language {
+        id
+        created_at
+        iso2
+        name
+        native_name
+      }
+    `,
     name: "Languages",
   },
 ];
@@ -118,66 +190,69 @@ describe("shared reference-data hooks deduplicate network requests", () => {
     expect(operationCounts.get("Skills")).toBe(1);
   });
 
-  describe.each(fieldConfigs)("$name cache-modify", ({ query, field, initial, added, fragment, name }) => {
-    it("reflects a cache-modified $name without a second network request", async () => {
-      const operationCounts = new Map<string, number>();
-      const countingLink = new ApolloLink((operation, forward) => {
-        const opName = operation.operationName ?? "";
-        operationCounts.set(opName, (operationCounts.get(opName) ?? 0) + 1);
-        return forward(operation);
-      });
-
-      const client = new ApolloClient({
-        cache: new InMemoryCache({}),
-        link: countingLink,
-        defaultOptions: { watchQuery: { fetchPolicy: "cache-first" } },
-      });
-
-      client.cache.writeQuery({
-        query,
-        data: { [field]: [initial] } as Record<string, unknown>,
-      });
-
-      await act(async () => {
-        render(
-          <ApolloProvider client={client}>
-            <ListReader query={query as DocumentNode} />
-          </ApolloProvider>,
-        );
-      });
-
-      await waitFor(() =>
-        expect(screen.getByTestId("list-names").textContent).toBe(initial.name as string),
-      );
-
-      expect(operationCounts.get(name)).toBe(undefined);
-
-      await act(async () => {
-        client.cache.modify({
-          id: "ROOT_QUERY",
-          fields: {
-            [field](existingRefs: unknown) {
-              const newRef = client.cache.writeFragment({
-                data: added,
-                fragment,
-              });
-              if (typeof newRef === "undefined") return existingRefs;
-              const current = Array.isArray(existingRefs) ? existingRefs : [];
-              return [...current, newRef];
-            },
-          },
+  describe.each(fieldConfigs)(
+    "$name cache-modify",
+    ({ query, field, initial, added, fragment, name }) => {
+      it("reflects a cache-modified $name without a second network request", async () => {
+        const operationCounts = new Map<string, number>();
+        const countingLink = new ApolloLink((operation, forward) => {
+          const opName = operation.operationName ?? "";
+          operationCounts.set(opName, (operationCounts.get(opName) ?? 0) + 1);
+          return forward(operation);
         });
+
+        const client = new ApolloClient({
+          cache: new InMemoryCache({}),
+          link: countingLink,
+          defaultOptions: { watchQuery: { fetchPolicy: "cache-first" } },
+        });
+
+        client.cache.writeQuery({
+          query,
+          data: { [field]: [initial] } as Record<string, unknown>,
+        });
+
+        await act(async () => {
+          render(
+            <ApolloProvider client={client}>
+              <ListReader query={query as DocumentNode} />
+            </ApolloProvider>,
+          );
+        });
+
+        await waitFor(() =>
+          expect(screen.getByTestId("list-names").textContent).toBe(initial.name as string),
+        );
+
+        expect(operationCounts.get(name)).toBe(undefined);
+
+        await act(async () => {
+          client.cache.modify({
+            id: "ROOT_QUERY",
+            fields: {
+              [field](existingRefs: unknown) {
+                const newRef = client.cache.writeFragment({
+                  data: added,
+                  fragment,
+                });
+                if (typeof newRef === "undefined") return existingRefs;
+                const current = Array.isArray(existingRefs) ? existingRefs : [];
+                return [...current, newRef];
+              },
+            },
+          });
+        });
+
+        await waitFor(() =>
+          expect(screen.getByTestId("list-names").textContent).toBe(
+            `${initial.name},${added.name}`,
+          ),
+        );
+
+        expect(operationCounts.get(name)).toBe(undefined);
       });
-
-      await waitFor(() =>
-        expect(screen.getByTestId("list-names").textContent).toBe(
-          `${initial.name},${added.name}`,
-        ),
-      );
-
-      expect(operationCounts.get(name)).toBe(undefined);
-    });
-  });
+    },
+  );
 
   describe.each(fieldConfigs)("$name cache-delete", ({ query, field, initial, added, name }) => {
     it("reflects a cache-removed $name without a second network request", async () => {

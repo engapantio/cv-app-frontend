@@ -2,15 +2,12 @@
 
 import { useState, useCallback } from "react";
 import { toast } from "sonner";
-import { ChevronDown } from "lucide-react";
 import { useTranslations } from "next-intl";
 import {
-  Button,
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
   Input,
   Select,
   SelectContent,
@@ -18,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui";
+import { DialogActions } from "@/components/shared/dialog-actions";
 import type { Mastery } from "@/gql/generated/graphql";
 import { MASTERY_OPTIONS } from "../utils/mastery-mapping";
 
@@ -70,7 +68,6 @@ export function UpdateSkillDialog({
               readOnly
               className="border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none opacity-60 h-12 text-lg"
             />
-            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
           </div>
           <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
             <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-icon transition-colors group-focus-within:text-primary">
@@ -93,25 +90,14 @@ export function UpdateSkillDialog({
             </Select>
           </div>
         </div>
-        <DialogFooter className="gap-3 border-t-0 bg-transparent mx-0 mb-0 py-0">
-          <Button
-            type="button"
-            variant="ghost"
-            className="uppercase min-w-30 border border-border py-1.5"
-            onClick={() => onOpenChange(false)}
-          >
-            {t("buttons.cancel")}
-          </Button>
-          <Button
-            type="button"
-            className="uppercase text-white min-w-30 py-1.5"
-            style={{ backgroundColor: "#e53935" }}
-            disabled={!isDirty || loading}
-            onClick={handleConfirm}
-          >
-            {loading ? t("buttons.confirming") : t("buttons.confirm")}
-          </Button>
-        </DialogFooter>
+        <DialogActions
+          submitLabel={t("buttons.confirm")}
+          loadingLabel={t("buttons.confirming")}
+          loading={loading}
+          disabled={!isDirty || loading}
+          onCancel={() => onOpenChange(false)}
+          onSubmit={handleConfirm}
+        />
       </DialogContent>
     </Dialog>
   );

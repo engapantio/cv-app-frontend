@@ -37,13 +37,7 @@ beforeEach(() => {
 describe("CreateSkillDialog", () => {
   it("disables submit until a name is provided", async () => {
     const user = userEvent.setup();
-    render(
-      <CreateSkillDialog
-        open
-        onOpenChange={jest.fn()}
-        onCreated={jest.fn()}
-      />,
-    );
+    render(<CreateSkillDialog open onOpenChange={jest.fn()} onCreated={jest.fn()} />);
     expect(screen.getByRole("button", { name: "create" })).toBeDisabled();
     await user.type(screen.getByRole("textbox"), "Go");
     expect(screen.getByRole("button", { name: "create" })).toBeEnabled();
@@ -66,13 +60,7 @@ describe("CreateSkillDialog", () => {
 
     const onCreated = jest.fn();
     const onOpenChange = jest.fn();
-    render(
-      <CreateSkillDialog
-        open
-        onOpenChange={onOpenChange}
-        onCreated={onCreated}
-      />,
-    );
+    render(<CreateSkillDialog open onOpenChange={onOpenChange} onCreated={onCreated} />);
 
     await user.type(screen.getByRole("textbox"), "Go");
     const categoryItem = screen
@@ -93,24 +81,12 @@ describe("CreateSkillDialog", () => {
 
 describe("UpdateSkillDialog", () => {
   it("prefills the form with existing values", () => {
-    render(
-      <UpdateSkillDialog
-        target={target}
-        onClose={jest.fn()}
-        onUpdated={jest.fn()}
-      />,
-    );
+    render(<UpdateSkillDialog target={target} onClose={jest.fn()} onUpdated={jest.fn()} />);
     expect((screen.getByRole("textbox") as HTMLInputElement).value).toBe("TypeScript");
   });
 
   it("disables submit when nothing changed", () => {
-    render(
-      <UpdateSkillDialog
-        target={target}
-        onClose={jest.fn()}
-        onUpdated={jest.fn()}
-      />,
-    );
+    render(<UpdateSkillDialog target={target} onClose={jest.fn()} onUpdated={jest.fn()} />);
     expect(screen.getByRole("button", { name: "update" })).toBeDisabled();
   });
 
@@ -131,13 +107,7 @@ describe("UpdateSkillDialog", () => {
 
     const onUpdated = jest.fn();
     const onClose = jest.fn();
-    render(
-      <UpdateSkillDialog
-        target={target}
-        onClose={onClose}
-        onUpdated={onUpdated}
-      />,
-    );
+    render(<UpdateSkillDialog target={target} onClose={onClose} onUpdated={onUpdated} />);
 
     const nameInput = screen.getByRole("textbox");
     await user.clear(nameInput);
