@@ -4,18 +4,17 @@ import { useState, useCallback } from "react";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import {
-  Button,
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui";
+import { DialogActions } from "@/components/shared/dialog-actions";
 import type { Mastery } from "@/gql/generated/graphql";
 import { MASTERY_OPTIONS } from "../utils/mastery-mapping";
 
@@ -112,25 +111,14 @@ export function AddSkillDialog({
             </Select>
           </div>
         </div>
-        <DialogFooter className="gap-3 border-t-0 bg-transparent mx-0 mb-0 py-0">
-          <Button
-            type="button"
-            variant="ghost"
-            className="uppercase min-w-30 border border-border py-1.5"
-            onClick={() => onOpenChange(false)}
-          >
-            {t("buttons.cancel")}
-          </Button>
-          <Button
-            type="button"
-            className="uppercase text-white min-w-30 py-1.5"
-            style={{ backgroundColor: "#e53935" }}
-            disabled={!selectedSkill || loading}
-            onClick={handleConfirm}
-          >
-            {loading ? t("buttons.confirming") : t("buttons.confirm")}
-          </Button>
-        </DialogFooter>
+        <DialogActions
+          submitLabel={t("buttons.confirm")}
+          loadingLabel={t("buttons.confirming")}
+          loading={loading}
+          disabled={!selectedSkill || loading}
+          onCancel={() => onOpenChange(false)}
+          onSubmit={handleConfirm}
+        />
       </DialogContent>
     </Dialog>
   );

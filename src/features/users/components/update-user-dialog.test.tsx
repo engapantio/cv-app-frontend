@@ -57,7 +57,12 @@ function renderDialog(props: DialogProps = {}) {
 
 beforeEach(() => {
   jest.clearAllMocks();
-  mockUseQuery.mockReturnValue({ data: { departments: [{ id: "d1", name: "Engineering" }], positions: [{ id: "pos1", name: "Engineer" }] } });
+  mockUseQuery.mockReturnValue({
+    data: {
+      departments: [{ id: "d1", name: "Engineering" }],
+      positions: [{ id: "pos1", name: "Engineer" }],
+    },
+  });
 });
 
 describe("UpdateUserDialog pre-fill", () => {

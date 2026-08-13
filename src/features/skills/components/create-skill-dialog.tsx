@@ -33,11 +33,7 @@ interface CreateSkillDialogProps {
   }) => void;
 }
 
-export function CreateSkillDialog({
-  open,
-  onOpenChange,
-  onCreated,
-}: CreateSkillDialogProps) {
+export function CreateSkillDialog({ open, onOpenChange, onCreated }: CreateSkillDialogProps) {
   const t = useTranslations();
   const { categories } = useSkillCategoriesList();
   const [name, setName] = useState("");

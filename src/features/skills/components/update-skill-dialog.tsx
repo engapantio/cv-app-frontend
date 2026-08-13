@@ -33,11 +33,7 @@ interface UpdateSkillDialogProps {
   }) => void;
 }
 
-export function UpdateSkillDialog({
-  target,
-  onClose,
-  onUpdated,
-}: UpdateSkillDialogProps) {
+export function UpdateSkillDialog({ target, onClose, onUpdated }: UpdateSkillDialogProps) {
   const t = useTranslations();
   const { categories } = useSkillCategoriesList();
   const initialCategoryName = target

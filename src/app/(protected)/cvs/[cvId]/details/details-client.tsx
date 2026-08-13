@@ -109,7 +109,10 @@ function CvDetailsForm({ cv, cvId }: { cv: NonNullable<CvData>; cvId: string }) 
   };
 
   return (
-    <form onSubmit={handleSubmit(handleSave)} className="space-y-6 pl-50">
+    <form
+      onSubmit={handleSubmit(handleSave)}
+      className="space-y-6 max-md:pl-0 md:max-[1439px]:pl-0 min-[1440px]:pl-25 min-[1440px]:pr-25"
+    >
       <div className="relative">
         <FloatingField label={t("fields.name")} error={errors.name?.message}>
           <Input

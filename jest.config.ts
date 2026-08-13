@@ -16,7 +16,6 @@ const config: Config = {
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
     "\\.(css|less|scss|sass)$": "identity-obj-proxy",
-    "\\.(gif|ttf|eot|svg|png|jpg|jpeg|webp|avif)$": "<rootDir>/test/__mocks__/fileMock.ts",
   },
 
   testPathIgnorePatterns: [
@@ -29,10 +28,10 @@ const config: Config = {
 
   coverageThreshold: {
     global: {
-      statements: 22,
-      branches: 22,
-      functions: 22,
-      lines: 22,
+      statements: 33,
+      branches: 33,
+      functions: 33,
+      lines: 33,
     },
   },
 

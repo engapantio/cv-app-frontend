@@ -3,7 +3,8 @@
 import { useCallback } from "react";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
-import { Button, Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui";
+import { DialogActions } from "@/components/shared/dialog-actions";
 import type { CvProjectItem } from "../hooks/use-cv-projects-page";
 
 interface RemoveProjectDialogProps {
@@ -41,31 +42,14 @@ export function RemoveProjectDialog({
         <p className="text-sm text-muted-foreground">
           {t("dialogs.removeProjectConfirm", { name: target?.name ?? "" })}
         </p>
-        <div
-          className="flex flex-row justify-end items-center gap-3 mt-2 py-3"
-          style={{ paddingRight: "48px" }}
-        >
-          <Button
-            variant="ghost"
-            className="uppercase min-w-30 border border-border py-1.5"
-            onClick={onClose}
-          >
-            {t("buttons.cancel")}
-          </Button>
-          <Button
-            type="submit"
-            className="uppercase text-white min-w-30 py-1.5 hover:brightness-90"
-            style={{
-              backgroundColor: "#e53935",
-              boxShadow:
-                "0 1px 5px 0 rgba(0,0,0,0.12),0 2px 2px 0 rgba(0,0,0,0.14),0 3px 1px -2px rgba(0,0,0,0.2)",
-            }}
-            onClick={handleConfirm}
-            disabled={loading}
-          >
-            {loading ? t("buttons.removing") : t("buttons.confirm")}
-          </Button>
-        </div>
+        <DialogActions
+          submitLabel={t("buttons.confirm")}
+          loadingLabel={t("buttons.removing")}
+          loading={loading}
+          disabled={loading}
+          onCancel={onClose}
+          onSubmit={handleConfirm}
+        />
       </DialogContent>
     </Dialog>
   );
