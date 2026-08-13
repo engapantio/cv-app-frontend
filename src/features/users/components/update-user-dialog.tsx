@@ -3,7 +3,10 @@
 import { useState, useCallback, useMemo } from "react";
 import type { UserItem } from "@/features/users/types";
 import type { UpdateUserPayload } from "@/features/users/hooks/use-users-page";
+import { usePermissions } from "@/lib/auth/permissions";
 import { AuthField } from "@/components/auth/auth-field";
+import { useDepartmentsList } from "@/lib/apollo/use-departments-list";
+import { usePositionsList } from "@/lib/apollo/use-positions-list";
 import {
   Dialog,
   DialogContent,
@@ -19,21 +22,9 @@ import {
 import { DialogActions, FloatingField } from "@/components/shared";
 import { useTranslations } from "next-intl";
 
-interface DepartmentOption {
-  id: string;
-  name: string;
-}
-interface PositionOption {
-  id: string;
-  name: string;
-}
-
 interface UpdateUserDialogProps {
   target: UserItem | null;
   onClose: () => void;
-  currentUserId?: string | null;
-  departments: DepartmentOption[];
-  positions: PositionOption[];
   onConfirm: (payload: UpdateUserPayload) => Promise<void>;
   loading: boolean;
 }
@@ -46,13 +37,15 @@ const selectClassName =
 export function UpdateUserDialog({
   target,
   onClose,
-  currentUserId,
-  departments,
-  positions,
   onConfirm,
   loading,
 }: UpdateUserDialogProps) {
   const t = useTranslations();
+  const { currentUserId } = usePermissions();
+  const { data: departmentsData } = useDepartmentsList();
+  const { data: positionsData } = usePositionsList();
+  const departments = departmentsData?.departments ?? [];
+  const positions = positionsData?.positions ?? [];
   const user = target;
   const isCurrentUser = !!currentUserId && user?.id === currentUserId;
 

@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation } from "@apollo/client/react";
+import { gql } from "@apollo/client";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { CreatePositionDocument } from "@/gql/generated/graphql";
@@ -23,7 +24,28 @@ interface CreatePositionDialogProps {
 
 export function CreatePositionDialog({ open, onOpenChange, onCreated }: CreatePositionDialogProps) {
   const t = useTranslations();
-  const [createPosition, { loading: creating }] = useMutation(CreatePositionDocument);
+  const [createPosition, { loading: creating }] = useMutation(CreatePositionDocument, {
+    update(cache, { data }) {
+      if (!data?.createPosition) return;
+      cache.modify({
+        fields: {
+          positions(existingRefs = []) {
+            const newRef = cache.writeFragment({
+              data: data.createPosition,
+              fragment: gql`
+                fragment NewPosition on Position {
+                  id
+                  created_at
+                  name
+                }
+              `,
+            });
+            return [...existingRefs, newRef];
+          },
+        },
+      });
+    },
+  });
 
   const validation = useMemo(() => ({ requiredName: t("validation.nameRequired") }), [t]);
 

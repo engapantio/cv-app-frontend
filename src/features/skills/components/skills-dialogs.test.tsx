@@ -1,17 +1,18 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { useMutation } from "@apollo/client/react";
+import { useMutation, useQuery } from "@apollo/client/react";
 import { CreateSkillDialog } from "./create-skill-dialog";
 import { UpdateSkillDialog } from "./update-skill-dialog";
 import { DeleteSkillDialog } from "./delete-skill-dialog";
 import type { SkillItem } from "../types";
 import type { SkillCategoriesQuery } from "@/gql/generated/graphql";
 
-jest.mock("@apollo/client/react", () => ({ useMutation: jest.fn() }));
+jest.mock("@apollo/client/react", () => ({ useMutation: jest.fn(), useQuery: jest.fn() }));
 jest.mock("next-intl", () => require("@/test-utils/mocks").mockNextIntl());
 jest.mock("@/components/ui", () => require("@/test-utils/ui-mock"));
 
 const mockUseMutation = useMutation as unknown as jest.Mock;
+const mockUseQuery = useQuery as unknown as jest.Mock;
 
 const categories: SkillCategoriesQuery["skillCategories"] = [
   { id: "c1", name: "Programming Language", order: 1, parent: null, children: [] },
@@ -30,6 +31,7 @@ const target: SkillItem = {
 beforeEach(() => {
   jest.clearAllMocks();
   mockUseMutation.mockReturnValue([jest.fn(), { loading: false }]);
+  mockUseQuery.mockReturnValue({ data: { skillCategories: categories }, loading: false });
 });
 
 describe("CreateSkillDialog", () => {
@@ -39,7 +41,6 @@ describe("CreateSkillDialog", () => {
       <CreateSkillDialog
         open
         onOpenChange={jest.fn()}
-        categories={categories}
         onCreated={jest.fn()}
       />,
     );
@@ -69,7 +70,6 @@ describe("CreateSkillDialog", () => {
       <CreateSkillDialog
         open
         onOpenChange={onOpenChange}
-        categories={categories}
         onCreated={onCreated}
       />,
     );
@@ -97,7 +97,6 @@ describe("UpdateSkillDialog", () => {
       <UpdateSkillDialog
         target={target}
         onClose={jest.fn()}
-        categories={categories}
         onUpdated={jest.fn()}
       />,
     );
@@ -109,7 +108,6 @@ describe("UpdateSkillDialog", () => {
       <UpdateSkillDialog
         target={target}
         onClose={jest.fn()}
-        categories={categories}
         onUpdated={jest.fn()}
       />,
     );
@@ -137,7 +135,6 @@ describe("UpdateSkillDialog", () => {
       <UpdateSkillDialog
         target={target}
         onClose={onClose}
-        categories={categories}
         onUpdated={onUpdated}
       />,
     );

@@ -9,6 +9,9 @@ jest.mock("@/components/ui", () => require("@/test-utils/ui-mock"));
 jest.mock("@/components/ui/input", () => require("@/test-utils/ui-mock"));
 jest.mock("@/components/ui/button", () => require("@/test-utils/ui-mock"));
 
+const mockUseQuery = jest.fn();
+jest.mock("@apollo/client/react", () => ({ useQuery: () => mockUseQuery() }));
+
 const mockToastError = jest.fn();
 
 jest.mock("sonner", () => ({
@@ -18,13 +21,16 @@ jest.mock("sonner", () => ({
 const mockOnConfirm = jest.fn();
 const mockOnOpenChange = jest.fn();
 
+beforeEach(() => {
+  jest.clearAllMocks();
+  mockUseQuery.mockReturnValue({ data: { departments: [], positions: [] } });
+});
+
 function renderDialog() {
   const view = render(
     <CreateUserDialog
       open
       onOpenChange={mockOnOpenChange}
-      departments={[]}
-      positions={[]}
       onConfirm={mockOnConfirm}
       loading={false}
     />,
@@ -66,8 +72,6 @@ describe("CreateUserDialog password visibility toggle", () => {
       <CreateUserDialog
         open
         onOpenChange={jest.fn()}
-        departments={[]}
-        positions={[]}
         onConfirm={jest.fn()}
         loading
       />,

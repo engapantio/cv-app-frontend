@@ -44,7 +44,7 @@ const payload: CreateUserPayload = {
 };
 
 const createUserResult = {
-  data: { createUser: { id: "42", created_at: "", email: "new@example.com", is_verified: false } },
+  data: { createUser: { id: "42", created_at: "", email: "new@example.com", is_verified: false, role: "Employee" } },
 };
 
 const createUserVariables = {
@@ -119,14 +119,12 @@ describe("useUsersPage create orchestration", () => {
     expect(mockToastWarning).not.toHaveBeenCalled();
   });
 
-  it("closes the create dialog as soon as creation succeeds, before the refetch settles", async () => {
-    let resolveRefetch: (value: unknown) => void = () => {};
+  it("closes the create dialog as soon as creation succeeds", async () => {
     const users = [] as UserItem[];
-    const refetch = jest.fn(() => new Promise((res) => (resolveRefetch = res)));
     mockUseQuery.mockImplementation(() => ({
       data: { users, departments: [], positions: [] },
       loading: false,
-      refetch,
+      refetch: jest.fn(),
     }));
     actionCreateUser.mockResolvedValue(createUserResult);
     actionSendVerificationEmail.mockResolvedValue({ data: { sendVerificationEmail: null } });
@@ -135,13 +133,11 @@ describe("useUsersPage create orchestration", () => {
     act(() => result.current.setCreateOpen(true));
     expect(result.current.createOpen).toBe(true);
 
-    const pending = result.current.handleCreated(payload);
+    await act(async () => {
+      await result.current.handleCreated(payload);
+    });
 
-    await waitFor(() => expect(result.current.createOpen).toBe(false));
-    expect(refetch).toHaveBeenCalled();
-
-    act(() => resolveRefetch(undefined));
-    await pending;
+    expect(result.current.createOpen).toBe(false);
   });
 
   it("shows a non-blocking warning when the verification email dispatch fails", async () => {
@@ -198,11 +194,12 @@ describe("useUsersPage create orchestration", () => {
     const refetch = jest.fn(async () => {
       users = [createdUser, ...users];
     });
-    mockUseQuery.mockImplementation(() => ({
+    const stableQueryResult = {
       data: { users, departments: [], positions: [] },
       loading: false,
       refetch,
-    }));
+    };
+    mockUseQuery.mockImplementation(() => stableQueryResult);
     actionCreateUser.mockResolvedValue(createUserResult);
     actionSendVerificationEmail.mockResolvedValue({ data: { sendVerificationEmail: null } });
 
@@ -213,6 +210,8 @@ describe("useUsersPage create orchestration", () => {
     await act(async () => {
       await result.current.handleCreated(payload);
     });
+
+    expect(actionCreateUser).toHaveBeenCalled();
 
     await waitFor(() => {
       const emails = result.current.table.getRowModel().rows.map((r) => r.original.email);

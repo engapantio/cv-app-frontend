@@ -4,7 +4,8 @@ import { useState, useCallback } from "react";
 import { useMutation } from "@apollo/client/react";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
-import { UpdateSkillDocument, type SkillCategoriesQuery } from "@/gql/generated/graphql";
+import { UpdateSkillDocument } from "@/gql/generated/graphql";
+import { useSkillCategoriesList } from "@/lib/apollo/use-skill-categories-list";
 import {
   Dialog,
   DialogContent,
@@ -23,7 +24,6 @@ import type { SkillItem } from "@/features/skills/types";
 interface UpdateSkillDialogProps {
   target: SkillItem | null;
   onClose: () => void;
-  categories: SkillCategoriesQuery["skillCategories"];
   onUpdated: (result: {
     id: string;
     created_at: string;
@@ -36,10 +36,10 @@ interface UpdateSkillDialogProps {
 export function UpdateSkillDialog({
   target,
   onClose,
-  categories,
   onUpdated,
 }: UpdateSkillDialogProps) {
   const t = useTranslations();
+  const { categories } = useSkillCategoriesList();
   const initialCategoryName = target
     ? (categories.find((c) => c.id === target.category?.id)?.name ?? null)
     : null;
