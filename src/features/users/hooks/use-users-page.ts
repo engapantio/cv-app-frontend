@@ -6,8 +6,6 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
   UsersDocument,
-  DepartmentsDocument,
-  PositionsDocument,
   CreateUserDocument,
   UpdateProfileDocument,
   UpdateUserDocument,
@@ -21,6 +19,8 @@ import { buildUserUpdateOperations } from "@/lib/user-updates";
 import { DuplicateEmailError, isDuplicateEmailError } from "@/features/users/errors";
 import { createUsersColumns } from "@/features/users/columns";
 import { orderUsers } from "@/features/users/order-users";
+import { useDepartmentsList } from "@/lib/apollo/use-departments-list";
+import { usePositionsList } from "@/lib/apollo/use-positions-list";
 import { useTranslations } from "next-intl";
 import {
   useReactTable,
@@ -65,24 +65,17 @@ export function useUsersPage(
   const effectiveUserId = sessionUserId ?? initialUserId ?? null;
   const effectiveIsAdmin = sessionUserId != null ? sessionIsAdmin : initialIsAdmin;
 
-  const {
+const {
     data: usersData,
     loading,
-    refetch,
   } = useQuery<UsersQuery>(UsersDocument, {
-    fetchPolicy: "network-only",
+    fetchPolicy: "cache-and-network",
     errorPolicy: "all",
   });
 
-  const { data: departmentsData } = useQuery(DepartmentsDocument, {
-    fetchPolicy: "cache-first",
-    errorPolicy: "all",
-  });
+  const { data: departmentsData } = useDepartmentsList();
 
-  const { data: positionsData } = useQuery(PositionsDocument, {
-    fetchPolicy: "cache-first",
-    errorPolicy: "all",
-  });
+  const { data: positionsData } = usePositionsList();
 
   const [usersList, setUsersList] = useState<UserItem[]>(initialUsers);
 
@@ -133,10 +126,17 @@ export function useUsersPage(
     [sendVerificationEmail, t],
   );
 
+  const departments = useMemo(() => departmentsData?.departments ?? [], [departmentsData]);
+  const positions = useMemo(() => positionsData?.positions ?? [], [positionsData]);
+
   const handleCreated = useCallback(
     async (payload: CreateUserPayload) => {
+      let createdId: string | null = null;
+      let createdEmail: string | null = null;
+      let createdRole: UserRole | null = null;
+      let createdAt: string | null = null;
       try {
-        await createUser({
+        const { data } = await createUser({
           variables: {
             user: {
               auth: { email: payload.email, password: payload.password },
@@ -148,6 +148,13 @@ export function useUsersPage(
             },
           },
         });
+        const created = data?.createUser;
+        if (created) {
+          createdId = created.id;
+          createdEmail = created.email;
+          createdRole = created.role;
+          createdAt = created.created_at;
+        }
       } catch (error) {
         if (isDuplicateEmailError(error)) {
           throw new DuplicateEmailError();
@@ -157,19 +164,40 @@ export function useUsersPage(
       setCreateOpen(false);
       toast.success(t("common.userCreatedSuccess"));
       dispatchVerificationEmail(payload.email);
-      await refetch();
-      setPagination((p) => ({ ...p, pageIndex: 0 }));
+
+      if (createdId) {
+        const dept = departments.find((d) => d.id === payload.departmentId);
+        const pos = positions.find((p) => p.id === payload.positionId);
+        const newUser: UserItem = {
+          id: createdId,
+          created_at: createdAt ?? new Date().toISOString(),
+          email: createdEmail ?? payload.email,
+          is_verified: false,
+          role: createdRole ?? payload.role,
+          department_name: dept?.name ?? null,
+          position_name: pos?.name ?? null,
+          profile: {
+            id: createdId,
+            created_at: createdAt ?? new Date().toISOString(),
+            first_name: payload.first_name || null,
+            last_name: payload.last_name || null,
+            full_name: [payload.first_name, payload.last_name].filter(Boolean).join(" ") || null,
+            avatar: null,
+          },
+          department: dept ? { id: dept.id, created_at: dept.created_at, name: dept.name } : null,
+          position: pos ? { id: pos.id, created_at: pos.created_at, name: pos.name } : null,
+          cvs: [],
+        };
+        setUsersList((prev) => [newUser, ...prev]);
+        setPagination((p) => ({ ...p, pageIndex: 0 }));
+      }
     },
-    [createUser, refetch, setPagination, dispatchVerificationEmail, t],
+    [createUser, setPagination, dispatchVerificationEmail, t, departments, positions],
   );
 
-  const handleDeleted = useCallback(
-    async (userId: string) => {
-      setUsersList((prev) => prev.filter((u) => u.id !== userId));
-      await refetch();
-    },
-    [refetch],
-  );
+  const handleDeleted = useCallback(async (userId: string) => {
+    setUsersList((prev) => prev.filter((u) => u.id !== userId));
+  }, []);
 
   const handleUpdated = useCallback(
     async (payload: UpdateUserPayload) => {
@@ -209,8 +237,43 @@ export function useUsersPage(
           }
         }
         const failed = operations.filter((_, i) => !results[i]);
-        if (failed.length === 0) {
+        const allSucceeded = failed.length === 0;
+
+        if (allSucceeded) {
           toast.success(t("common.userUpdatedSuccess"));
+          const dept = departments.find((d) => d.id === payload.departmentId);
+          const pos = positions.find((p) => p.id === payload.positionId);
+          setUsersList((prev) =>
+            prev.map((u) => {
+              if (u.id !== payload.userId) return u;
+              return {
+                ...u,
+                role: payload.role ?? u.role,
+                department_name: dept?.name ?? u.department_name,
+                position_name: pos?.name ?? u.position_name,
+                profile: {
+                  ...u.profile,
+                  first_name: payload.first_name || u.profile?.first_name,
+                  last_name: payload.last_name || u.profile?.last_name,
+                  full_name:
+                    [payload.first_name, payload.last_name].filter(Boolean).join(" ") ||
+                    u.profile?.full_name,
+                },
+                department:
+                  payload.departmentId != null
+                    ? dept
+                      ? { id: dept.id, created_at: dept.created_at, name: dept.name }
+                      : null
+                    : u.department,
+                position:
+                  payload.positionId != null
+                    ? pos
+                      ? { id: pos.id, created_at: pos.created_at, name: pos.name }
+                      : null
+                    : u.position,
+              };
+            }),
+          );
         } else if (failed.length === operations.length) {
           toast.error(t("common.updateUserFailed"));
           throw new Error("updateUserFailed");
@@ -236,13 +299,48 @@ export function useUsersPage(
                 .join(", "),
             }),
           );
+          const dept = departments.find((d) => d.id === payload.departmentId);
+          const pos = positions.find((p) => p.id === payload.positionId);
+          setUsersList((prev) =>
+            prev.map((u) => {
+              if (u.id !== payload.userId) return u;
+              const updated = { ...u };
+              if (results[0] && operations[0]?.kind === "profile") {
+                updated.profile = {
+                  ...updated.profile,
+                  first_name: payload.first_name || updated.profile?.first_name,
+                  last_name: payload.last_name || updated.profile?.last_name,
+                  full_name:
+                    [payload.first_name, payload.last_name].filter(Boolean).join(" ") ||
+                    updated.profile?.full_name,
+                };
+              }
+              if (operations.some((op, i) => op.kind === "user" && results[i])) {
+                updated.role = payload.role ?? updated.role;
+                updated.department_name = dept?.name ?? updated.department_name;
+                updated.position_name = pos?.name ?? updated.position_name;
+                updated.department =
+                  payload.departmentId != null
+                    ? dept
+                      ? { id: dept.id, created_at: dept.created_at, name: dept.name }
+                      : null
+                    : updated.department;
+                updated.position =
+                  payload.positionId != null
+                    ? pos
+                      ? { id: pos.id, created_at: pos.created_at, name: pos.name }
+                      : null
+                    : updated.position;
+              }
+              return updated;
+            }),
+          );
         }
-        await refetch();
       } finally {
         setUpdating(false);
       }
     },
-    [updateTarget, updateProfile, updateUser, refetch, t],
+    [updateTarget, updateProfile, updateUser, departments, positions, t],
   );
 
   const orderedUsers = useMemo(
@@ -252,14 +350,12 @@ export function useUsersPage(
 
   const columns = useMemo(
     () =>
-      createUsersColumns(tColumns, tButtons, effectiveIsAdmin, effectiveUserId ?? undefined, {
+      createUsersColumns(tColumns, tButtons, {
         onOpen: handleNavigate,
         onUpdate: handleUpdate,
         onDelete: handleDelete,
       }),
     [
-      effectiveIsAdmin,
-      effectiveUserId,
       handleNavigate,
       handleUpdate,
       handleDelete,
@@ -294,15 +390,10 @@ export function useUsersPage(
     getPaginationRowModel: getPaginationRowModel(),
   });
 
-  const departments = departmentsData?.departments ?? [];
-  const positions = positionsData?.positions ?? [];
-
   return {
     loading: loading && orderedUsers.length === 0,
     table,
     columnCount: columns.length,
-    isAdmin: effectiveIsAdmin,
-    currentUserId: effectiveUserId,
     createOpen,
     setCreateOpen,
     updateTarget,
@@ -315,8 +406,6 @@ export function useUsersPage(
     handleDeleted,
     globalFilter,
     setGlobalFilter,
-    departments,
-    positions,
     creating,
     updating,
     deleting,

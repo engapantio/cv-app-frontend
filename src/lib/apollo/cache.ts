@@ -1,53 +1,4 @@
-import { InMemoryCache, Reference, TypePolicies } from "@apollo/client";
-import type { FieldMergeFunctionOptions } from "@apollo/client/cache";
-
-type PaginationArgs = {
-  offset?: number | null;
-  search?: string | null;
-  sort?: string | null;
-  filter?: string | null;
-  userId?: string | null;
-  departmentId?: string | null;
-  positionId?: string | null;
-  cvId?: string | null;
-  projectId?: string | null;
-};
-
-function paginatedFieldPolicy<T = Reference>(fieldName = "items") {
-  return {
-    keyArgs: [
-      "search",
-      "sort",
-      "filter",
-      "userId",
-      "departmentId",
-      "positionId",
-      "cvId",
-      "projectId",
-    ],
-    merge(
-      existing: Record<string, unknown> = { [fieldName]: [] },
-      incoming: Record<string, unknown>,
-      options: FieldMergeFunctionOptions<Record<string, unknown>, Record<string, unknown>>,
-    ) {
-      const args = (options.args ?? {}) as PaginationArgs;
-      const offset = typeof args.offset === "number" ? args.offset : 0;
-
-      const existingItems = Array.isArray(existing[fieldName]) ? (existing[fieldName] as T[]) : [];
-      const incomingItems = Array.isArray(incoming[fieldName]) ? (incoming[fieldName] as T[]) : [];
-      const merged = existingItems.slice(0);
-
-      for (let i = 0; i < incomingItems.length; i += 1) {
-        merged[offset + i] = incomingItems[i];
-      }
-
-      return {
-        ...incoming,
-        [fieldName]: merged,
-      };
-    },
-  };
-}
+import { InMemoryCache, TypePolicies } from "@apollo/client";
 
 export const typePolicies: TypePolicies = {
   User: {
@@ -93,9 +44,9 @@ export const typePolicies: TypePolicies = {
       position: { keyArgs: ["id"] },
       users: { merge: false },
       cvs: { merge: false },
-      departments: paginatedFieldPolicy("items"),
-      positions: paginatedFieldPolicy("items"),
-      projects: paginatedFieldPolicy("items"),
+      departments: { merge: false },
+      positions: { merge: false },
+      projects: { merge: false },
       skills: { merge: false },
       languages: { merge: false },
       skillCategories: { merge: false },

@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation } from "@apollo/client/react";
+import { gql } from "@apollo/client";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { CreateLanguageDocument } from "@/gql/generated/graphql";
@@ -31,7 +32,30 @@ interface CreateLanguageDialogProps {
 
 export function CreateLanguageDialog({ open, onOpenChange, onCreated }: CreateLanguageDialogProps) {
   const t = useTranslations();
-  const [createLanguage, { loading: creating }] = useMutation(CreateLanguageDocument);
+  const [createLanguage, { loading: creating }] = useMutation(CreateLanguageDocument, {
+    update(cache, { data }) {
+      if (!data?.createLanguage) return;
+      cache.modify({
+        fields: {
+          languages(existingRefs = []) {
+            const newRef = cache.writeFragment({
+              data: data.createLanguage,
+              fragment: gql`
+                fragment NewLanguage on Language {
+                  id
+                  created_at
+                  iso2
+                  name
+                  native_name
+                }
+              `,
+            });
+            return [...existingRefs, newRef];
+          },
+        },
+      });
+    },
+  });
 
   const validation = useMemo(
     () => ({

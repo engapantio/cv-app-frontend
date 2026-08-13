@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useCallback, useMemo, useEffect, useRef } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { useQuery, useMutation } from "@apollo/client/react";
 import {
   SkillsDocument,
-  SkillCategoriesDocument,
   CreateSkillDocument,
   UpdateSkillDocument,
   DeleteSkillDocument,
@@ -12,8 +11,8 @@ import {
   type UpdateSkillMutation,
   type SkillCategoriesQuery,
 } from "@/gql/generated/graphql";
-import { usePermissions } from "@/lib/auth/permissions";
 import { createSkillsColumns } from "@/features/skills/columns";
+import { useSkillCategoriesList } from "@/lib/apollo/use-skill-categories-list";
 import {
   useReactTable,
   getCoreRowModel,
@@ -30,28 +29,20 @@ export function useSkillsPage(
   serverError?: string | null,
   initialCategories: SkillCategoriesQuery["skillCategories"] = [],
 ) {
-  const { isAdmin } = usePermissions();
   const tColumns = useTranslations("columns.skills");
   const tButtons = useTranslations("buttons");
 
   const { data: skillsData, loading } = useQuery(SkillsDocument, {
-    fetchPolicy: "network-only",
+    fetchPolicy: "cache-and-network",
     errorPolicy: "all",
   });
 
-  const { data: categoriesData } = useQuery(SkillCategoriesDocument, {
-    fetchPolicy: "cache-first",
-    errorPolicy: "all",
-    skip: serverError == null,
-  });
+  const { data: categoriesData } = useSkillCategoriesList();
 
   const [skillsList, setSkillsList] = useState<SkillItem[]>(initialSkills);
 
-  const hydratedRef = useRef(false);
-
   useEffect(() => {
-    if (skillsData?.skills && !hydratedRef.current) {
-      hydratedRef.current = true;
+    if (skillsData?.skills) {
       setSkillsList(skillsData.skills as SkillItem[]);
     }
   }, [skillsData]);
@@ -124,12 +115,12 @@ export function useSkillsPage(
 
   const columns = useMemo(
     () =>
-      createSkillsColumns(tColumns, tButtons, isAdmin, {
+      createSkillsColumns(tColumns, tButtons, {
         onOpen: handleOpen,
         onUpdate: handleUpdate,
         onDelete: handleDelete,
       }),
-    [isAdmin, handleOpen, handleUpdate, handleDelete, tColumns, tButtons],
+    [handleOpen, handleUpdate, handleDelete, tColumns, tButtons],
   );
 
   // eslint-disable-next-line react-hooks/incompatible-library
@@ -151,7 +142,6 @@ export function useSkillsPage(
     loading: loading && skillsList.length === 0,
     table,
     columnCount,
-    isAdmin,
     createOpen,
     setCreateOpen,
     deleteTarget,
@@ -171,6 +161,5 @@ export function useSkillsPage(
     createSkill,
     updateSkill,
     deleteSkill,
-    categories,
   };
 }

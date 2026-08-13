@@ -7,10 +7,8 @@ jest.mock("@apollo/client/react", () => ({ useQuery: jest.fn(), useMutation: jes
 jest.mock("next-intl", () => require("@/test-utils/mocks").mockNextIntl());
 jest.mock("lucide-react", () => require("@/test-utils/mocks").mockLucide());
 jest.mock("@/lib/auth/permissions", () => ({
-  usePermissions: () => ({ isAdmin: mockIsAdmin(), user: { id: "admin-1", role: "Admin" } }),
+  usePermissions: () => ({ isAdmin: true, user: { id: "admin-1", role: "Admin" } }),
 }));
-
-const mockIsAdmin = jest.fn(() => true);
 
 jest.mock("@/components/ui/button", () => require("@/test-utils/ui-mock"));
 jest.mock("@/components/ui/dropdown-menu", () => require("@/test-utils/ui-mock"));
@@ -43,13 +41,14 @@ const skills: SkillItem[] = [
 
 beforeEach(() => {
   jest.clearAllMocks();
-  mockIsAdmin.mockReturnValue(true);
   mockUseMutation.mockReturnValue([jest.fn(), { loading: false }]);
+  const queryResult = { data: { skills }, loading: false };
+  const categoriesResult = { data: { skillCategories: [] }, loading: false };
   mockUseQuery.mockImplementation((doc: unknown) => {
     if (String(doc).includes("SkillCategories")) {
-      return { data: { skillCategories: [] } };
+      return categoriesResult;
     }
-    return { data: { skills }, loading: false };
+    return queryResult;
   });
 });
 
@@ -64,14 +63,6 @@ describe("useSkillsPage", () => {
     mockUseQuery.mockReturnValue({ data: undefined, loading: false });
     const { result } = renderHook(() => useSkillsPage([skills[0]], null, []));
     expect(result.current.skillsList.map((s) => s.id)).toEqual(["1"]);
-  });
-
-  it("exposes isAdmin from permissions", () => {
-    const { result } = renderHook(() => useSkillsPage([], null, []));
-    expect(result.current.isAdmin).toBe(true);
-    mockIsAdmin.mockReturnValue(false);
-    const { result: employeeResult } = renderHook(() => useSkillsPage([], null, []));
-    expect(employeeResult.current.isAdmin).toBe(false);
   });
 
   it("filters rows by name via the global filter", async () => {

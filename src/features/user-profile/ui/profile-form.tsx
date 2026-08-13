@@ -18,11 +18,11 @@ import { buildUserUpdateOperations } from "@/lib/user-updates";
 import {
   UpdateProfileDocument,
   UpdateUserDocument,
-  DepartmentsDocument,
-  PositionsDocument,
   UserDocument,
 } from "@/gql/generated/graphql";
-import { useMutation, useQuery, useApolloClient } from "@apollo/client/react";
+import { useMutation, useApolloClient } from "@apollo/client/react";
+import { useDepartmentsList } from "@/lib/apollo/use-departments-list";
+import { usePositionsList } from "@/lib/apollo/use-positions-list";
 import { useTranslations } from "next-intl";
 import {
   profileSchema,
@@ -67,8 +67,8 @@ export function ProfileForm({
     },
   });
 
-  const { data: departmentsData } = useQuery(DepartmentsDocument);
-  const { data: positionsData } = useQuery(PositionsDocument);
+  const { data: departmentsData } = useDepartmentsList();
+  const { data: positionsData } = usePositionsList();
 
   const [updateUser] = useMutation(UpdateUserDocument);
   const [updateProfile] = useMutation(UpdateProfileDocument);

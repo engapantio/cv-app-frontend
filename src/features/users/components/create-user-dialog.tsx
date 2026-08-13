@@ -6,6 +6,8 @@ import { z } from "zod";
 import type { CreateUserPayload } from "@/features/users/hooks/use-users-page";
 import { isDuplicateEmailError } from "@/features/users/errors";
 import { AuthField } from "@/components/auth/auth-field";
+import { useDepartmentsList } from "@/lib/apollo/use-departments-list";
+import { usePositionsList } from "@/lib/apollo/use-positions-list";
 import {
   Dialog,
   DialogContent,
@@ -21,20 +23,9 @@ import {
 import { DialogActions, FloatingField } from "@/components/shared";
 import { useTranslations } from "next-intl";
 
-interface DepartmentOption {
-  id: string;
-  name: string;
-}
-interface PositionOption {
-  id: string;
-  name: string;
-}
-
 interface CreateUserDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  departments: DepartmentOption[];
-  positions: PositionOption[];
   onConfirm: (payload: CreateUserPayload) => Promise<void>;
   loading: boolean;
 }
@@ -47,12 +38,14 @@ const selectClassName =
 export function CreateUserDialog({
   open,
   onOpenChange,
-  departments,
-  positions,
   onConfirm,
   loading,
 }: CreateUserDialogProps) {
   const t = useTranslations();
+  const { data: departmentsData } = useDepartmentsList();
+  const { data: positionsData } = usePositionsList();
+  const departments = departmentsData?.departments ?? [];
+  const positions = positionsData?.positions ?? [];
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");

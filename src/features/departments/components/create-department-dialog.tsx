@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation } from "@apollo/client/react";
+import { gql } from "@apollo/client";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { CreateDepartmentDocument } from "@/gql/generated/graphql";
@@ -27,7 +28,28 @@ export function CreateDepartmentDialog({
   onCreated,
 }: CreateDepartmentDialogProps) {
   const t = useTranslations();
-  const [createDepartment, { loading: creating }] = useMutation(CreateDepartmentDocument);
+  const [createDepartment, { loading: creating }] = useMutation(CreateDepartmentDocument, {
+    update(cache, { data }) {
+      if (!data?.createDepartment) return;
+      cache.modify({
+        fields: {
+          departments(existingRefs = []) {
+            const newRef = cache.writeFragment({
+              data: data.createDepartment,
+              fragment: gql`
+                fragment NewDepartment on Department {
+                  id
+                  created_at
+                  name
+                }
+              `,
+            });
+            return [...existingRefs, newRef];
+          },
+        },
+      });
+    },
+  });
 
   const validation = useMemo(() => ({ requiredName: t("validation.nameRequired") }), [t]);
 

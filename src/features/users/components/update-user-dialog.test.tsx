@@ -9,6 +9,14 @@ jest.mock("@/components/ui", () => require("@/test-utils/ui-mock"));
 jest.mock("@/components/ui/input", () => require("@/test-utils/ui-mock"));
 jest.mock("@/components/ui/button", () => require("@/test-utils/ui-mock"));
 
+const mockUseQuery = jest.fn();
+jest.mock("@apollo/client/react", () => ({ useQuery: () => mockUseQuery() }));
+
+const mockUsePermissions = jest.fn(() => ({ currentUserId: "u1" }));
+jest.mock("@/lib/auth/permissions", () => ({
+  usePermissions: () => mockUsePermissions(),
+}));
+
 const mockOnConfirm = jest.fn();
 const mockOnClose = jest.fn();
 
@@ -33,9 +41,6 @@ const target = {
   cvs: [],
 } as unknown as UserItem;
 
-const departments = [{ id: "d1", name: "Engineering" }];
-const positions = [{ id: "pos1", name: "Engineer" }];
-
 type DialogProps = Partial<Parameters<typeof UpdateUserDialog>[0]>;
 
 function renderDialog(props: DialogProps = {}) {
@@ -43,8 +48,6 @@ function renderDialog(props: DialogProps = {}) {
     <UpdateUserDialog
       target={target}
       onClose={mockOnClose}
-      departments={departments}
-      positions={positions}
       onConfirm={mockOnConfirm}
       loading={false}
       {...props}
@@ -54,6 +57,7 @@ function renderDialog(props: DialogProps = {}) {
 
 beforeEach(() => {
   jest.clearAllMocks();
+  mockUseQuery.mockReturnValue({ data: { departments: [{ id: "d1", name: "Engineering" }], positions: [{ id: "pos1", name: "Engineer" }] } });
 });
 
 describe("UpdateUserDialog pre-fill", () => {
@@ -154,14 +158,16 @@ describe("UpdateUserDialog submit gating", () => {
 
 describe("UpdateUserDialog role field for current user", () => {
   it("disables the role select when editing the current user", () => {
-    const container = renderDialog({ currentUserId: "u1" });
+    mockUsePermissions.mockReturnValue({ currentUserId: "u1" });
+    const container = renderDialog();
 
     const selects = container.querySelectorAll('[data-testid="select"]');
     expect(selects[2].getAttribute("data-disabled")).toBe("true");
   });
 
   it("keeps the role select enabled when editing another user", () => {
-    const container = renderDialog({ currentUserId: "u2" });
+    mockUsePermissions.mockReturnValue({ currentUserId: "u2" });
+    const container = renderDialog();
 
     const selects = container.querySelectorAll('[data-testid="select"]');
     expect(selects[2].getAttribute("data-disabled")).toBeNull();
