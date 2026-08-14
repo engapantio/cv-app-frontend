@@ -364,6 +364,7 @@ export function useUsersPage(
     onSortingChange: setSorting,
     onGlobalFilterChange: setGlobalFilter,
     onPaginationChange: setPagination,
+    autoResetPageIndex: false,
     globalFilterFn: (row, _columnId, filterValue) => {
       const user = row.original;
       const query = String(filterValue ?? "")

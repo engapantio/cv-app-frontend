@@ -46,6 +46,8 @@ export default function ProjectsClient({
     projects,
     globalFilter,
     setGlobalFilter,
+    pagination,
+    onPaginationChange,
     openProject,
     setOpenProject,
     createOpen,
@@ -69,6 +71,8 @@ export default function ProjectsClient({
         projects={projects}
         globalFilter={globalFilter}
         setGlobalFilter={setGlobalFilter}
+        pagination={pagination}
+        onPaginationChange={onPaginationChange}
         serverError={serverError}
         onCreate={() => setCreateOpen(true)}
         onOpen={(p) => setOpenProject(p)}

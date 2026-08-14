@@ -2,6 +2,8 @@
 
 import { useState, useMemo, useCallback } from "react";
 import { useQuery, useMutation } from "@apollo/client/react";
+import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import {
   CvDocument,
   ProjectsDocument,
@@ -36,6 +38,7 @@ export function useCvProjectsPage(
   initialCv?: CvQuery["cv"] | null,
   serverError?: string | null,
 ) {
+  const t = useTranslations();
   const {
     data: cvData,
     loading: cvLoading,
@@ -70,6 +73,7 @@ export function useCvProjectsPage(
   }, [projectsData, projects]);
 
   const [globalFilter, setGlobalFilter] = useState("");
+  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
 
   const [openProject, setOpenProject] = useState<CvProjectItem | null>(null);
   const [addOpen, setAddOpen] = useState(false);
@@ -102,12 +106,23 @@ export function useCvProjectsPage(
       });
       const updatedCv = result.data?.addCvProject;
       if (updatedCv?.projects) {
-        setLocalProjects(updatedCv.projects as CvProjectItem[]);
+        const allProjects = updatedCv.projects as CvProjectItem[];
+        const newProject = allProjects.find((p) => p.project.id === data.projectId);
+        if (newProject) {
+          setLocalProjects((prev) => [
+            newProject,
+            ...prev.filter((p) => p.project.id !== data.projectId),
+          ]);
+        } else {
+          setLocalProjects(allProjects);
+        }
+        toast.success(t("common.cvsProjectAddedSuccess"));
+        setPagination((prev) => ({ ...prev, pageIndex: 0 }));
       }
       refetchCv();
       setAddOpen(false);
     },
-    [addCvProject, cvId, refetchCv],
+    [addCvProject, cvId, refetchCv, t, setPagination],
   );
 
   const handleUpdate = useCallback(
@@ -133,11 +148,12 @@ export function useCvProjectsPage(
       const updatedCv = result.data?.updateCvProject;
       if (updatedCv?.projects) {
         setLocalProjects(updatedCv.projects as CvProjectItem[]);
+        toast.success(t("common.cvsProjectUpdatedSuccess"));
       }
       refetchCv();
       setUpdateTarget(null);
     },
-    [updateCvProject, cvId, refetchCv],
+    [updateCvProject, cvId, refetchCv, t],
   );
 
   const handleRemove = useCallback(
@@ -150,10 +166,11 @@ export function useCvProjectsPage(
       const updatedCv = result.data?.removeCvProject;
       if (updatedCv?.projects) {
         setLocalProjects(updatedCv.projects as CvProjectItem[]);
+        toast.success(t("common.cvsProjectRemovedSuccess"));
       }
       refetchCv();
     },
-    [removeCvProject, cvId, refetchCv],
+    [removeCvProject, cvId, refetchCv, t],
   );
 
   return {
@@ -163,6 +180,8 @@ export function useCvProjectsPage(
     canMutate,
     globalFilter,
     setGlobalFilter,
+    pagination,
+    onPaginationChange: setPagination,
     openProject,
     setOpenProject,
     addOpen,

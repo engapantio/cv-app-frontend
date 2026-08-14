@@ -86,7 +86,7 @@ export function UpdateUserDialog({ target, onClose, onConfirm, loading }: Update
     <Dialog open={!!user} onOpenChange={(open) => !open && onClose()}>
       <DialogContent showCloseButton className="sm:max-w-4xl bg-card border-border rounded-none">
         <DialogHeader>
-          <DialogTitle className="text-left text-base font-semibold">
+          <DialogTitle className="text-left text-lg font-semibold">
             {t("dialogs.updateUser")}
           </DialogTitle>
         </DialogHeader>

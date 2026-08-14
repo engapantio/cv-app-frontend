@@ -9,6 +9,7 @@ export default async function ProjectsPage() {
     query: ProjectsDocument,
     getData: (data) => (data?.projects ?? []) as ProjectItem[],
     sort: (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+    pageSize: 10000,
     errorMessage: "Failed to load projects",
   });
 

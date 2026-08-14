@@ -59,6 +59,8 @@ function renderTable({
         canMutate={canMutate}
         globalFilter={globalFilter}
         setGlobalFilter={setGlobalFilter}
+        pagination={{ pageIndex: 0, pageSize: 10 }}
+        onPaginationChange={jest.fn()}
         onAdd={actions.onAdd}
         onOpen={actions.onOpen}
         onUpdate={actions.onUpdate}

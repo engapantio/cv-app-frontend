@@ -11,6 +11,7 @@ export default async function UserCvsPage({ params }: { params: Promise<{ userId
     query: UserDocument,
     variables: { userId },
     getData: (data) => (data?.user?.cvs ?? []) as Array<CvItem | null>,
+    pageSize: 10000,
     errorMessage: "Failed to load CVs",
     select: (data) => data?.user?.email ?? null,
   });

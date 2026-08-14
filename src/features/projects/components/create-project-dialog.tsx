@@ -105,7 +105,7 @@ export function CreateProjectDialog({
     >
       <DialogContent showCloseButton className="sm:max-w-4xl bg-card border-border rounded-none">
         <DialogHeader>
-          <DialogTitle className="text-left text-base font-semibold">
+          <DialogTitle className="text-left text-lg font-semibold">
             {t("dialogs.createProject")}
           </DialogTitle>
         </DialogHeader>

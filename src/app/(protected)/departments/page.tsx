@@ -8,8 +8,8 @@ export default async function DepartmentsPage() {
   const { initial, serverError } = await fetchInitialRows<DepartmentsQuery, DepartmentItem>({
     query: DepartmentsDocument,
     getData: (data) => (data?.departments ?? []) as DepartmentItem[],
-    sort: (a, b) => a.name.localeCompare(b.name),
     errorMessage: "Failed to load departments",
+    pageSize: 10000,
   });
 
   return <DepartmentsClient initialDepartments={initial} serverError={serverError} />;

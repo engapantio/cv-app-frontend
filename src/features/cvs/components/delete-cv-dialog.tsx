@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { DeleteCvDocument, type UserQuery } from "@/gql/generated/graphql";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui";
 import { DialogActions } from "@/components/shared/dialog-actions";
+import { removeById } from "@/lib/apollo/cache-utils";
 
 type CvItem = NonNullable<UserQuery["user"]["cvs"]>[number];
 
@@ -19,7 +20,27 @@ export function DeleteCvDialog({
   onDeleted: (cvId: string) => void;
 }) {
   const t = useTranslations();
-  const [deleteCv, { loading: deleting }] = useMutation(DeleteCvDocument);
+  const [deleteCv, { loading: deleting }] = useMutation(DeleteCvDocument, {
+    update(cache, { data }) {
+      if (!data?.deleteCv || !target) return;
+      cache.modify({
+        fields: {
+          cvs: removeById(target.id),
+        },
+      });
+      const userRef = target.user
+        ? cache.identify({ __typename: "User", id: target.user.id })
+        : null;
+      if (userRef) {
+        cache.modify({
+          id: userRef,
+          fields: {
+            cvs: removeById(target.id),
+          },
+        });
+      }
+    },
+  });
 
   const handleConfirm = useCallback(async () => {
     if (!target) return;
@@ -34,7 +55,7 @@ export function DeleteCvDialog({
     <Dialog open={!!target} onOpenChange={(open) => !open && onClose()}>
       <DialogContent showCloseButton className="sm:max-w-3xl bg-card border-border rounded-none">
         <DialogHeader>
-          <DialogTitle className="text-left text-base font-semibold">
+          <DialogTitle className="text-left text-lg font-semibold">
             {t("dialogs.deleteCv")}
           </DialogTitle>
         </DialogHeader>

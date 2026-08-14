@@ -67,6 +67,8 @@ function renderTable({
         projects={data}
         globalFilter={globalFilter}
         setGlobalFilter={setGlobalFilter}
+        pagination={{ pageIndex: 0, pageSize: 10 }}
+        onPaginationChange={jest.fn()}
         onCreate={jest.fn()}
         onOpen={actions.onOpen}
         onUpdate={actions.onUpdate}

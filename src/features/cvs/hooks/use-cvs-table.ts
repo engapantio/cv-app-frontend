@@ -3,6 +3,7 @@
 import { useMemo, useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@apollo/client/react";
+import { toast } from "sonner";
 import type { DocumentNode } from "graphql";
 import {
   useReactTable,
@@ -37,6 +38,7 @@ export function useCvsTable({
   initialUserEmail,
 }: UseCvsTableParams) {
   const router = useRouter();
+  const t = useTranslations();
   const tColumns = useTranslations("columns.cvs");
   const tButtons = useTranslations("buttons");
 
@@ -64,6 +66,7 @@ export function useCvsTable({
 
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
+  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
 
   const handleOpen = useCallback((cvId: string) => router.push(`/cvs/${cvId}/details`), [router]);
 
@@ -71,9 +74,13 @@ export function useCvsTable({
     setDeleteTarget(cv);
   }, []);
 
-  const handleDeleted = useCallback((cvId: string) => {
-    setCvsList((prev) => prev.filter((cv) => cv.id !== cvId));
-  }, []);
+  const handleDeleted = useCallback(
+    (cvId: string) => {
+      setCvsList((prev) => prev.filter((cv) => cv.id !== cvId));
+      toast.success(t("common.cvDeletedSuccess"));
+    },
+    [t],
+  );
 
   const handleCreated = useCallback(
     (newCv: CreateCvMutation["createCv"]) => {
@@ -83,8 +90,10 @@ export function useCvsTable({
         { ...newCv, user: { id: ownerId, email: ownerEmail } } as CvItem,
         ...prev,
       ]);
+      toast.success(t("common.cvCreatedSuccess"));
+      setPagination((prev) => ({ ...prev, pageIndex: 0 }));
     },
-    [userId, currentUserId, initialUserEmail, currentUser],
+    [userId, currentUserId, initialUserEmail, currentUser, t, setPagination],
   );
 
   const canCreate = userId != null ? currentUserId === userId || isAdmin : !!currentUser;
@@ -110,9 +119,11 @@ export function useCvsTable({
   const table = useReactTable({
     data: cvsList,
     columns,
-    state: { sorting, globalFilter },
+    state: { sorting, globalFilter, pagination },
     onSortingChange: setSorting,
     onGlobalFilterChange: setGlobalFilter,
+    onPaginationChange: setPagination,
+    autoResetPageIndex: false,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),

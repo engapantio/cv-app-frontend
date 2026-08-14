@@ -8,6 +8,7 @@ export default async function CvsPage() {
   const { initial, serverError } = await fetchInitialRows<CvsQuery, CvItem>({
     query: CvsDocument,
     getData: (data) => (data?.cvs ?? []) as Array<CvItem | null>,
+    pageSize: 10000,
     errorMessage: "Failed to load CVs",
   });
 

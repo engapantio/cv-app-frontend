@@ -20,9 +20,11 @@ import {
   type SortingState,
 } from "@tanstack/react-table";
 import type { LanguageItem } from "@/features/languages/types";
+import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 
 export function useLanguagesPage(initialLanguages: LanguageItem[]) {
+  const t = useTranslations();
   const tColumns = useTranslations("columns.languages");
   const tButtons = useTranslations("buttons");
 
@@ -36,10 +38,7 @@ export function useLanguagesPage(initialLanguages: LanguageItem[]) {
   useEffect(() => {
     if (languagesData?.languages) {
       setLanguagesList(
-        languagesData.languages
-          .filter((l): l is NonNullable<typeof l> => l !== null)
-          .slice()
-          .sort((a, b) => a.name.localeCompare(b.name)),
+        languagesData.languages.filter((l): l is NonNullable<typeof l> => l !== null),
       );
     }
   }, [languagesData]);
@@ -49,8 +48,12 @@ export function useLanguagesPage(initialLanguages: LanguageItem[]) {
   const [updateTarget, setUpdateTarget] = useState<LanguageItem | null>(null);
   const [openTarget, setOpenTarget] = useState<LanguageItem | null>(null);
 
-  const [sorting, setSorting] = useState<SortingState>([]);
+  const [sorting, setSorting] = useState<SortingState>([
+    { id: "created_at", desc: true },
+    { id: "id", desc: true },
+  ]);
   const [globalFilter, setGlobalFilter] = useState("");
+  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
 
   const handleOpen = useCallback((language: LanguageItem) => {
     setOpenTarget(language);
@@ -66,21 +69,33 @@ export function useLanguagesPage(initialLanguages: LanguageItem[]) {
 
   const [createLanguage] = useMutation(CreateLanguageDocument);
 
-  const handleCreated = useCallback((newLanguage: CreateLanguageMutation["createLanguage"]) => {
-    setLanguagesList((prev) => [...prev, newLanguage]);
-  }, []);
+  const handleCreated = useCallback(
+    (_newLanguage: CreateLanguageMutation["createLanguage"]) => {
+      toast.success(t("common.languageCreatedSuccess"));
+      setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+    },
+    [t, setPagination],
+  );
 
   const [updateLanguage, { loading: updating }] = useMutation(UpdateLanguageDocument);
 
-  const handleUpdated = useCallback((updated: UpdateLanguageMutation["updateLanguage"]) => {
-    setLanguagesList((prev) => prev.map((l) => (l.id === updated.id ? updated : l)));
-  }, []);
+  const handleUpdated = useCallback(
+    (updated: UpdateLanguageMutation["updateLanguage"]) => {
+      setLanguagesList((prev) => prev.map((l) => (l.id === updated.id ? updated : l)));
+      toast.success(t("common.languageUpdatedSuccess"));
+    },
+    [t],
+  );
 
   const [deleteLanguage, { loading: deleting }] = useMutation(DeleteLanguageDocument);
 
-  const handleDeleted = useCallback((languageId: string) => {
-    setLanguagesList((prev) => prev.filter((l) => l.id !== languageId));
-  }, []);
+  const handleDeleted = useCallback(
+    (languageId: string) => {
+      setLanguagesList((prev) => prev.filter((l) => l.id !== languageId));
+      toast.success(t("common.languageDeletedSuccess"));
+    },
+    [t],
+  );
 
   const columns = useMemo(
     () =>
@@ -96,9 +111,11 @@ export function useLanguagesPage(initialLanguages: LanguageItem[]) {
   const table = useReactTable({
     data: languagesList,
     columns,
-    state: { sorting, globalFilter },
+    state: { sorting, globalFilter, pagination },
     onSortingChange: setSorting,
     onGlobalFilterChange: setGlobalFilter,
+    onPaginationChange: setPagination,
+    autoResetPageIndex: false,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),

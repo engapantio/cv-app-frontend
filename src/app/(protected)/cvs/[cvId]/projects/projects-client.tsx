@@ -50,6 +50,8 @@ export default function CvProjectsClient({
     canMutate,
     globalFilter,
     setGlobalFilter,
+    pagination,
+    onPaginationChange,
     openProject,
     setOpenProject,
     addOpen,
@@ -82,6 +84,8 @@ export default function CvProjectsClient({
         canMutate={canMutate}
         globalFilter={globalFilter}
         setGlobalFilter={setGlobalFilter}
+        pagination={pagination}
+        onPaginationChange={onPaginationChange}
         onAdd={() => setAddOpen(true)}
         onOpen={(p) => setOpenProject(p)}
         onUpdate={(p) => setUpdateTarget(p)}
