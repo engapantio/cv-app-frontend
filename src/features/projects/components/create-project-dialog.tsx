@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { format } from "date-fns";
-import { CalendarIcon, ChevronDown, ChevronUp } from "lucide-react";
+import { CalendarIcon, TriangleIcon } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { DialogActions, EnvPill, FloatingField } from "@/components/shared";
@@ -103,13 +103,13 @@ export function CreateProjectDialog({
         onOpenChange(o);
       }}
     >
-      <DialogContent showCloseButton className="sm:max-w-xl bg-card border-border rounded-none">
+      <DialogContent showCloseButton className="sm:max-w-4xl bg-card border-border rounded-none">
         <DialogHeader>
           <DialogTitle className="text-left text-base font-semibold">
             {t("dialogs.createProject")}
           </DialogTitle>
         </DialogHeader>
-        <div className="space-y-5">
+        <div className="space-y-5 pb-1">
           <div className="grid grid-cols-2 gap-4">
             <FloatingField label={t("fields.project")}>
               <Input
@@ -232,9 +232,15 @@ export function CreateProjectDialog({
                       ))}
                     </div>
                     {envOpen ? (
-                      <ChevronUp className="ml-auto size-4 text-muted-foreground shrink-0 mt-1.5" />
+                      <TriangleIcon
+                        className="ml-auto size-2 scale-y-[0.6] shrink-0 mt-1.5 text-black dark:text-white"
+                        fill="currentColor"
+                      />
                     ) : (
-                      <ChevronDown className="ml-auto size-4 text-muted-foreground shrink-0 mt-1.5" />
+                      <TriangleIcon
+                        className="ml-auto size-2 scale-y-[0.6] shrink-0 mt-1.5 rotate-180 text-black dark:text-white"
+                        fill="currentColor"
+                      />
                     )}
                   </Button>
                 }

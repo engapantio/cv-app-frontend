@@ -97,13 +97,13 @@ export function UpdateLanguageDialog({ target, onClose, onUpdated }: UpdateLangu
 
   return (
     <Dialog open={!!target} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent showCloseButton className="sm:max-w-md bg-card border-border rounded-none">
+      <DialogContent showCloseButton className="sm:max-w-2xl bg-card border-border rounded-none">
         <DialogHeader>
           <DialogTitle className="text-left text-base font-semibold">
             {t("dialogs.updateLanguage")}
           </DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 py-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 pt-4">
           <FloatingField label={t("fields.name")} error={errors.name?.message}>
             <Input
               {...register("name")}
@@ -135,7 +135,6 @@ export function UpdateLanguageDialog({ target, onClose, onUpdated }: UpdateLangu
             loading={updating}
             disabled={!isDirty || isSubmitting}
             onCancel={onClose}
-            className="pt-1"
           />
         </form>
       </DialogContent>

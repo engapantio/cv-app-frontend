@@ -14,7 +14,7 @@ export function OpenLanguageOverlay({ target, onClose }: OpenLanguageOverlayProp
 
   return (
     <Dialog open={!!target} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent showCloseButton className="sm:max-w-md bg-card border-border rounded-none">
+      <DialogContent showCloseButton className="sm:max-w-2xl bg-card border-border rounded-none">
         <DialogHeader>
           <DialogTitle className="text-left text-base font-semibold">
             {t("dialogs.openLanguage")}
@@ -51,7 +51,7 @@ export function OpenLanguageOverlay({ target, onClose }: OpenLanguageOverlayProp
         <div className="flex justify-end pt-2">
           <Button
             variant="ghost"
-            className="uppercase min-w-30 border border-border py-1.5"
+            className="uppercase min-w-45 border border-border py-1.5 text-border"
             onClick={onClose}
           >
             {t("buttons.close")}

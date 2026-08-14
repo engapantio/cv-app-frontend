@@ -29,7 +29,7 @@ export function DeleteUserDialog({ target, onClose, onDeleted }: DeleteUserDialo
 
   return (
     <Dialog open={!!target} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent showCloseButton className="sm:max-w-lg bg-card border-border rounded-none">
+      <DialogContent showCloseButton className="sm:max-w-3xl bg-card border-border rounded-none">
         <DialogHeader>
           <DialogTitle className="text-left text-base font-semibold">
             {t("dialogs.deleteUser")}

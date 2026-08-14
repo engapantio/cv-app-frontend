@@ -118,13 +118,13 @@ export function AddProjectDialog({
         onOpenChange(open);
       }}
     >
-      <DialogContent showCloseButton className="sm:max-w-xl bg-card border-border rounded-none">
+      <DialogContent showCloseButton className="sm:max-w-4xl bg-card border-border rounded-none">
         <DialogHeader>
           <DialogTitle className="text-left text-base font-semibold">
             {t("dialogs.addProject")}
           </DialogTitle>
         </DialogHeader>
-        <div className="space-y-5">
+        <div className="space-y-5 pb-1">
           <div className="grid grid-cols-2 gap-4">
             <FloatingField
               label={t("fields.project")}

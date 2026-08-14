@@ -94,13 +94,13 @@ export function CreatePositionDialog({ open, onOpenChange, onCreated }: CreatePo
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent showCloseButton className="sm:max-w-md bg-card border-border rounded-none">
+      <DialogContent showCloseButton className="sm:max-w-2xl bg-card border-border rounded-none">
         <DialogHeader>
           <DialogTitle className="text-left text-base font-semibold">
             {t("dialogs.createPosition")}
           </DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 py-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 pt-4">
           <FloatingField label={t("fields.name")} error={errors.name?.message}>
             <Input
               {...register("name")}
@@ -116,7 +116,6 @@ export function CreatePositionDialog({ open, onOpenChange, onCreated }: CreatePo
             loading={creating}
             disabled={isSubmitting || !isDirty}
             onCancel={() => onOpenChange(false)}
-            className="pt-1"
           />
         </form>
       </DialogContent>

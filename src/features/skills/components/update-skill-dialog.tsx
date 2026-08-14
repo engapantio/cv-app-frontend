@@ -80,13 +80,13 @@ export function UpdateSkillDialog({ target, onClose, onUpdated }: UpdateSkillDia
 
   return (
     <Dialog open={!!target} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent showCloseButton className="sm:max-w-md bg-card border-border rounded-none">
+      <DialogContent showCloseButton className="sm:max-w-2xl bg-card border-border rounded-none">
         <DialogHeader>
           <DialogTitle className="text-left text-base font-semibold">
             {t("dialogs.updateSkill")}
           </DialogTitle>
         </DialogHeader>
-        <div className="space-y-6 py-4">
+        <div className="space-y-6 pt-4 pb-2">
           <FloatingField label={t("fields.name")}>
             <Input
               value={name}
