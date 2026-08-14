@@ -178,7 +178,7 @@ export function UserSkillsClient({
                 <button
                   type="button"
                   onClick={cancelRemove}
-                  className="uppercase text-base font-medium text-foreground bg-transparent border border-border rounded-[40px] min-w-30 py-2 cursor-pointer"
+                  className="uppercase text-base font-medium text-border bg-transparent border border-border rounded-[40px] min-w-30 py-2 cursor-pointer"
                 >
                   {t("buttons.cancel")}
                 </button>
@@ -187,7 +187,11 @@ export function UserSkillsClient({
                   onClick={handleDeleteSkills}
                   disabled={selectedSkills.size === 0 || deletingSkill}
                   className="uppercase text-white min-w-30 py-1.5"
-                  style={{ backgroundColor: "#e53935" }}
+                  style={
+                    selectedSkills.size === 0 || deletingSkill
+                      ? undefined
+                      : { backgroundColor: "#e53935" }
+                  }
                 >
                   {t("buttons.delete")}
                   {selectedSkills.size > 0 && (

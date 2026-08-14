@@ -216,7 +216,7 @@ export function UserLanguagesClient({ userId, initialUser }: UserLanguagesClient
               <button
                 type="button"
                 onClick={cancelRemove}
-                className="uppercase text-base font-medium text-foreground bg-transparent border border-border rounded-[40px] min-w-30 py-2 cursor-pointer"
+                className="uppercase text-base font-medium text-border bg-transparent border border-border rounded-[40px] min-w-30 py-2 cursor-pointer"
               >
                 {t("buttons.cancel")}
               </button>
@@ -225,7 +225,11 @@ export function UserLanguagesClient({ userId, initialUser }: UserLanguagesClient
                 onClick={handleDeleteLanguages}
                 disabled={selectedLanguages.length === 0 || deleting}
                 className="uppercase text-white min-w-30 py-1.5"
-                style={{ backgroundColor: "#e53935" }}
+                style={
+                  selectedLanguages.length === 0 || deleting
+                    ? undefined
+                    : { backgroundColor: "#e53935" }
+                }
               >
                 {t("buttons.delete")}
                 {selectedLanguages.length > 0 && (

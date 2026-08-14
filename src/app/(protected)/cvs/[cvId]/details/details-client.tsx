@@ -157,7 +157,11 @@ function CvDetailsForm({ cv, cvId }: { cv: NonNullable<CvData>; cvId: string }) 
         <Button
           type="submit"
           className="uppercase text-white w-2/5 py-1.5 cursor-pointer"
-          style={{ backgroundColor: "#e53935" }}
+          style={
+            !canEdit || isSubmitting || updating || !isDirty
+              ? undefined
+              : { backgroundColor: "#e53935" }
+          }
           disabled={!canEdit || isSubmitting || updating || !isDirty}
         >
           {updating ? t("buttons.updating") : t("buttons.update")}
