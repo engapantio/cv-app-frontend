@@ -41,6 +41,7 @@ export function ProjectRow({
   return (
     <tbody
       className={cn(
+        "group",
         "hover:bg-row-hover dark:hover:bg-white/15",
         !isLast && "border-b border-b-table-border",
       )}
@@ -110,7 +111,12 @@ export function ProjectRow({
         >
           <div className="flex flex-wrap gap-1">
             {project.environment.map((env, index) => (
-              <Pill key={index} text={env} variant="transparent" />
+              <Pill
+                key={index}
+                text={env}
+                variant="transparent"
+                className="group-hover:border-background transition-colors"
+              />
             ))}
           </div>
         </td>

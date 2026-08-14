@@ -86,6 +86,16 @@ export function createDepartmentsColumns(
       cell: () => null,
     },
     {
+      id: "created_at",
+      accessorKey: "created_at",
+      enableSorting: true,
+      enableGlobalFilter: false,
+      enableHiding: false,
+      meta: { className: "hidden" },
+      header: () => null,
+      cell: () => null,
+    },
+    {
       id: "name",
       header: ({ column }) => <SortableHeader column={column} label={t("name")} />,
       accessorKey: "name",

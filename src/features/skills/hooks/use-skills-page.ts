@@ -22,6 +22,7 @@ import {
   type SortingState,
 } from "@tanstack/react-table";
 import type { SkillItem } from "@/features/skills/types";
+import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 
 export function useSkillsPage(
@@ -29,6 +30,7 @@ export function useSkillsPage(
   serverError?: string | null,
   initialCategories: SkillCategoriesQuery["skillCategories"] = [],
 ) {
+  const t = useTranslations();
   const tColumns = useTranslations("columns.skills");
   const tButtons = useTranslations("buttons");
 
@@ -54,6 +56,7 @@ export function useSkillsPage(
 
   const [sorting, setSorting] = useState<SortingState>([{ id: "id", desc: true }]);
   const [globalFilter, setGlobalFilter] = useState("");
+  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
 
   const handleOpen = useCallback((skill: SkillItem) => {
     setOpenTarget(skill);
@@ -83,8 +86,10 @@ export function useSkillsPage(
         category: matched ?? null,
       } as SkillItem;
       setSkillsList((prev) => [...prev, item]);
+      toast.success(t("common.skillCreatedSuccess"));
+      setPagination((prev) => ({ ...prev, pageIndex: 0 }));
     },
-    [categories],
+    [categories, t, setPagination],
   );
 
   const [updateSkill, { loading: updating }] = useMutation(UpdateSkillDocument);
@@ -103,15 +108,20 @@ export function useSkillsPage(
             : s,
         ),
       );
+      toast.success(t("common.skillUpdatedSuccess"));
     },
-    [categories],
+    [categories, t],
   );
 
   const [deleteSkill, { loading: deleting }] = useMutation(DeleteSkillDocument);
 
-  const handleDeleted = useCallback((skillId: string) => {
-    setSkillsList((prev) => prev.filter((s) => s.id !== skillId));
-  }, []);
+  const handleDeleted = useCallback(
+    (skillId: string) => {
+      setSkillsList((prev) => prev.filter((s) => s.id !== skillId));
+      toast.success(t("common.skillDeletedSuccess"));
+    },
+    [t],
+  );
 
   const columns = useMemo(
     () =>
@@ -127,9 +137,11 @@ export function useSkillsPage(
   const table = useReactTable({
     data: skillsList,
     columns,
-    state: { sorting, globalFilter },
+    state: { sorting, globalFilter, pagination },
     onSortingChange: setSorting,
     onGlobalFilterChange: setGlobalFilter,
+    onPaginationChange: setPagination,
+    autoResetPageIndex: false,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),

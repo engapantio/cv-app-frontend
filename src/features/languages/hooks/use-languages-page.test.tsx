@@ -70,14 +70,14 @@ describe("useLanguagesPage", () => {
     expect(result.current.table.getRowModel().rows.map((r) => r.original.name)).toEqual(["German"]);
   });
 
-  it("hydrates the list sorted by name to match the SSR render", async () => {
+  it("hydrates the list in server order (no local sort)", async () => {
     mockUseQuery.mockReturnValue({
       data: { languages: [languages[1], languages[0]] },
       loading: false,
     });
     const { result } = renderHook(() => useLanguagesPage([]));
     await waitFor(() => expect(result.current.languagesList).toHaveLength(2));
-    expect(result.current.languagesList.map((l) => l.name)).toEqual(["English", "German"]);
+    expect(result.current.languagesList.map((l) => l.name)).toEqual(["German", "English"]);
   });
 
   it("sorts rows by name in both directions", async () => {
@@ -95,9 +95,9 @@ describe("useLanguagesPage", () => {
     ]);
   });
 
-  it("appends a language on create", async () => {
+  it("does not mutate local state on create (cache.modify + useEffect handle it)", () => {
     const { result } = renderHook(() => useLanguagesPage([]));
-    await waitFor(() => expect(result.current.languagesList).toHaveLength(2));
+    expect(result.current.languagesList).toHaveLength(2);
     act(() =>
       result.current.handleCreated({
         id: "3",
@@ -107,7 +107,7 @@ describe("useLanguagesPage", () => {
         native_name: "Français",
       }),
     );
-    expect(result.current.languagesList.map((l) => l.id)).toEqual(["1", "2", "3"]);
+    expect(result.current.languagesList).toHaveLength(2);
   });
 
   it("replaces a language on update", async () => {

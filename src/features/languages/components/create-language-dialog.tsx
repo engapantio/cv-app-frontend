@@ -50,7 +50,7 @@ export function CreateLanguageDialog({ open, onOpenChange, onCreated }: CreateLa
                 }
               `,
             });
-            return [...existingRefs, newRef];
+            return [newRef, ...existingRefs];
           },
         },
       });
@@ -117,7 +117,7 @@ export function CreateLanguageDialog({ open, onOpenChange, onCreated }: CreateLa
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent showCloseButton className="sm:max-w-2xl bg-card border-border rounded-none">
         <DialogHeader>
-          <DialogTitle className="text-left text-base font-semibold">
+          <DialogTitle className="text-left text-lg font-semibold">
             {t("dialogs.createLanguage")}
           </DialogTitle>
         </DialogHeader>

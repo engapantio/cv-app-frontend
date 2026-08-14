@@ -55,16 +55,16 @@ describe("useProjectsPage", () => {
     expect(result.current.loading).toBe(false);
   });
 
-  it("replaces the initial rows with the sorted server list once loaded", async () => {
+  it("replaces the initial rows with the server list once loaded", async () => {
     const { result } = renderHook(() => useProjectsPage([projects[0]]));
     await waitFor(() => expect(result.current.projects).toHaveLength(2));
-    expect(result.current.projects.map((p) => p.id)).toEqual(["2", "1"]);
+    expect(result.current.projects.map((p) => p.id)).toEqual(["1", "2"]);
   });
 
-  it("sorts projects by created_at descending", async () => {
+  it("preserves server insertion order", async () => {
     const { result } = renderHook(() => useProjectsPage([]));
     await waitFor(() => expect(result.current.projects).toHaveLength(2));
-    expect(result.current.projects.map((p) => p.name)).toEqual(["Beta", "Alpha"]);
+    expect(result.current.projects.map((p) => p.name)).toEqual(["Alpha", "Beta"]);
   });
 
   it("merges a locally created project on top of server rows", async () => {
@@ -102,7 +102,7 @@ describe("useProjectsPage", () => {
     });
 
     await waitFor(() =>
-      expect(result.current.projects.map((p) => p.name)).toEqual(["Gamma", "Beta", "Alpha"]),
+      expect(result.current.projects.map((p) => p.name)).toEqual(["Gamma", "Alpha", "Beta"]),
     );
   });
 
@@ -142,12 +142,12 @@ describe("useProjectsPage", () => {
         environment: [],
       });
     });
-    expect(result.current.projects.map((p) => p.id)).toEqual(["3", "2", "1"]);
+    expect(result.current.projects.map((p) => p.id)).toEqual(["3", "1", "2"]);
 
     await act(async () => {
       await result.current.handleDelete("3");
     });
 
-    expect(result.current.projects.map((p) => p.id)).toEqual(["2", "1"]);
+    expect(result.current.projects.map((p) => p.id)).toEqual(["1", "2"]);
   });
 });

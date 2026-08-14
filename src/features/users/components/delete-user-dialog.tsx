@@ -31,7 +31,7 @@ export function DeleteUserDialog({ target, onClose, onDeleted }: DeleteUserDialo
     <Dialog open={!!target} onOpenChange={(open) => !open && onClose()}>
       <DialogContent showCloseButton className="sm:max-w-3xl bg-card border-border rounded-none">
         <DialogHeader>
-          <DialogTitle className="text-left text-base font-semibold">
+          <DialogTitle className="text-left text-lg font-semibold">
             {t("dialogs.deleteUser")}
           </DialogTitle>
         </DialogHeader>

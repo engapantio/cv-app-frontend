@@ -16,6 +16,7 @@ export default async function SkillsPage() {
       query: SkillsDocument,
       getData: (data) => (data?.skills ?? []) as SkillItem[],
       sort: (a, b) => Number(b.id) - Number(a.id),
+      pageSize: 10000,
       errorMessage: "Failed to load skills",
     }),
     fetchInitialRows<SkillCategoriesQuery, SkillCategoryItem>({

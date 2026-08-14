@@ -8,8 +8,8 @@ export default async function PositionsPage() {
   const { initial, serverError } = await fetchInitialRows<PositionsQuery, PositionItem>({
     query: PositionsDocument,
     getData: (data) => (data?.positions ?? []) as PositionItem[],
-    sort: (a, b) => a.name.localeCompare(b.name),
     errorMessage: "Failed to load positions",
+    pageSize: 10000,
   });
 
   return <PositionsClient initialPositions={initial} serverError={serverError} />;

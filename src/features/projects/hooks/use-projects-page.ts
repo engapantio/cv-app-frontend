@@ -2,6 +2,8 @@
 
 import { useState, useMemo, useCallback } from "react";
 import { useQuery, useMutation } from "@apollo/client/react";
+import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import {
   ProjectsDocument,
   CreateProjectDocument,
@@ -13,6 +15,7 @@ import {
 export type ProjectItem = ProjectsQuery["projects"][number];
 
 export function useProjectsPage(initialProjects: ProjectItem[]) {
+  const t = useTranslations();
   const { data, loading } = useQuery(ProjectsDocument, {
     fetchPolicy: "cache-and-network",
     errorPolicy: "all",
@@ -22,16 +25,20 @@ export function useProjectsPage(initialProjects: ProjectItem[]) {
 
   const projects = useMemo(() => {
     const serverProjects = data?.projects ?? initialProjects;
-    const merged = new Map<string, ProjectItem>(serverProjects.map((p) => [p.id, p]));
+    const merged = new Map<string, ProjectItem>();
     for (const p of localProjects) {
       merged.set(p.id, p);
     }
-    return [...merged.values()].sort(
-      (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
-    );
+    for (const p of serverProjects) {
+      if (!merged.has(p.id)) {
+        merged.set(p.id, p);
+      }
+    }
+    return [...merged.values()];
   }, [data, localProjects, initialProjects]);
 
   const [globalFilter, setGlobalFilter] = useState("");
+  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
 
   const [openProject, setOpenProject] = useState<ProjectItem | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
@@ -57,10 +64,12 @@ export function useProjectsPage(initialProjects: ProjectItem[]) {
       const created = result.data?.createProject;
       if (created) {
         setLocalProjects((prev) => [created as ProjectItem, ...prev]);
+        toast.success(t("common.projectCreatedSuccess"));
+        setPagination((prev) => ({ ...prev, pageIndex: 0 }));
       }
       setCreateOpen(false);
     },
-    [createProject],
+    [createProject, t, setPagination],
   );
 
   const handleUpdate = useCallback(
@@ -81,10 +90,11 @@ export function useProjectsPage(initialProjects: ProjectItem[]) {
         setLocalProjects((prev) =>
           prev.map((p) => (p.id === updated.id ? (updated as ProjectItem) : p)),
         );
+        toast.success(t("common.projectUpdatedSuccess"));
       }
       setUpdateTarget(null);
     },
-    [updateProject],
+    [updateProject, t],
   );
 
   const handleDelete = useCallback(
@@ -93,8 +103,9 @@ export function useProjectsPage(initialProjects: ProjectItem[]) {
         variables: { project: { projectId } },
       });
       setLocalProjects((prev) => prev.filter((p) => p.id !== projectId));
+      toast.success(t("common.projectDeletedSuccess"));
     },
-    [deleteProject],
+    [deleteProject, t],
   );
 
   return {
@@ -102,6 +113,8 @@ export function useProjectsPage(initialProjects: ProjectItem[]) {
     projects,
     globalFilter,
     setGlobalFilter,
+    pagination,
+    onPaginationChange: setPagination,
     openProject,
     setOpenProject,
     createOpen,

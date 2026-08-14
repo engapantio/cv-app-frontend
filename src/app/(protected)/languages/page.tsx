@@ -8,8 +8,8 @@ export default async function LanguagesPage() {
   const { initial, serverError } = await fetchInitialRows<LanguagesQuery, LanguageItem>({
     query: LanguagesDocument,
     getData: (data) => (data?.languages ?? []) as Array<LanguageItem | null>,
-    sort: (a, b) => a.name.localeCompare(b.name),
     errorMessage: "Failed to load languages",
+    pageSize: 10000,
   });
 
   return <LanguagesClient initialLanguages={initial} serverError={serverError} />;

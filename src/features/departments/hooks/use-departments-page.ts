@@ -20,9 +20,11 @@ import {
   type SortingState,
 } from "@tanstack/react-table";
 import type { DepartmentItem } from "@/features/departments/types";
+import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 
 export function useDepartmentsPage(initialDepartments: DepartmentItem[]) {
+  const t = useTranslations();
   const tColumns = useTranslations("columns.departments");
   const tButtons = useTranslations("buttons");
 
@@ -35,11 +37,7 @@ export function useDepartmentsPage(initialDepartments: DepartmentItem[]) {
 
   useEffect(() => {
     if (departmentsData?.departments) {
-      setDepartmentsList(
-        (departmentsData.departments as DepartmentItem[])
-          .slice()
-          .sort((a, b) => a.name.localeCompare(b.name)),
-      );
+      setDepartmentsList(departmentsData.departments as DepartmentItem[]);
     }
   }, [departmentsData]);
 
@@ -48,8 +46,12 @@ export function useDepartmentsPage(initialDepartments: DepartmentItem[]) {
   const [updateTarget, setUpdateTarget] = useState<DepartmentItem | null>(null);
   const [openTarget, setOpenTarget] = useState<DepartmentItem | null>(null);
 
-  const [sorting, setSorting] = useState<SortingState>([]);
+  const [sorting, setSorting] = useState<SortingState>([
+    { id: "created_at", desc: true },
+    { id: "id", desc: true },
+  ]);
   const [globalFilter, setGlobalFilter] = useState("");
+  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
 
   const handleOpen = useCallback((department: DepartmentItem) => {
     setOpenTarget(department);
@@ -66,23 +68,32 @@ export function useDepartmentsPage(initialDepartments: DepartmentItem[]) {
   const [createDepartment] = useMutation(CreateDepartmentDocument);
 
   const handleCreated = useCallback(
-    (newDepartment: CreateDepartmentMutation["createDepartment"]) => {
-      setDepartmentsList((prev) => [...prev, newDepartment]);
+    (_newDepartment: CreateDepartmentMutation["createDepartment"]) => {
+      toast.success(t("common.departmentCreatedSuccess"));
+      setPagination((prev) => ({ ...prev, pageIndex: 0 }));
     },
-    [],
+    [t, setPagination],
   );
 
   const [updateDepartment, { loading: updating }] = useMutation(UpdateDepartmentDocument);
 
-  const handleUpdated = useCallback((updated: UpdateDepartmentMutation["updateDepartment"]) => {
-    setDepartmentsList((prev) => prev.map((d) => (d.id === updated.id ? updated : d)));
-  }, []);
+  const handleUpdated = useCallback(
+    (updated: UpdateDepartmentMutation["updateDepartment"]) => {
+      setDepartmentsList((prev) => prev.map((d) => (d.id === updated.id ? updated : d)));
+      toast.success(t("common.departmentUpdatedSuccess"));
+    },
+    [t],
+  );
 
   const [deleteDepartment, { loading: deleting }] = useMutation(DeleteDepartmentDocument);
 
-  const handleDeleted = useCallback((departmentId: string) => {
-    setDepartmentsList((prev) => prev.filter((d) => d.id !== departmentId));
-  }, []);
+  const handleDeleted = useCallback(
+    (departmentId: string) => {
+      setDepartmentsList((prev) => prev.filter((d) => d.id !== departmentId));
+      toast.success(t("common.departmentDeletedSuccess"));
+    },
+    [t],
+  );
 
   const columns = useMemo(
     () =>
@@ -98,9 +109,11 @@ export function useDepartmentsPage(initialDepartments: DepartmentItem[]) {
   const table = useReactTable({
     data: departmentsList,
     columns,
-    state: { sorting, globalFilter },
+    state: { sorting, globalFilter, pagination },
     onSortingChange: setSorting,
     onGlobalFilterChange: setGlobalFilter,
+    onPaginationChange: setPagination,
+    autoResetPageIndex: false,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),

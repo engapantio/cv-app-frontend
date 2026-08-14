@@ -20,9 +20,11 @@ import {
   type SortingState,
 } from "@tanstack/react-table";
 import type { PositionItem } from "@/features/positions/types";
+import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 
 export function usePositionsPage(initialPositions: PositionItem[]) {
+  const t = useTranslations();
   const tColumns = useTranslations("columns.positions");
   const tButtons = useTranslations("buttons");
 
@@ -35,11 +37,7 @@ export function usePositionsPage(initialPositions: PositionItem[]) {
 
   useEffect(() => {
     if (positionsData?.positions) {
-      setPositionsList(
-        (positionsData.positions as PositionItem[])
-          .slice()
-          .sort((a, b) => a.name.localeCompare(b.name)),
-      );
+      setPositionsList(positionsData.positions as PositionItem[]);
     }
   }, [positionsData]);
 
@@ -48,8 +46,12 @@ export function usePositionsPage(initialPositions: PositionItem[]) {
   const [updateTarget, setUpdateTarget] = useState<PositionItem | null>(null);
   const [openTarget, setOpenTarget] = useState<PositionItem | null>(null);
 
-  const [sorting, setSorting] = useState<SortingState>([]);
+  const [sorting, setSorting] = useState<SortingState>([
+    { id: "created_at", desc: true },
+    { id: "id", desc: true },
+  ]);
   const [globalFilter, setGlobalFilter] = useState("");
+  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
 
   const handleOpen = useCallback((position: PositionItem) => {
     setOpenTarget(position);
@@ -65,21 +67,33 @@ export function usePositionsPage(initialPositions: PositionItem[]) {
 
   const [createPosition] = useMutation(CreatePositionDocument);
 
-  const handleCreated = useCallback((newPosition: CreatePositionMutation["createPosition"]) => {
-    setPositionsList((prev) => [...prev, newPosition]);
-  }, []);
+  const handleCreated = useCallback(
+    (_newPosition: CreatePositionMutation["createPosition"]) => {
+      toast.success(t("common.positionCreatedSuccess"));
+      setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+    },
+    [t, setPagination],
+  );
 
   const [updatePosition, { loading: updating }] = useMutation(UpdatePositionDocument);
 
-  const handleUpdated = useCallback((updated: UpdatePositionMutation["updatePosition"]) => {
-    setPositionsList((prev) => prev.map((p) => (p.id === updated.id ? updated : p)));
-  }, []);
+  const handleUpdated = useCallback(
+    (updated: UpdatePositionMutation["updatePosition"]) => {
+      setPositionsList((prev) => prev.map((p) => (p.id === updated.id ? updated : p)));
+      toast.success(t("common.positionUpdatedSuccess"));
+    },
+    [t],
+  );
 
   const [deletePosition, { loading: deleting }] = useMutation(DeletePositionDocument);
 
-  const handleDeleted = useCallback((positionId: string) => {
-    setPositionsList((prev) => prev.filter((p) => p.id !== positionId));
-  }, []);
+  const handleDeleted = useCallback(
+    (positionId: string) => {
+      setPositionsList((prev) => prev.filter((p) => p.id !== positionId));
+      toast.success(t("common.positionDeletedSuccess"));
+    },
+    [t],
+  );
 
   const columns = useMemo(
     () =>
@@ -95,9 +109,11 @@ export function usePositionsPage(initialPositions: PositionItem[]) {
   const table = useReactTable({
     data: positionsList,
     columns,
-    state: { sorting, globalFilter },
+    state: { sorting, globalFilter, pagination },
     onSortingChange: setSorting,
     onGlobalFilterChange: setGlobalFilter,
+    onPaginationChange: setPagination,
+    autoResetPageIndex: false,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),

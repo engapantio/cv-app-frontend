@@ -175,13 +175,14 @@ export function UserSkillsClient({
               </>
             ) : (
               <>
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
                   onClick={cancelRemove}
-                  className="uppercase text-base font-medium text-border bg-transparent border border-border rounded-[40px] min-w-30 py-2 cursor-pointer"
+                  className="uppercase text-border min-w-30 border border-border rounded-[40px] py-2 h-auto"
                 >
                   {t("buttons.cancel")}
-                </button>
+                </Button>
                 <Button
                   type="button"
                   onClick={handleDeleteSkills}

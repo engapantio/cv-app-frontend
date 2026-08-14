@@ -5,6 +5,11 @@ import nextTs from "eslint-config-next/typescript";
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
+  {
+    rules: {
+      "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
+    },
+  },
   // Tests use require() inside jest.mock factories to share mock definitions.
   {
     files: ["**/*.test.{ts,tsx}", "**/__tests__/**/*.{ts,tsx}", "src/test-utils/**"],

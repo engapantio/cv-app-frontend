@@ -44,7 +44,7 @@ export function CreateDepartmentDialog({
                 }
               `,
             });
-            return [...existingRefs, newRef];
+            return [newRef, ...existingRefs];
           },
         },
       });
@@ -100,7 +100,7 @@ export function CreateDepartmentDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent showCloseButton className="sm:max-w-2xl bg-card border-border rounded-none">
         <DialogHeader>
-          <DialogTitle className="text-left text-base font-semibold">
+          <DialogTitle className="text-left text-lg font-semibold">
             {t("dialogs.createDepartment")}
           </DialogTitle>
         </DialogHeader>

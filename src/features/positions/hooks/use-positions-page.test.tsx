@@ -31,7 +31,7 @@ beforeEach(() => {
 });
 
 describe("usePositionsPage", () => {
-  it("hydrates the list sorted by name", async () => {
+  it("hydrates the list in server order (no local sort)", async () => {
     mockUseQuery.mockReturnValue({
       data: { positions: [positions[1], positions[0]] },
       loading: false,
@@ -39,8 +39,8 @@ describe("usePositionsPage", () => {
     const { result } = renderHook(() => usePositionsPage([]));
     await waitFor(() => expect(result.current.positionsList).toHaveLength(2));
     expect(result.current.positionsList.map((p) => p.name)).toEqual([
-      "Backend Developer",
       "Frontend Developer",
+      "Backend Developer",
     ]);
   });
 
@@ -69,9 +69,9 @@ describe("usePositionsPage", () => {
     ]);
   });
 
-  it("appends a position on create", async () => {
+  it("does not mutate local state on create (cache.modify + useEffect handle it)", () => {
     const { result } = renderHook(() => usePositionsPage([]));
-    await waitFor(() => expect(result.current.positionsList).toHaveLength(2));
+    expect(result.current.positionsList).toHaveLength(2);
     act(() =>
       result.current.handleCreated({
         id: "3",
@@ -79,11 +79,7 @@ describe("usePositionsPage", () => {
         name: "QA Engineer",
       }),
     );
-    expect(result.current.positionsList.map((p) => p.name)).toEqual([
-      "Backend Developer",
-      "Frontend Developer",
-      "QA Engineer",
-    ]);
+    expect(result.current.positionsList).toHaveLength(2);
   });
 
   it("replaces a position on update", async () => {

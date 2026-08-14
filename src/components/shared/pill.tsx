@@ -5,9 +5,10 @@ import { cn } from "@/lib/utils";
 interface PillProps {
   text: string;
   variant?: "muted" | "transparent" | "responsibility";
+  className?: string;
 }
 
-export function Pill({ text, variant = "muted" }: PillProps) {
+export function Pill({ text, variant = "muted", className }: PillProps) {
   return (
     <span
       className={cn(
@@ -16,6 +17,7 @@ export function Pill({ text, variant = "muted" }: PillProps) {
         variant === "responsibility" &&
           "bg-responsibility text-foreground font-normal text-[13px] leading-[143%] tracking-[0.01em]",
         variant === "transparent" && "bg-transparent text-foreground border border-table-border",
+        className,
       )}
       title={text}
     >

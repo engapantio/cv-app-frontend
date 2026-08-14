@@ -9,6 +9,8 @@ import {
   getSortedRowModel,
   flexRender,
   type SortingState,
+  type OnChangeFn,
+  type PaginationState,
 } from "@tanstack/react-table";
 import {
   Table as UITable,
@@ -33,6 +35,8 @@ interface ProjectsTableProps {
   projects: ProjectItem[];
   globalFilter: string;
   setGlobalFilter: (value: string) => void;
+  pagination: PaginationState;
+  onPaginationChange: OnChangeFn<PaginationState>;
   onCreate: () => void;
   onOpen: (project: ProjectItem) => void;
   onUpdate: (project: ProjectItem) => void;
@@ -45,6 +49,8 @@ export function ProjectsTable({
   projects,
   globalFilter,
   setGlobalFilter,
+  pagination,
+  onPaginationChange,
   onCreate,
   onOpen,
   onUpdate,
@@ -63,9 +69,11 @@ export function ProjectsTable({
   const table = useReactTable({
     data: projects,
     columns,
-    state: { sorting, globalFilter },
+    state: { sorting, globalFilter, pagination },
     onSortingChange: setSorting,
     onGlobalFilterChange: setGlobalFilter,
+    onPaginationChange,
+    autoResetPageIndex: false,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),

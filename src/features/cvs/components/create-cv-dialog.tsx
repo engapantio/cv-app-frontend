@@ -5,8 +5,10 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation } from "@apollo/client/react";
+import { gql } from "@apollo/client";
 import { useTranslations } from "next-intl";
 import { CreateCvDocument, type CreateCvMutation } from "@/gql/generated/graphql";
+import { useSession } from "@/lib/auth/session";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, Input, Textarea } from "@/components/ui";
 import { DialogActions, FloatingField } from "@/components/shared";
 
@@ -31,7 +33,49 @@ export function CreateCvDialog({
   onCreated: (newCv: CreateCvMutation["createCv"]) => void;
 }) {
   const t = useTranslations();
-  const [createCv, { loading: creating }] = useMutation(CreateCvDocument);
+  const { user: currentUser } = useSession();
+  const [createCv, { loading: creating }] = useMutation(CreateCvDocument, {
+    update(cache, { data }) {
+      if (!data?.createCv) return;
+      const ownerEmail = currentUser?.email ?? "";
+      const newRef = cache.writeFragment({
+        data: {
+          ...data.createCv,
+          user: { id: userId, email: ownerEmail, __typename: "User" },
+          __typename: "Cv",
+        },
+        fragment: gql`
+          fragment NewCv on Cv {
+            id
+            created_at
+            name
+            education
+            description
+            user {
+              id
+              email
+            }
+          }
+        `,
+      });
+      if (!newRef) return;
+      cache.modify({
+        fields: {
+          cvs(existingRefs = []) {
+            return [newRef, ...existingRefs];
+          },
+        },
+      });
+      cache.modify({
+        id: cache.identify({ __typename: "User", id: userId }),
+        fields: {
+          cvs(existingRefs = []) {
+            return [newRef, ...existingRefs];
+          },
+        },
+      });
+    },
+  });
 
   const validation = useMemo(
     () => ({
@@ -88,7 +132,7 @@ export function CreateCvDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent showCloseButton className="sm:max-w-2xl bg-card border-border rounded-none">
         <DialogHeader>
-          <DialogTitle className="text-left text-base font-semibold">
+          <DialogTitle className="text-left text-lg font-semibold">
             {t("dialogs.createCv")}
           </DialogTitle>
         </DialogHeader>

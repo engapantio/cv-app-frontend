@@ -31,14 +31,14 @@ beforeEach(() => {
 });
 
 describe("useDepartmentsPage", () => {
-  it("hydrates the list sorted by name", async () => {
+  it("hydrates the list in server order (no local sort)", async () => {
     mockUseQuery.mockReturnValue({
       data: { departments: [departments[1], departments[0]] },
       loading: false,
     });
     const { result } = renderHook(() => useDepartmentsPage([]));
     await waitFor(() => expect(result.current.departmentsList).toHaveLength(2));
-    expect(result.current.departmentsList.map((d) => d.name)).toEqual(["Engineering", "Marketing"]);
+    expect(result.current.departmentsList.map((d) => d.name)).toEqual(["Marketing", "Engineering"]);
   });
 
   it("falls back to initial departments when the query returns no data", () => {
@@ -66,9 +66,9 @@ describe("useDepartmentsPage", () => {
     ]);
   });
 
-  it("appends a department on create", async () => {
+  it("does not mutate local state on create (cache.modify + useEffect handle it)", () => {
     const { result } = renderHook(() => useDepartmentsPage([]));
-    await waitFor(() => expect(result.current.departmentsList).toHaveLength(2));
+    expect(result.current.departmentsList).toHaveLength(2);
     act(() =>
       result.current.handleCreated({
         id: "3",
@@ -76,11 +76,7 @@ describe("useDepartmentsPage", () => {
         name: "HR",
       }),
     );
-    expect(result.current.departmentsList.map((d) => d.name)).toEqual([
-      "Engineering",
-      "Marketing",
-      "HR",
-    ]);
+    expect(result.current.departmentsList).toHaveLength(2);
   });
 
   it("replaces a department on update", async () => {
