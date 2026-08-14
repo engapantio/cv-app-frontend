@@ -14,6 +14,7 @@ interface DialogActionsProps {
   onSubmit?: () => void;
   onCancel: () => void;
   className?: string;
+  actionsClassName?: string;
   submitClassName?: string;
 }
 
@@ -31,18 +32,19 @@ export function DialogActions({
   onSubmit,
   onCancel,
   className,
+  actionsClassName,
   submitClassName,
 }: DialogActionsProps) {
   const t = useTranslations("buttons");
   const resolvedCancel = cancelLabel ?? t("cancel");
 
   return (
-    <div className={cn("flex flex-row items-center justify-end gap-3 mt-2 py-2", className)}>
-      <div className="flex w-2/3 gap-3">
+    <div className={cn("flex flex-row items-center justify-end gap-2", className)}>
+      <div className={cn("flex w-2/3 gap-2", actionsClassName)}>
         <Button
           type="button"
           variant="ghost"
-          className="uppercase flex-1 border border-border py-1.5"
+          className="uppercase flex-1 border border-border py-1.5 text-border"
           onClick={onCancel}
         >
           {resolvedCancel}
@@ -50,7 +52,7 @@ export function DialogActions({
         <Button
           type={type}
           className={cn("uppercase flex-1 py-1.5", submitClassName)}
-          style={{ backgroundColor: RED, boxShadow: SHADOW }}
+          style={disabled || loading ? undefined : { backgroundColor: RED, boxShadow: SHADOW }}
           disabled={disabled || loading}
           onClick={onSubmit}
         >
