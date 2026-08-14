@@ -95,13 +95,13 @@ export function CreateSkillDialog({ open, onOpenChange, onCreated }: CreateSkill
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent showCloseButton className="sm:max-w-md bg-card border-border rounded-none">
+      <DialogContent showCloseButton className="sm:max-w-2xl bg-card border-border rounded-none">
         <DialogHeader>
           <DialogTitle className="text-left text-base font-semibold">
             {t("dialogs.createSkill")}
           </DialogTitle>
         </DialogHeader>
-        <div className="space-y-6 py-4">
+        <div className="space-y-6 pt-4 pb-2">
           <FloatingField label={t("fields.name")}>
             <Input
               value={name}

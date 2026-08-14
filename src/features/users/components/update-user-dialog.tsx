@@ -84,13 +84,13 @@ export function UpdateUserDialog({ target, onClose, onConfirm, loading }: Update
 
   return (
     <Dialog open={!!user} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent showCloseButton className="sm:max-w-xl bg-card border-border rounded-none">
+      <DialogContent showCloseButton className="sm:max-w-4xl bg-card border-border rounded-none">
         <DialogHeader>
           <DialogTitle className="text-left text-base font-semibold">
             {t("dialogs.updateUser")}
           </DialogTitle>
         </DialogHeader>
-        <div className="space-y-5">
+        <div className="space-y-5 pb-1">
           <div className="grid grid-cols-2 gap-4">
             <FloatingField label={t("fields.email")}>
               <Input
@@ -199,27 +199,29 @@ export function UpdateUserDialog({ target, onClose, onConfirm, loading }: Update
             </FloatingField>
           </div>
 
-          <FloatingField
-            label={t("fields.role")}
-            variant="select"
-            labelClassName="bg-background"
-            active={!!role || roleOpen}
-          >
-            <Select
-              value={role}
-              onValueChange={(v) => setRole(v ?? "")}
-              onOpenChange={setRoleOpen}
-              disabled={loading || isCurrentUser}
+          <div className="grid grid-cols-2 gap-4">
+            <FloatingField
+              label={t("fields.role")}
+              variant="select"
+              labelClassName="bg-background"
+              active={!!role || roleOpen}
             >
-              <SelectTrigger className={selectClassName}>
-                <SelectValue placeholder={t("fields.role")} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Employee">{t("roles.employee")}</SelectItem>
-                <SelectItem value="Admin">{t("roles.admin")}</SelectItem>
-              </SelectContent>
-            </Select>
-          </FloatingField>
+              <Select
+                value={role}
+                onValueChange={(v) => setRole(v ?? "")}
+                onOpenChange={setRoleOpen}
+                disabled={loading || isCurrentUser}
+              >
+                <SelectTrigger className={selectClassName}>
+                  <SelectValue placeholder={t("fields.role")} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Employee">{t("roles.employee")}</SelectItem>
+                  <SelectItem value="Admin">{t("roles.admin")}</SelectItem>
+                </SelectContent>
+              </Select>
+            </FloatingField>
+          </div>
         </div>
 
         <DialogActions

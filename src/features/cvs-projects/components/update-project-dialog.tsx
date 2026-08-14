@@ -99,7 +99,7 @@ function UpdateProjectForm({
           {t("dialogs.updateProject")}
         </DialogTitle>
       </DialogHeader>
-      <div className="space-y-5">
+      <div className="space-y-5 pb-1">
         <div className="grid grid-cols-2 gap-4">
           <div className="group relative rounded-none border border-border">
             <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-icon">
@@ -240,7 +240,7 @@ export function UpdateProjectDialog({
         <DialogContent
           key={project.id}
           showCloseButton
-          className="sm:max-w-xl bg-card border-border rounded-none"
+          className="sm:max-w-4xl bg-card border-border rounded-none"
         >
           <UpdateProjectForm
             project={project}

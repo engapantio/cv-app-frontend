@@ -33,7 +33,7 @@ export function RemoveProjectDialog({
 
   return (
     <Dialog open={!!target} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent showCloseButton className="sm:max-w-sm bg-card border-border rounded-none">
+      <DialogContent showCloseButton className="sm:max-w-xl bg-card border-border rounded-none">
         <DialogHeader>
           <DialogTitle className="text-left text-base font-semibold">
             {t("dialogs.removeProject")}

@@ -57,13 +57,13 @@ export function AddSkillDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent showCloseButton className="sm:max-w-md bg-card border-border rounded-none">
+      <DialogContent showCloseButton className="sm:max-w-2xl bg-card border-border rounded-none">
         <DialogHeader>
           <DialogTitle className="text-left text-base font-semibold">
             {t("dialogs.addSkill")}
           </DialogTitle>
         </DialogHeader>
-        <div className="space-y-6 py-4">
+        <div className="space-y-6 pt-4 pb-2">
           <div className="group relative rounded-none border border-border transition-colors focus-within:border-primary">
             <span className="absolute -top-2.5 left-3 bg-card px-1 text-xs text-muted-foreground dark:text-icon transition-colors group-focus-within:text-primary">
               {t("fields.name")}

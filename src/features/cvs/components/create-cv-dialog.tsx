@@ -86,7 +86,7 @@ export function CreateCvDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent showCloseButton className="sm:max-w-md bg-card border-border rounded-none">
+      <DialogContent showCloseButton className="sm:max-w-2xl bg-card border-border rounded-none">
         <DialogHeader>
           <DialogTitle className="text-left text-base font-semibold">
             {t("dialogs.createCv")}
@@ -113,7 +113,7 @@ export function CreateCvDialog({
               />
             </FloatingField>
           </div>
-          <div className="mb-3">
+          <div className="mb-5">
             <FloatingField
               label={t("fields.description")}
               variant="textarea"
