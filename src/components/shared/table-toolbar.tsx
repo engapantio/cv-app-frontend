@@ -37,7 +37,7 @@ export function TableToolbar({
         <Button
           variant="ghost"
           className={cn(
-            "uppercase text-primary hover:text-primary text-sm font-medium cursor-pointer",
+            "uppercase text-primary hover:text-primary text-sm font-medium cursor-pointer dark:hover:bg-white/15 dark:hover:brightness-125",
             actionClassName,
           )}
           onClick={onAction}

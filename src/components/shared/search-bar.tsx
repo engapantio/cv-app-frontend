@@ -31,7 +31,7 @@ export function SearchBar({
         value={value ?? ""}
         onChange={(e) => onChange(e.target.value)}
         className={cn(
-          "pl-10 rounded-[40px] text-foreground bg-background placeholder:text-foreground/70",
+          "pl-10 rounded-[40px] text-foreground bg-background placeholder:text-foreground/70 dark:placeholder:text-foreground/70 placeholder:text-base md:placeholder:text-base",
           inputClassName,
         )}
       />
