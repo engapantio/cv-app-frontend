@@ -53,7 +53,7 @@ export function CvLayoutClient({
           {t("breadcrumbs.cvs")}
         </Link>
         <ChevronRight className="size-5" />
-        <span style={{ color: "#c63031" }}>{cvName}</span>
+        <span className="text-primary">{cvName}</span>
         <ChevronRight className="size-5" />
         <span className="text-base text-foreground/70">
           {TABS.find((tab) => tab.href === currentTab)

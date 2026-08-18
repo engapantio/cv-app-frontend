@@ -38,11 +38,7 @@ function AvatarImage({ className, src, alt = "", ...props }: ImgHTMLAttributes<H
 
   return (
     <>
-      <span
-        aria-hidden
-        className="absolute inset-0 z-10 size-full rounded-full"
-        style={{ backgroundColor: "var(--avatar-bg)" }}
-      />
+      <span aria-hidden className="absolute inset-0 z-10 size-full rounded-full bg-avatar-bg" />
       {/* eslint-disable-next-line @next/next/no-img-element -- avatars may be base64 data URIs or arbitrary-host URLs and can arrive asynchronously, so next/image optimization does not apply */}
       <img
         src={src}
@@ -71,10 +67,9 @@ function AvatarFallback({ className, ...props }: ComponentProps<"span">) {
     <span
       data-slot="avatar-fallback"
       className={cn(
-        "absolute inset-0 flex size-full items-center justify-center rounded-full text-sm text-[var(--avatar-letter)] group-data-[size=sm]/avatar:text-xs group-data-[size=xl]/avatar:text-4xl",
+        "absolute inset-0 flex size-full items-center justify-center rounded-full text-sm text-avatar-letter group-data-[size=sm]/avatar:text-xs group-data-[size=xl]/avatar:text-4xl bg-avatar-bg",
         className,
       )}
-      style={{ backgroundColor: "var(--avatar-bg)" }}
       {...props}
     />
   );

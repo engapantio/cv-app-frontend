@@ -1,6 +1,6 @@
 import type { Mastery } from "@/gql/generated/graphql";
 
-export interface MasteryConfig {
+interface MasteryConfig {
   percent: number;
   fill: string;
   track: string;

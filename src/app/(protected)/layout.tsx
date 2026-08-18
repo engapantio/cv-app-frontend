@@ -12,7 +12,7 @@ export default async function ProtectedLayout({ children }: { children: React.Re
   const initialUser = await getServerSessionUser();
 
   return (
-    <SidebarProvider style={{ display: "contents" }}>
+    <SidebarProvider className="contents">
       <ProtectedShell initialUser={initialUser}>{children}</ProtectedShell>
     </SidebarProvider>
   );

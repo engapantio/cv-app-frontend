@@ -3,6 +3,7 @@
 import { useCallback } from "react";
 import { useMutation } from "@apollo/client/react";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 import { DeleteCvDocument, type UserQuery } from "@/gql/generated/graphql";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui";
 import { DialogActions } from "@/components/shared/dialog-actions";
@@ -48,8 +49,10 @@ export function DeleteCvDialog({
       await deleteCv({ variables: { cv: { cvId: target.id } } });
       onDeleted(target.id);
       onClose();
-    } catch {}
-  }, [target, deleteCv, onDeleted, onClose]);
+    } catch {
+      toast.error(t("common.deleteCvFailed"));
+    }
+  }, [target, deleteCv, onDeleted, onClose, t]);
 
   return (
     <Dialog open={!!target} onOpenChange={(open) => !open && onClose()}>

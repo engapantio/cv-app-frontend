@@ -66,8 +66,8 @@ export function ProfileSection({
     <>
       {compact && name && <h2>{name}</h2>}
       <Avatar className="h-10 w-10">
-        <AvatarFallback style={{ backgroundColor: "var(--primary)" }}>
-          {initial ? initial : <UserCircle2Icon className="size-6 text-[var(--avatar-letter)]" />}
+        <AvatarFallback className="bg-primary">
+          {initial ? initial : <UserCircle2Icon className="size-6 text-avatar-letter" />}
         </AvatarFallback>
         <AvatarImage src={avatar ?? undefined} />
       </Avatar>

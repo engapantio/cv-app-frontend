@@ -1,4 +1,4 @@
-export type ThemeColor = "light" | "dark";
+type ThemeColor = "light" | "dark";
 
 export type ThemeColors = {
   background: string;

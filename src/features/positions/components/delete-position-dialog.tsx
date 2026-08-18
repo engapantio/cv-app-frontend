@@ -3,6 +3,7 @@
 import { useCallback } from "react";
 import { useMutation } from "@apollo/client/react";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 import { DeletePositionDocument } from "@/gql/generated/graphql";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui";
 import { DialogActions } from "@/components/shared/dialog-actions";
@@ -34,8 +35,10 @@ export function DeletePositionDialog({ target, onClose, onDeleted }: DeletePosit
       await deletePosition({ variables: { position: { positionId: target.id } } });
       onDeleted(target.id);
       onClose();
-    } catch {}
-  }, [target, deletePosition, onDeleted, onClose]);
+    } catch {
+      toast.error(t("common.deletePositionFailed"));
+    }
+  }, [target, deletePosition, onDeleted, onClose, t]);
 
   return (
     <Dialog open={!!target} onOpenChange={(open) => !open && onClose()}>

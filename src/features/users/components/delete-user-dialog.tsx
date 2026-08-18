@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { DialogActions } from "@/components/shared/dialog-actions";
 import type { UserItem } from "@/features/users/types";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 
 interface DeleteUserDialogProps {
   target: UserItem | null;
@@ -24,8 +25,10 @@ export function DeleteUserDialog({ target, onClose, onDeleted }: DeleteUserDialo
       await deleteUser({ variables: { userId: target.id } });
       onClose();
       await onDeleted(target.id);
-    } catch {}
-  }, [target, deleteUser, onDeleted, onClose]);
+    } catch {
+      toast.error(t("common.deleteUserFailed"));
+    }
+  }, [target, deleteUser, onDeleted, onClose, t]);
 
   return (
     <Dialog open={!!target} onOpenChange={(open) => !open && onClose()}>

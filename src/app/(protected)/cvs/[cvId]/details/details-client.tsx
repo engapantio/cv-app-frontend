@@ -156,12 +156,8 @@ function CvDetailsForm({ cv, cvId }: { cv: NonNullable<CvData>; cvId: string }) 
       <div className="flex justify-end pt-4">
         <Button
           type="submit"
-          className="uppercase text-white w-2/5 py-1.5 cursor-pointer"
-          style={
-            !canEdit || isSubmitting || updating || !isDirty
-              ? undefined
-              : { backgroundColor: "#e53935" }
-          }
+          variant="danger"
+          className="uppercase w-2/5 py-1.5 cursor-pointer"
           disabled={!canEdit || isSubmitting || updating || !isDirty}
         >
           {updating ? t("buttons.updating") : t("buttons.update")}

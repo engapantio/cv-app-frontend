@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { OpenProjectOverlay } from "./open-project-overlay";
-import type { CvProjectItem } from "../hooks/use-cv-projects-page";
+import type { CvProjectItem } from "../types";
 import { makeCvProject } from "@/test-utils/cv-fixtures";
 
 jest.mock("next-intl", () => require("@/test-utils/mocks").mockNextIntl());

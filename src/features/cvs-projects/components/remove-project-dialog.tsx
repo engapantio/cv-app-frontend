@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui";
 import { DialogActions } from "@/components/shared/dialog-actions";
-import type { CvProjectItem } from "../hooks/use-cv-projects-page";
+import type { CvProjectItem } from "../types";
 
 interface RemoveProjectDialogProps {
   target: CvProjectItem | null;

@@ -9,7 +9,6 @@ import {
   CreateUserDocument,
   UpdateProfileDocument,
   UpdateUserDocument,
-  DeleteUserDocument,
   SendVerificationEmailDocument,
   type UsersQuery,
   type UserRole,
@@ -109,7 +108,6 @@ export function useUsersPage(
   const [createUser, { loading: creating }] = useMutation(CreateUserDocument);
   const [updateProfile] = useMutation(UpdateProfileDocument);
   const [updateUser] = useMutation(UpdateUserDocument);
-  const [deleteUser, { loading: deleting }] = useMutation(DeleteUserDocument);
   const [sendVerificationEmail] = useMutation(SendVerificationEmailDocument);
 
   const dispatchVerificationEmail = useCallback(
@@ -400,7 +398,5 @@ export function useUsersPage(
     setGlobalFilter,
     creating,
     updating,
-    deleting,
-    deleteUser,
   };
 }

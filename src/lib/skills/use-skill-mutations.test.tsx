@@ -4,6 +4,7 @@ import { useSkillMutations } from "./use-skill-mutations";
 
 jest.mock("@apollo/client/react", () => ({ useMutation: jest.fn() }));
 jest.mock("sonner", () => ({ toast: { error: jest.fn() } }));
+jest.mock("next-intl", () => require("@/test-utils/mocks").mockNextIntl());
 
 const mockUseMutation = useMutation as unknown as jest.Mock;
 const mockToastError = jest.fn();
@@ -179,6 +180,6 @@ describe("useSkillMutations", () => {
       ok = await result.current.handleDeleteSkills(["TypeScript"]);
     });
     expect(ok).toBe(false);
-    expect(mockToastError).toHaveBeenCalledWith("Failed to delete skills");
+    expect(mockToastError).toHaveBeenCalledWith("removeSkillsFailed");
   });
 });

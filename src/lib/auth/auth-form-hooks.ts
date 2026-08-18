@@ -89,8 +89,6 @@ export function useAuthForm({ endpoint, onSuccess }: UseAuthFormOptions) {
   };
 }
 
-// ── Forgot Password ──────────────────────────────────────────────────────────
-
 type UseForgotPasswordFormOptions = {
   onSuccess?: () => void;
 };
@@ -141,8 +139,6 @@ export function useForgotPasswordForm({ onSuccess }: UseForgotPasswordFormOption
 
   return { email, setEmail, submitting, error, sent, handleSubmit };
 }
-
-// ── Reset Password ────────────────────────────────────────────────────────────
 
 type UseResetPasswordFormOptions = {
   token?: string;

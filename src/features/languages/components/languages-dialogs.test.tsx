@@ -10,6 +10,12 @@ jest.mock("@apollo/client/react", () => ({ useMutation: jest.fn() }));
 jest.mock("next-intl", () => require("@/test-utils/mocks").mockNextIntl());
 jest.mock("@/components/ui", () => require("@/test-utils/ui-mock"));
 
+const mockToastError = jest.fn();
+
+jest.mock("sonner", () => ({
+  toast: { error: (...args: unknown[]) => mockToastError(...args) },
+}));
+
 const mockUseMutation = useMutation as unknown as jest.Mock;
 
 const target: LanguageItem = {
@@ -103,6 +109,46 @@ describe("CreateLanguageDialog", () => {
     await user.click(screen.getByRole("button", { name: "create" }));
 
     await waitFor(() => expect(createLanguage).not.toHaveBeenCalled());
+  });
+
+  it("shows a friendly toast when the language already exists", async () => {
+    const user = userEvent.setup();
+    const createLanguage = jest.fn().mockRejectedValue({
+      graphQLErrors: [
+        {
+          message:
+            'duplicate key value violates unique constraint "UQ_7df7d1e250ea2a416f078a631fb"',
+        },
+      ],
+    });
+    mockUseMutation.mockReturnValue([createLanguage, { loading: false }]);
+
+    const onCreated = jest.fn();
+    const onOpenChange = jest.fn();
+    render(<CreateLanguageDialog open onOpenChange={onOpenChange} onCreated={onCreated} />);
+
+    const inputs = screen.getAllByRole("textbox");
+    await user.type(inputs[0], "English");
+    await user.type(inputs[2], "en");
+    await user.click(screen.getByRole("button", { name: "create" }));
+
+    await waitFor(() => expect(mockToastError).toHaveBeenCalledWith("languageAlreadyExists"));
+    expect(onCreated).not.toHaveBeenCalled();
+    expect(onOpenChange).not.toHaveBeenCalled();
+  });
+
+  it("shows a generic toast when creation fails for another reason", async () => {
+    const user = userEvent.setup();
+    const createLanguage = jest.fn().mockRejectedValue(new Error("network error"));
+    mockUseMutation.mockReturnValue([createLanguage, { loading: false }]);
+    render(<CreateLanguageDialog open onOpenChange={jest.fn()} onCreated={jest.fn()} />);
+
+    const inputs = screen.getAllByRole("textbox");
+    await user.type(inputs[0], "English");
+    await user.type(inputs[2], "en");
+    await user.click(screen.getByRole("button", { name: "create" }));
+
+    await waitFor(() => expect(mockToastError).toHaveBeenCalledWith("createLanguageFailed"));
   });
 });
 

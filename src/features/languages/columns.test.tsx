@@ -68,7 +68,14 @@ function renderActionsCell(isAdmin: boolean) {
 describe("createLanguagesColumns", () => {
   it("exposes name, native_name and iso2 columns", () => {
     const { columns } = buildTableWithColumns(true);
-    expect(columns.map((c) => c.id)).toEqual(["id", "name", "native_name", "iso2", "actions"]);
+    expect(columns.map((c) => c.id)).toEqual([
+      "id",
+      "created_at",
+      "name",
+      "native_name",
+      "iso2",
+      "actions",
+    ]);
   });
 
   it("sorts rows by name", () => {

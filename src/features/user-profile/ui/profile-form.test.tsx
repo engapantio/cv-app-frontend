@@ -158,7 +158,7 @@ describe("ProfileForm", () => {
         position: { id: "p1", name: "Engineer" },
       }),
     );
-    expect(mockToastSuccess).toHaveBeenCalledWith("Profile updated successfully");
+    expect(mockToastSuccess).toHaveBeenCalledWith("profileUpdatedSuccess");
   });
 
   it("does not sync the session profile when viewing someone else", async () => {
@@ -178,7 +178,7 @@ describe("ProfileForm", () => {
     await user.clear(screen.getByDisplayValue("Alice"));
     await user.type(screen.getByDisplayValue(""), "Alicia");
     await user.click(screen.getByRole("button", { name: "update" }));
-    await waitFor(() => expect(mockToastError).toHaveBeenCalledWith("boom"));
+    await waitFor(() => expect(mockToastError).toHaveBeenCalledWith("profileUpdatedFailed"));
   });
 
   it("does nothing when there are no changes to apply", async () => {

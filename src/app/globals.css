@@ -40,6 +40,14 @@
   --row-hover: #ececee;
   --responsibility: rgba(0, 0, 0, 0.08);
   --description: rgba(46, 46, 46, 0.5);
+  --overlay: rgba(0, 0, 0, 0.1);
+  --disabled: #7f7f7f;
+  --disabled-foreground: #4e4e4e;
+  --delete: #e53935;
+  --env-pill-bg: #e0e0e0;
+  --env-pill-foreground: #000000;
+  --env-pill-icon-bg: #666666;
+  --env-pill-icon-foreground: #ffffff;
 }
 
 .dark {
@@ -79,6 +87,14 @@
   --muted-solid: #767676;
   --table-border: #515151;
   --row-hover: rgba(255, 255, 255, 0.15);
+  --overlay: rgba(18, 18, 18, 0.6);
+  --disabled: #4e4e4e;
+  --disabled-foreground: #7f7f7f;
+  --delete: #e53935;
+  --env-pill-bg: #4a4a4a;
+  --env-pill-foreground: #ffffff;
+  --env-pill-icon-bg: #aaaaaa;
+  --env-pill-icon-foreground: #000000;
 }
 
 html,
@@ -141,6 +157,20 @@ body {
   --color-row-hover: var(--row-hover);
   --color-responsibility: var(--responsibility);
   --color-description: var(--description);
+  --color-overlay: var(--overlay);
+  --color-disabled: var(--disabled);
+  --color-disabled-foreground: var(--disabled-foreground);
+  --color-delete: var(--delete);
+  --color-muted-solid: var(--muted-solid);
+  --color-avatar-bg: var(--avatar-bg);
+  --color-avatar-letter: var(--avatar-letter);
+  --color-env-pill-bg: var(--env-pill-bg);
+  --color-env-pill-foreground: var(--env-pill-foreground);
+  --color-env-pill-icon-bg: var(--env-pill-icon-bg);
+  --color-env-pill-icon-foreground: var(--env-pill-icon-foreground);
+  --shadow-solid:
+    0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 2px 2px 0 rgba(0, 0, 0, 0.14),
+    0 3px 1px -2px rgba(0, 0, 0, 0.2);
   --radius: 40px;
   --radius-lg: 40px;
   --radius-xl: 40px;

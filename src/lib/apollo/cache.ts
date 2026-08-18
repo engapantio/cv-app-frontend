@@ -1,4 +1,4 @@
-import { InMemoryCache, TypePolicies } from "@apollo/client";
+import type { TypePolicies } from "@apollo/client";
 
 export const typePolicies: TypePolicies = {
   User: {
@@ -53,5 +53,3 @@ export const typePolicies: TypePolicies = {
     },
   },
 };
-
-export const cache = new InMemoryCache({ typePolicies });

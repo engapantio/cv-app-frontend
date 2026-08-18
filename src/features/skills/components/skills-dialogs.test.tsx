@@ -77,6 +77,23 @@ describe("CreateSkillDialog", () => {
     expect(onCreated).toHaveBeenCalledWith(expect.objectContaining({ id: "3" }));
     expect(onOpenChange).toHaveBeenCalledWith(false);
   });
+
+  it("blocks submit and shows an error when no category is selected", async () => {
+    const user = userEvent.setup();
+    const createSkill = jest.fn();
+    mockUseMutation.mockReturnValue([createSkill, { loading: false }]);
+
+    const onCreated = jest.fn();
+    const onOpenChange = jest.fn();
+    render(<CreateSkillDialog open onOpenChange={onOpenChange} onCreated={onCreated} />);
+
+    await user.type(screen.getByRole("textbox"), "Go");
+    await user.click(screen.getByRole("button", { name: "create" }));
+
+    await waitFor(() => expect(createSkill).not.toHaveBeenCalled());
+    expect(onCreated).not.toHaveBeenCalled();
+    expect(onOpenChange).not.toHaveBeenCalled();
+  });
 });
 
 describe("UpdateSkillDialog", () => {

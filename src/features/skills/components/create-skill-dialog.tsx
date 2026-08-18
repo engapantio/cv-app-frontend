@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useMutation } from "@apollo/client/react";
 import { gql } from "@apollo/client";
+import { z } from "zod";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { CreateSkillDocument } from "@/gql/generated/graphql";
@@ -39,6 +40,22 @@ export function CreateSkillDialog({ open, onOpenChange, onCreated }: CreateSkill
   const [name, setName] = useState("");
   const [selectedCategoryName, setSelectedCategoryName] = useState<string | null>(null);
   const [categoryOpen, setCategoryOpen] = useState(false);
+  const [categoryError, setCategoryError] = useState<string | null>(null);
+
+  const validationMessages = useMemo(
+    () => ({
+      categoryRequired: t("validation.categoryRequired"),
+    }),
+    [t],
+  );
+
+  const skillSchema = useMemo(
+    () =>
+      z.object({
+        selectedCategoryName: z.string().min(1, validationMessages.categoryRequired),
+      }),
+    [validationMessages],
+  );
 
   const [createSkill, { loading: creating }] = useMutation(CreateSkillDocument, {
     update(cache, { data }) {
@@ -67,6 +84,12 @@ export function CreateSkillDialog({ open, onOpenChange, onCreated }: CreateSkill
 
   const handleCreate = useCallback(async () => {
     if (!name.trim()) return;
+    const parsed = skillSchema.safeParse({ selectedCategoryName: selectedCategoryName ?? "" });
+    if (!parsed.success) {
+      setCategoryError(parsed.error.flatten().fieldErrors.selectedCategoryName?.[0] ?? null);
+      return;
+    }
+    setCategoryError(null);
     try {
       const categoryId = categories.find((c) => c.name === selectedCategoryName)?.id ?? null;
       const { data } = await createSkill({
@@ -82,11 +105,21 @@ export function CreateSkillDialog({ open, onOpenChange, onCreated }: CreateSkill
       }
       setName("");
       setSelectedCategoryName(null);
+      setCategoryError(null);
       onOpenChange(false);
     } catch {
       toast.error(t("common.createSkillFailed"));
     }
-  }, [name, selectedCategoryName, categories, createSkill, onCreated, onOpenChange, t]);
+  }, [
+    name,
+    selectedCategoryName,
+    categories,
+    skillSchema,
+    createSkill,
+    onCreated,
+    onOpenChange,
+    t,
+  ]);
 
   const inputClasses =
     "peer border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none h-12";
@@ -115,10 +148,14 @@ export function CreateSkillDialog({ open, onOpenChange, onCreated }: CreateSkill
             label={t("fields.category")}
             variant="select"
             active={!!selectedCategoryName || categoryOpen}
+            error={categoryError ?? undefined}
           >
             <Select
               value={selectedCategoryName ?? ""}
-              onValueChange={(v) => setSelectedCategoryName(v || null)}
+              onValueChange={(v) => {
+                setSelectedCategoryName(v || null);
+                if (v) setCategoryError(null);
+              }}
               onOpenChange={setCategoryOpen}
             >
               <SelectTrigger className={selectTriggerClasses}>

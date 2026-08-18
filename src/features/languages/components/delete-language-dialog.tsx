@@ -3,6 +3,7 @@
 import { useCallback } from "react";
 import { useMutation } from "@apollo/client/react";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 import { DeleteLanguageDocument } from "@/gql/generated/graphql";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui";
 import { DialogActions } from "@/components/shared/dialog-actions";
@@ -34,8 +35,10 @@ export function DeleteLanguageDialog({ target, onClose, onDeleted }: DeleteLangu
       await deleteLanguage({ variables: { language: { languageId: target.id } } });
       onDeleted(target.id);
       onClose();
-    } catch {}
-  }, [target, deleteLanguage, onDeleted, onClose]);
+    } catch {
+      toast.error(t("common.deleteLanguageFailed"));
+    }
+  }, [target, deleteLanguage, onDeleted, onClose, t]);
 
   return (
     <Dialog open={!!target} onOpenChange={(open) => !open && onClose()}>

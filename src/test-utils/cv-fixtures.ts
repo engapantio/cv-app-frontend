@@ -1,15 +1,7 @@
 import type { CvQuery } from "@/gql/generated/graphql";
-import type { CvProjectItem } from "@/features/cvs-projects/hooks/use-cv-projects-page";
+import type { CvProjectItem } from "@/features/cvs-projects/types";
 
 type CvData = CvQuery["cv"];
-
-export function makeCvSkill(
-  name: string,
-  mastery: string = "Proficient",
-  categoryId: string | null = "c1",
-) {
-  return { name, mastery, categoryId };
-}
 
 export function makeCvProject(overrides: Partial<CvProjectItem> = {}): CvProjectItem {
   return {

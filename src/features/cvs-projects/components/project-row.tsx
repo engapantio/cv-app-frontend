@@ -13,7 +13,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { CvProjectItem } from "../hooks/use-cv-projects-page";
+import type { CvProjectItem } from "../types";
 
 interface ProjectRowProps {
   project: CvProjectItem;
@@ -66,7 +66,7 @@ export function ProjectRow({
               <DropdownMenuTrigger
                 render={
                   <Button variant="ghost" size="icon" className="rounded-[20px] cursor-pointer">
-                    <MoreVertical className="size-6 text-[#767676] dark:text-white" />
+                    <MoreVertical className="size-6 text-muted-solid dark:text-foreground" />
                   </Button>
                 }
               />

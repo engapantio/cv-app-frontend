@@ -237,19 +237,15 @@ export function CvPreviewClient({
   const cvOwnerId = cv.user?.id;
   const canExport = isAdmin || (cvOwnerId != null && currentUserId === cvOwnerId);
 
-  const fgStyle = { color: "var(--foreground)" } as const;
-
   return (
     <div className="mx-auto w-full max-w-225">
       <div className="flex items-start justify-between mb-8">
         <div>
-          <h1 className="text-[34px] font-normal leading-10.5 tracking-[0.25px]" style={fgStyle}>
+          <h1 className="text-[34px] font-normal leading-10.5 tracking-[0.25px] text-foreground">
             {fullName}
           </h1>
           {positionName && (
-            <p className="text-base mt-1 uppercase" style={fgStyle}>
-              {positionName}
-            </p>
+            <p className="text-base mt-1 uppercase text-foreground">{positionName}</p>
           )}
         </div>
         {canExport && (
@@ -257,12 +253,7 @@ export function CvPreviewClient({
             type="button"
             onClick={handleExportPdf}
             disabled={exporting}
-            className="shrink-0 h-10 px-4 rounded-full border text-sm font-medium uppercase tracking-[0.4px] bg-transparent hover:bg-muted cursor-pointer disabled:opacity-50"
-            style={{
-              borderColor: "rgba(198, 48, 49, 0.5)",
-              color: "#c63031",
-              minWidth: 160,
-            }}
+            className="shrink-0 h-10 px-4 rounded-full border text-sm font-medium uppercase tracking-[0.4px] bg-transparent hover:bg-muted cursor-pointer disabled:opacity-50 border-primary/50 text-primary min-w-40"
           >
             {exporting ? t("buttons.exporting") : t("buttons.exportPdf")}
           </button>
@@ -272,9 +263,7 @@ export function CvPreviewClient({
       <div className="grid grid-cols-1 md:grid-cols-[284px_1fr] min-[1440px]:grid-cols-[284px_568px] gap-x-4 gap-y-0">
         <div className="space-y-6">
           <CvSection label={t("preview.education")}>
-            <p className="text-base" style={fgStyle}>
-              {cv.education || "—"}
-            </p>
+            <p className="text-base text-foreground">{cv.education || "—"}</p>
           </CvSection>
 
           <CvSection label={t("preview.languageProficiency")}>
@@ -286,11 +275,9 @@ export function CvPreviewClient({
           </CvSection>
         </div>
 
-        <div className="md:border-l-2 pl-0 md:pl-8 pt-6 md:pt-0" style={{ borderColor: "#c63031" }}>
+        <div className="md:border-l-2 border-primary pl-0 md:pl-8 pt-6 md:pt-0">
           <CvSection label={cv.name}>
-            <p className="text-base leading-relaxed" style={fgStyle}>
-              {cv.description}
-            </p>
+            <p className="text-base leading-relaxed text-foreground">{cv.description}</p>
           </CvSection>
 
           {[...skillsByCategory.entries()].map(([catId, skills]) => {
@@ -298,7 +285,7 @@ export function CvPreviewClient({
             return (
               <div key={catId} className="mt-4">
                 <CvSection label={catName}>
-                  <p className="text-base" style={fgStyle}>
+                  <p className="text-base text-foreground">
                     {skills.map((s) => s.name).join(", ")}.
                   </p>
                 </CvSection>
@@ -310,10 +297,7 @@ export function CvPreviewClient({
 
       {cv.projects && cv.projects.length > 0 && (
         <>
-          <h3
-            className="text-[34px] font-normal leading-10.5 tracking-[0.25px] mt-12 mb-6"
-            style={fgStyle}
-          >
+          <h3 className="text-[34px] font-normal leading-10.5 tracking-[0.25px] mt-12 mb-6 text-foreground">
             {t("preview.projects")}
           </h3>
 
@@ -337,10 +321,7 @@ export function CvPreviewClient({
 
       {skillsByCategory.size > 0 && (
         <>
-          <h3
-            className="text-[34px] font-normal leading-10.5 tracking-[0.25px] mt-12 mb-6"
-            style={fgStyle}
-          >
+          <h3 className="text-[34px] font-normal leading-10.5 tracking-[0.25px] mt-12 mb-6 text-foreground">
             {t("preview.professionalSkills")}
           </h3>
 

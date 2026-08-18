@@ -18,10 +18,6 @@ interface DialogActionsProps {
   submitClassName?: string;
 }
 
-const RED = "#e53935";
-const SHADOW =
-  "0 1px 5px 0 rgba(0,0,0,0.12),0 2px 2px 0 rgba(0,0,0,0.14),0 3px 1px -2px rgba(0,0,0,0.2)";
-
 export function DialogActions({
   cancelLabel,
   submitLabel,
@@ -51,8 +47,12 @@ export function DialogActions({
         </Button>
         <Button
           type={type}
-          className={cn("uppercase flex-1 py-1.5", submitClassName)}
-          style={disabled || loading ? undefined : { backgroundColor: RED, boxShadow: SHADOW }}
+          variant="danger"
+          className={cn(
+            "uppercase flex-1 py-1.5",
+            !disabled && !loading && "shadow-solid",
+            submitClassName,
+          )}
           disabled={disabled || loading}
           onClick={onSubmit}
         >

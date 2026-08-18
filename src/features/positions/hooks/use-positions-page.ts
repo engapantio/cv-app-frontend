@@ -1,12 +1,9 @@
 "use client";
 
 import { useState, useCallback, useMemo, useEffect } from "react";
-import { useQuery, useMutation } from "@apollo/client/react";
+import { useQuery } from "@apollo/client/react";
 import {
   PositionsDocument,
-  CreatePositionDocument,
-  UpdatePositionDocument,
-  DeletePositionDocument,
   type CreatePositionMutation,
   type UpdatePositionMutation,
 } from "@/gql/generated/graphql";
@@ -65,8 +62,6 @@ export function usePositionsPage(initialPositions: PositionItem[]) {
     setDeleteTarget(position);
   }, []);
 
-  const [createPosition] = useMutation(CreatePositionDocument);
-
   const handleCreated = useCallback(
     (_newPosition: CreatePositionMutation["createPosition"]) => {
       toast.success(t("common.positionCreatedSuccess"));
@@ -75,8 +70,6 @@ export function usePositionsPage(initialPositions: PositionItem[]) {
     [t, setPagination],
   );
 
-  const [updatePosition, { loading: updating }] = useMutation(UpdatePositionDocument);
-
   const handleUpdated = useCallback(
     (updated: UpdatePositionMutation["updatePosition"]) => {
       setPositionsList((prev) => prev.map((p) => (p.id === updated.id ? updated : p)));
@@ -84,8 +77,6 @@ export function usePositionsPage(initialPositions: PositionItem[]) {
     },
     [t],
   );
-
-  const [deletePosition, { loading: deleting }] = useMutation(DeletePositionDocument);
 
   const handleDeleted = useCallback(
     (positionId: string) => {
@@ -140,10 +131,5 @@ export function usePositionsPage(initialPositions: PositionItem[]) {
     globalFilter,
     setGlobalFilter,
     positionsList,
-    updating,
-    deleting,
-    createPosition,
-    updatePosition,
-    deletePosition,
   };
 }

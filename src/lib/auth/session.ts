@@ -11,7 +11,7 @@ import {
   isTokenExpired,
 } from "@/lib/auth/token-store";
 
-export type SessionState = {
+type SessionState = {
   status: "loading" | "authenticated" | "anonymous";
   user: SessionUser | null;
 };

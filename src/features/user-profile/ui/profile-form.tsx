@@ -124,10 +124,10 @@ export function ProfileForm({
         });
       }
 
-      toast.success("Profile updated successfully");
+      toast.success(t("common.profileUpdatedSuccess"));
       reset(data);
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to update profile");
+    } catch {
+      toast.error(t("common.profileUpdatedFailed"));
     }
   };
 

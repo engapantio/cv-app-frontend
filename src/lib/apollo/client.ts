@@ -32,21 +32,6 @@ function isAuthErrorFromErrors(errors: Array<{ message: string }> | null | undef
   return errors?.some(({ message }) => isAuthErrorMessage(message)) ?? false;
 }
 
-function logGraphQLErrors(operationName: string | undefined, errors: Array<{ message: string }>) {
-  for (const { message } of errors) {
-    console.error(`[GraphQL error] ${operationName}: ${message}`);
-  }
-}
-
-function logOperationError(operationName: string | undefined, error: unknown) {
-  const graphQLErrors = extractGraphQLErrors(error);
-  if (graphQLErrors) {
-    logGraphQLErrors(operationName, graphQLErrors);
-  } else {
-    console.error(`[Network error] ${operationName}:`, error);
-  }
-}
-
 let refreshPromise: Promise<void> | null = null;
 let refreshFailed = false;
 
@@ -113,7 +98,7 @@ const authLink = new ApolloLink((operation, forward) => {
                 await refreshAuthSession();
               }
             } catch {
-              // pre-request refresh failed; continue with stale token or none
+              // ignore refresh failures; continue with the stale token or none
             }
           }
 
@@ -146,7 +131,6 @@ const authLink = new ApolloLink((operation, forward) => {
                   waitForRefresh()
                     ?.then(doRetry)
                     .catch(() => {
-                      if (errors) logGraphQLErrors(operation.operationName, errors);
                       observer.next(value);
                     });
                 } else {
@@ -156,16 +140,12 @@ const authLink = new ApolloLink((operation, forward) => {
                       doRetry();
                     })
                     .catch(() => {
-                      if (errors) logGraphQLErrors(operation.operationName, errors);
                       observer.next(value);
                     });
                 }
                 return;
               }
 
-              if (errors && errors.length > 0) {
-                logGraphQLErrors(operation.operationName, errors);
-              }
               observer.next(value);
             },
             error(err) {
@@ -182,7 +162,6 @@ const authLink = new ApolloLink((operation, forward) => {
                         execute(retriesLeft - 1);
                       })
                       .catch(() => {
-                        logOperationError(operation.operationName, err);
                         observer.error(err);
                       });
                   } else {
@@ -192,14 +171,12 @@ const authLink = new ApolloLink((operation, forward) => {
                         execute(retriesLeft - 1);
                       })
                       .catch(() => {
-                        logOperationError(operation.operationName, err);
                         observer.error(err);
                       });
                   }
                   return;
                 }
               }
-              logOperationError(operation.operationName, err);
               observer.error(err);
             },
             complete() {
@@ -207,12 +184,9 @@ const authLink = new ApolloLink((operation, forward) => {
             },
           });
         } catch (err) {
-          logOperationError(operation.operationName, err);
           observer.error(err);
         }
-      })().catch(() => {
-        // async IIFE rejection already handled by catch block above
-      });
+      })().catch(() => {});
     };
 
     execute(1);
