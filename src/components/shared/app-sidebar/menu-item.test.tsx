@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MenuItem } from "./menu-item";
 import { SidebarProvider } from "@/components/ui/sidebar";
@@ -57,7 +57,7 @@ describe("MenuItem phone footer", () => {
     const link = screen.getByRole("link", { name: "Projects" });
     expect(link).toHaveAttribute("href", "/projects");
     expect(link).toHaveAttribute("aria-label", "Projects");
-    expect(screen.queryByText("Projects")).not.toBeInTheDocument();
+    expect(within(link).getByText("Projects")).toHaveClass("max-md:hidden");
   });
 
   it("navigates on a short tap without revealing the label", async () => {
@@ -70,7 +70,7 @@ describe("MenuItem phone footer", () => {
     await user.click(link);
 
     expect(onClick).toHaveBeenCalledTimes(1);
-    expect(screen.queryByText("Projects")).not.toBeInTheDocument();
+    expect(screen.getAllByText("Projects")).toHaveLength(1);
   });
 
   it("reveals the label on long-press without navigating", () => {
@@ -82,7 +82,7 @@ describe("MenuItem phone footer", () => {
       jest.advanceTimersByTime(500);
     });
 
-    expect(screen.getByText("Projects")).toBeInTheDocument();
+    expect(screen.getAllByText("Projects")).toHaveLength(2);
 
     fireEvent.touchEnd(link);
     const clickEvent = new MouseEvent("click", { bubbles: true, cancelable: true });
@@ -91,7 +91,7 @@ describe("MenuItem phone footer", () => {
 
     expect(onClick).not.toHaveBeenCalled();
     expect(preventDefaultSpy).toHaveBeenCalled();
-    expect(screen.queryByText("Projects")).not.toBeInTheDocument();
+    expect(screen.getAllByText("Projects")).toHaveLength(1);
   });
 
   it("cancels the long-press when the finger moves", () => {
@@ -104,7 +104,7 @@ describe("MenuItem phone footer", () => {
       jest.advanceTimersByTime(500);
     });
 
-    expect(screen.queryByText("Projects")).not.toBeInTheDocument();
+    expect(screen.getAllByText("Projects")).toHaveLength(1);
   });
 
   it("reveals the label on hover for pointer devices", () => {
@@ -130,7 +130,7 @@ describe("MenuItem phone footer", () => {
       fireEvent.pointerEnter(link, { pointerType: "mouse" });
     });
 
-    expect(screen.getByText("Projects")).toBeInTheDocument();
+    expect(screen.getAllByText("Projects")).toHaveLength(2);
     window.matchMedia = originalMatchMedia;
   });
 });

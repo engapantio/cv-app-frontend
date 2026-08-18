@@ -110,6 +110,7 @@ export function createSkillsColumns(
       header: "",
       enableSorting: false,
       enableGlobalFilter: false,
+      meta: { className: "w-12" },
       cell: ({ row }) => <ActionsCell skill={row.original} tb={tb} actions={actions} />,
     },
   ];

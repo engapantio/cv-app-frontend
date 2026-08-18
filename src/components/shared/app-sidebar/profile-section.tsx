@@ -64,7 +64,7 @@ export function ProfileSection({
   const name = fullName || email || "";
   const content = (
     <>
-      {compact && name && <h2>{name}</h2>}
+      {compact && name && <h2 className="max-md:hidden">{name}</h2>}
       <Avatar className="h-10 w-10">
         <AvatarFallback className="bg-primary">
           {initial ? initial : <UserCircle2Icon className="size-6 text-avatar-letter" />}

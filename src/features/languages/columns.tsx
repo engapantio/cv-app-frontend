@@ -120,6 +120,7 @@ export function createLanguagesColumns(
       header: "",
       enableSorting: false,
       enableGlobalFilter: false,
+      meta: { className: "w-12" },
       cell: ({ row }) => <ActionsCell language={row.original} tb={tb} actions={actions} />,
     },
   ];

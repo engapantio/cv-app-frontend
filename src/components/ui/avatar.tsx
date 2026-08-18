@@ -25,6 +25,24 @@ function Avatar({
   );
 }
 
+function AvatarLoadingDots() {
+  return (
+    <span
+      aria-hidden
+      data-slot="avatar-loading"
+      className="absolute inset-0 z-10 flex size-full items-center justify-center gap-[3px] rounded-full"
+    >
+      {[0, 1, 2].map((i) => (
+        <span
+          key={i}
+          className="size-1 rounded-full bg-avatar-letter animate-bounce group-data-[size=xl]/avatar:size-1.5"
+          style={{ animationDelay: `${-i * 160}ms` }}
+        />
+      ))}
+    </span>
+  );
+}
+
 function AvatarImage({ className, src, alt = "", ...props }: ImgHTMLAttributes<HTMLImageElement>) {
   const [resolvedSrc, setResolvedSrc] = useState(src);
   const [status, setStatus] = useState<"loading" | "loaded" | "error">(src ? "loading" : "error");
@@ -39,6 +57,7 @@ function AvatarImage({ className, src, alt = "", ...props }: ImgHTMLAttributes<H
   return (
     <>
       <span aria-hidden className="absolute inset-0 z-10 size-full rounded-full bg-avatar-bg" />
+      {status === "loading" && <AvatarLoadingDots />}
       {/* eslint-disable-next-line @next/next/no-img-element -- avatars may be base64 data URIs or arbitrary-host URLs and can arrive asynchronously, so next/image optimization does not apply */}
       <img
         src={src}

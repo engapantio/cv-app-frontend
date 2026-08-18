@@ -109,9 +109,9 @@ function FooterNavItem({
       className={classes}
     >
       <item.icon className="size-6" />
-      {!isPhone && (
-        <span className="font-normal text-base leading-normal tracking-[0.01em]">{label}</span>
-      )}
+      <span className="max-md:hidden font-normal text-base leading-normal tracking-[0.01em]">
+        {label}
+      </span>
     </Link>
   );
 

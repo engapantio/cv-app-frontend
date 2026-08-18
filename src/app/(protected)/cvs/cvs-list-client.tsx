@@ -26,7 +26,7 @@ export default function CvsListClient({
         {...tableData}
         serverError={serverError}
         createUserId={currentUser?.id ?? ""}
-        tableClassName="table-fixed w-full [&_tr]:border-b-table-border [border-collapse:collapse]"
+        tableClassName="w-full [&_tr]:border-b-table-border [border-collapse:collapse]"
       />
     </TablePageLayout>
   );

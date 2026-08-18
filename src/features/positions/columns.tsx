@@ -106,6 +106,7 @@ export function createPositionsColumns(
       header: "",
       enableSorting: false,
       enableGlobalFilter: false,
+      meta: { className: "w-12" },
       cell: ({ row }) => <ActionsCell position={row.original} tb={tb} actions={actions} />,
     },
   ];

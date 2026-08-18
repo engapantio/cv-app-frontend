@@ -7,6 +7,7 @@ export { EnvPill } from "./env-pill";
 export { TableEmptyState } from "./table-empty-state";
 export { TablePagination } from "./table-pagination";
 export { TableToolbar } from "./table-toolbar";
+export { TableColGroup } from "./table-colgroup";
 export { VerifiedBadge } from "./verified-badge";
 export { FloatingField } from "./floating-field";
 export { TablePageLayout } from "./table-page-layout";

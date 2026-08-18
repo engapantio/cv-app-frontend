@@ -24,7 +24,6 @@ import { TableEmptyState } from "@/components/shared/table-empty-state";
 import { TablePagination } from "@/components/shared/table-pagination";
 import { TableToolbar } from "@/components/shared/table-toolbar";
 import { useTranslations } from "next-intl";
-import { useProjectsVisibleColumnCount } from "@/hooks/use-projects-visible-column-count";
 import { ProjectRow } from "./project-row";
 import { createProjectColumns } from "../columns";
 import type { CvProjectItem } from "../types";
@@ -80,7 +79,7 @@ export function ProjectsTable({
     getPaginationRowModel: getPaginationRowModel(),
   });
 
-  const columnCount = useProjectsVisibleColumnCount();
+  const columnCount = columns.length;
   const rows = table.getRowModel().rows;
 
   return (
@@ -94,7 +93,7 @@ export function ProjectsTable({
       />
 
       <div className="overflow-x-hidden">
-        <UITable className="table-fixed w-full">
+        <UITable className="w-full">
           <colgroup>
             <col />
             <col className="hidden max-md:hidden md:table-column" />
