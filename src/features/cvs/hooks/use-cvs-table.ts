@@ -55,6 +55,9 @@ export function useCvsTable({
   useEffect(() => {
     if (data && getData) {
       const fetched = getData(data);
+      // Keep the SSR-provided rows when the network response is empty so a
+      // refetch never flashes an empty list over real data; only an empty
+      // server list over no SSR rows is trusted as a genuine empty result.
       if (fetched.length > 0 || initialCvs.length === 0) {
         setCvsList(fetched);
       }
@@ -83,17 +86,13 @@ export function useCvsTable({
   );
 
   const handleCreated = useCallback(
-    (newCv: CreateCvMutation["createCv"]) => {
-      const ownerId = userId ?? currentUserId ?? "";
-      const ownerEmail = initialUserEmail ?? currentUser?.email ?? "";
-      setCvsList((prev) => [
-        { ...newCv, user: { id: ownerId, email: ownerEmail } } as CvItem,
-        ...prev,
-      ]);
+    (_newCv: CreateCvMutation["createCv"]) => {
       toast.success(t("common.cvCreatedSuccess"));
+      // A new CV sorts to the top of page one, so jump back there to reveal
+      // it; update/delete keep the user on their current page.
       setPagination((prev) => ({ ...prev, pageIndex: 0 }));
     },
-    [userId, currentUserId, initialUserEmail, currentUser, t, setPagination],
+    [t, setPagination],
   );
 
   const canCreate = userId != null ? currentUserId === userId || isAdmin : !!currentUser;
@@ -115,7 +114,7 @@ export function useCvsTable({
     [handleOpen, handleDelete, userEmail, userId, tColumns, tButtons],
   );
 
-  // eslint-disable-next-line react-hooks/incompatible-library
+  // eslint-disable-next-line react-hooks/incompatible-library -- TanStack Table requires the table instance to be created directly in the render body
   const table = useReactTable({
     data: cvsList,
     columns,
@@ -123,7 +122,7 @@ export function useCvsTable({
     onSortingChange: setSorting,
     onGlobalFilterChange: setGlobalFilter,
     onPaginationChange: setPagination,
-    autoResetPageIndex: false,
+    autoResetPageIndex: false, // pagination is controlled here and reset explicitly on create
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),

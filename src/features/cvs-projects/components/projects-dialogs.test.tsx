@@ -1,8 +1,8 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { AddProjectDialog } from "./add-project-dialog";
+import { CreateProjectDialog } from "./create-project-dialog";
 import { UpdateProjectDialog } from "./update-project-dialog";
-import { RemoveProjectDialog } from "./remove-project-dialog";
+import { DeleteProjectDialog } from "./delete-project-dialog";
 import { makeCvProject } from "@/test-utils/cv-fixtures";
 
 jest.mock("next-intl", () => require("@/test-utils/mocks").mockNextIntl());
@@ -52,11 +52,11 @@ beforeEach(() => {
   jest.clearAllMocks();
 });
 
-describe("AddProjectDialog", () => {
+describe("CreateProjectDialog", () => {
   it("disables submit until a project is selected", async () => {
     const user = userEvent.setup();
     render(
-      <AddProjectDialog
+      <CreateProjectDialog
         open
         onOpenChange={jest.fn()}
         allProjects={allProjects}
@@ -75,7 +75,7 @@ describe("AddProjectDialog", () => {
   it("prefills the domain and dates when a project is selected", async () => {
     const user = userEvent.setup();
     render(
-      <AddProjectDialog
+      <CreateProjectDialog
         open
         onOpenChange={jest.fn()}
         allProjects={allProjects}
@@ -95,7 +95,7 @@ describe("AddProjectDialog", () => {
     const user = userEvent.setup();
     const onConfirm = jest.fn().mockResolvedValue(undefined);
     render(
-      <AddProjectDialog
+      <CreateProjectDialog
         open
         onOpenChange={jest.fn()}
         allProjects={allProjects}
@@ -129,7 +129,7 @@ describe("AddProjectDialog", () => {
     const user = userEvent.setup();
     const onConfirm = jest.fn().mockRejectedValue(new Error("boom"));
     render(
-      <AddProjectDialog
+      <CreateProjectDialog
         open
         onOpenChange={jest.fn()}
         allProjects={allProjects}
@@ -230,13 +230,13 @@ describe("UpdateProjectDialog", () => {
   });
 });
 
-describe("RemoveProjectDialog", () => {
+describe("DeleteProjectDialog", () => {
   it("sends the project id and notifies onClose", async () => {
     const user = userEvent.setup();
     const onConfirm = jest.fn().mockResolvedValue(undefined);
     const onClose = jest.fn();
     render(
-      <RemoveProjectDialog
+      <DeleteProjectDialog
         target={project}
         onClose={onClose}
         onConfirm={onConfirm}
@@ -255,7 +255,7 @@ describe("RemoveProjectDialog", () => {
     const onConfirm = jest.fn().mockRejectedValue(new Error("boom"));
     const onClose = jest.fn();
     render(
-      <RemoveProjectDialog
+      <DeleteProjectDialog
         target={project}
         onClose={onClose}
         onConfirm={onConfirm}

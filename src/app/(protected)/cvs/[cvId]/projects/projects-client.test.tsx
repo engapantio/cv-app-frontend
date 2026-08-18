@@ -9,14 +9,14 @@ jest.mock("@/features/cvs-projects/hooks/use-cv-projects-page", () => ({
 jest.mock("@/features/cvs-projects/components/projects-table", () => ({
   ProjectsTable: () => <div data-testid="projects-table" />,
 }));
-jest.mock("@/features/cvs-projects/components/add-project-dialog", () => ({
-  AddProjectDialog: () => <div data-testid="add-project-dialog" />,
+jest.mock("@/features/cvs-projects/components/create-project-dialog", () => ({
+  CreateProjectDialog: () => <div data-testid="create-project-dialog" />,
 }));
 jest.mock("@/features/cvs-projects/components/update-project-dialog", () => ({
   UpdateProjectDialog: () => <div data-testid="update-project-dialog" />,
 }));
-jest.mock("@/features/cvs-projects/components/remove-project-dialog", () => ({
-  RemoveProjectDialog: () => <div data-testid="remove-project-dialog" />,
+jest.mock("@/features/cvs-projects/components/delete-project-dialog", () => ({
+  DeleteProjectDialog: () => <div data-testid="delete-project-dialog" />,
 }));
 jest.mock("@/features/cvs-projects/components/open-project-overlay", () => ({
   OpenProjectOverlay: () => <div data-testid="open-project-overlay" />,
@@ -34,18 +34,18 @@ const defaultReturn = {
   setGlobalFilter: jest.fn(),
   openProject: null,
   setOpenProject: jest.fn(),
-  addOpen: false,
-  setAddOpen: jest.fn(),
+  createOpen: false,
+  setCreateOpen: jest.fn(),
   updateTarget: null,
   setUpdateTarget: jest.fn(),
-  removeTarget: null,
-  setRemoveTarget: jest.fn(),
-  handleAdd: jest.fn(),
+  deleteTarget: null,
+  setDeleteTarget: jest.fn(),
+  handleCreate: jest.fn(),
   handleUpdate: jest.fn(),
-  handleRemove: jest.fn(),
-  adding: false,
+  handleDelete: jest.fn(),
+  creating: false,
   updating: false,
-  removing: false,
+  deleting: false,
 };
 
 beforeEach(() => {
@@ -71,10 +71,10 @@ describe("CvProjectsClient", () => {
     expect(screen.queryByTestId("projects-table")).not.toBeInTheDocument();
   });
 
-  it("opens the add project dialog when requested", async () => {
-    mockUseCvProjectsPage.mockReturnValue({ ...defaultReturn, addOpen: true });
+  it("opens the create project dialog when requested", async () => {
+    mockUseCvProjectsPage.mockReturnValue({ ...defaultReturn, createOpen: true });
     render(<CvProjectsClient cvId="cv1" initialCv={null} serverError={null} />);
-    expect(await screen.findByTestId("add-project-dialog")).toBeInTheDocument();
+    expect(await screen.findByTestId("create-project-dialog")).toBeInTheDocument();
   });
 
   it("opens the update project dialog when a target is set", async () => {
@@ -83,10 +83,10 @@ describe("CvProjectsClient", () => {
     expect(await screen.findByTestId("update-project-dialog")).toBeInTheDocument();
   });
 
-  it("opens the remove project dialog when a target is set", async () => {
-    mockUseCvProjectsPage.mockReturnValue({ ...defaultReturn, removeTarget: project });
+  it("opens the delete project dialog when a target is set", async () => {
+    mockUseCvProjectsPage.mockReturnValue({ ...defaultReturn, deleteTarget: project });
     render(<CvProjectsClient cvId="cv1" initialCv={null} serverError={null} />);
-    expect(await screen.findByTestId("remove-project-dialog")).toBeInTheDocument();
+    expect(await screen.findByTestId("delete-project-dialog")).toBeInTheDocument();
   });
 
   it("opens the project overlay when a project is set", async () => {

@@ -7,6 +7,7 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { CreateSkillDocument } from "@/gql/generated/graphql";
+import { prependCreated } from "@/lib/apollo/cache-utils";
 import { useSkillCategoriesList } from "@/lib/apollo/use-skill-categories-list";
 import {
   Dialog,
@@ -60,25 +61,20 @@ export function CreateSkillDialog({ open, onOpenChange, onCreated }: CreateSkill
   const [createSkill, { loading: creating }] = useMutation(CreateSkillDocument, {
     update(cache, { data }) {
       if (!data?.createSkill) return;
-      cache.modify({
-        fields: {
-          skills(existingRefs = []) {
-            const newRef = cache.writeFragment({
-              data: data.createSkill,
-              fragment: gql`
-                fragment NewSkill on Skill {
-                  id
-                  created_at
-                  name
-                  category_name
-                  category_parent_name
-                }
-              `,
-            });
-            return [...existingRefs, newRef];
-          },
-        },
-      });
+      prependCreated(
+        cache,
+        data.createSkill,
+        gql`
+          fragment NewSkill on Skill {
+            id
+            created_at
+            name
+            category_name
+            category_parent_name
+          }
+        `,
+        "skills",
+      );
     },
   });
 

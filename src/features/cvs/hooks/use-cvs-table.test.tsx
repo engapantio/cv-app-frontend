@@ -123,7 +123,7 @@ describe("useCvsPage", () => {
     expect(result.current.canCreate).toBe(false);
   });
 
-  it("prepends a locally created cv with the owner resolved from the page", async () => {
+  it("does not mutate local state on create (cache.modify + useEffect handle it)", () => {
     const { result } = renderHook(() =>
       useCvsPage({ userId: "u1", initialCvs: [cvs[0] as never] }),
     );
@@ -136,7 +136,7 @@ describe("useCvsPage", () => {
         description: "New",
       } as never);
     });
-    expect(result.current.rows.map((r) => r.original.id)).toEqual(["c3", "c1"]);
+    expect(result.current.rows.map((r) => r.original.id)).toEqual(["c1"]);
   });
 
   it("removes a cv from the list on handleDeleted", () => {

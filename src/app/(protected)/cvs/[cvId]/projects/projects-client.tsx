@@ -5,9 +5,11 @@ import { useCvProjectsPage } from "@/features/cvs-projects/hooks/use-cv-projects
 import { ProjectsTable } from "@/features/cvs-projects/components/projects-table";
 import type { CvQuery } from "@/gql/generated/graphql";
 
-const AddProjectDialog = dynamic(
+const CreateProjectDialog = dynamic(
   () =>
-    import("@/features/cvs-projects/components/add-project-dialog").then((m) => m.AddProjectDialog),
+    import("@/features/cvs-projects/components/create-project-dialog").then(
+      (m) => m.CreateProjectDialog,
+    ),
   { loading: () => null },
 );
 const UpdateProjectDialog = dynamic(
@@ -24,10 +26,10 @@ const OpenProjectOverlay = dynamic(
     ),
   { loading: () => null },
 );
-const RemoveProjectDialog = dynamic(
+const DeleteProjectDialog = dynamic(
   () =>
-    import("@/features/cvs-projects/components/remove-project-dialog").then(
-      (m) => m.RemoveProjectDialog,
+    import("@/features/cvs-projects/components/delete-project-dialog").then(
+      (m) => m.DeleteProjectDialog,
     ),
   { loading: () => null },
 );
@@ -54,18 +56,18 @@ export default function CvProjectsClient({
     onPaginationChange,
     openProject,
     setOpenProject,
-    addOpen,
-    setAddOpen,
+    createOpen,
+    setCreateOpen,
     updateTarget,
     setUpdateTarget,
-    removeTarget,
-    setRemoveTarget,
-    handleAdd,
+    deleteTarget,
+    setDeleteTarget,
+    handleCreate,
     handleUpdate,
-    handleRemove,
-    adding,
+    handleDelete,
+    creating,
     updating,
-    removing,
+    deleting,
   } = useCvProjectsPage(cvId, initialCv, serverError);
 
   if (serverError) {
@@ -86,10 +88,10 @@ export default function CvProjectsClient({
         setGlobalFilter={setGlobalFilter}
         pagination={pagination}
         onPaginationChange={onPaginationChange}
-        onAdd={() => setAddOpen(true)}
+        onCreate={() => setCreateOpen(true)}
         onOpen={(p) => setOpenProject(p)}
         onUpdate={(p) => setUpdateTarget(p)}
-        onRemove={(p) => setRemoveTarget(p)}
+        onDelete={(p) => setDeleteTarget(p)}
       />
 
       {openProject && (
@@ -102,13 +104,13 @@ export default function CvProjectsClient({
         />
       )}
 
-      {addOpen && (
-        <AddProjectDialog
-          open={addOpen}
-          onOpenChange={setAddOpen}
+      {createOpen && (
+        <CreateProjectDialog
+          open={createOpen}
+          onOpenChange={setCreateOpen}
           allProjects={allProjects}
-          onConfirm={handleAdd}
-          loading={adding}
+          onConfirm={handleCreate}
+          loading={creating}
         />
       )}
 
@@ -124,12 +126,12 @@ export default function CvProjectsClient({
         />
       )}
 
-      {removeTarget && (
-        <RemoveProjectDialog
-          target={removeTarget}
-          onClose={() => setRemoveTarget(null)}
-          onConfirm={handleRemove}
-          loading={removing}
+      {deleteTarget && (
+        <DeleteProjectDialog
+          target={deleteTarget}
+          onClose={() => setDeleteTarget(null)}
+          onConfirm={handleDelete}
+          loading={deleting}
         />
       )}
     </>

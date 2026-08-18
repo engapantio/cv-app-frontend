@@ -37,10 +37,10 @@ interface ProjectsTableProps {
   setGlobalFilter: (value: string) => void;
   pagination: PaginationState;
   onPaginationChange: OnChangeFn<PaginationState>;
-  onAdd: () => void;
+  onCreate: () => void;
   onOpen: (project: CvProjectItem) => void;
   onUpdate: (project: CvProjectItem) => void;
-  onRemove: (project: CvProjectItem) => void;
+  onDelete: (project: CvProjectItem) => void;
   serverError?: string | null;
 }
 
@@ -52,10 +52,10 @@ export function ProjectsTable({
   setGlobalFilter,
   pagination,
   onPaginationChange,
-  onAdd,
+  onCreate,
   onOpen,
   onUpdate,
-  onRemove,
+  onDelete,
   serverError,
 }: ProjectsTableProps) {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -73,7 +73,7 @@ export function ProjectsTable({
     onSortingChange: setSorting,
     onGlobalFilterChange: setGlobalFilter,
     onPaginationChange,
-    autoResetPageIndex: false,
+    autoResetPageIndex: false, // pagination is controlled here and reset explicitly on create
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -89,7 +89,7 @@ export function ProjectsTable({
         value={globalFilter}
         onChange={setGlobalFilter}
         actionLabel={tButtons("addProject")}
-        onAction={onAdd}
+        onAction={onCreate}
         showAction={canMutate}
       />
 
@@ -151,7 +151,7 @@ export function ProjectsTable({
                 isLast={idx === rows.length - 1}
                 onOpen={onOpen}
                 onUpdate={onUpdate}
-                onRemove={onRemove}
+                onDelete={onDelete}
               />
             ))
           )}

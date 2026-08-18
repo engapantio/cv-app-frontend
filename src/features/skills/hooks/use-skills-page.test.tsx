@@ -82,18 +82,9 @@ describe("useSkillsPage", () => {
     ]);
   });
 
-  it("appends a skill on create, matching its category", async () => {
-    mockUseQuery.mockReturnValue({ data: { skills: [] }, loading: false });
-    const category = {
-      id: "c1",
-      name: "Programming Language",
-      order: 1,
-      parent: null,
-      children: [] as { id: string; name: string; order: number }[],
-    };
-    const { result } = renderHook(() => useSkillsPage([], null, [category]));
-    await waitFor(() => expect(result.current.skillsList).toHaveLength(0));
-
+  it("does not mutate local state on create (cache.modify + useEffect handle it)", () => {
+    const { result } = renderHook(() => useSkillsPage([], null, []));
+    expect(result.current.skillsList).toHaveLength(2);
     act(() =>
       result.current.handleCreated({
         id: "3",
@@ -103,9 +94,7 @@ describe("useSkillsPage", () => {
         category_parent_name: "Development",
       }),
     );
-
-    const created = result.current.skillsList.find((s) => s.id === "3");
-    expect(created?.category?.name).toBe("Programming Language");
+    expect(result.current.skillsList).toHaveLength(2);
   });
 
   it("replaces a skill on update", async () => {

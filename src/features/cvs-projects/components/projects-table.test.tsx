@@ -48,7 +48,12 @@ function renderTable({
   data?: typeof projects;
   serverError?: string | null;
 }) {
-  const actions = { onAdd: jest.fn(), onOpen: jest.fn(), onUpdate: jest.fn(), onRemove: jest.fn() };
+  const actions = {
+    onCreate: jest.fn(),
+    onOpen: jest.fn(),
+    onUpdate: jest.fn(),
+    onDelete: jest.fn(),
+  };
 
   function Harness() {
     const [globalFilter, setGlobalFilter] = useState("");
@@ -61,10 +66,10 @@ function renderTable({
         setGlobalFilter={setGlobalFilter}
         pagination={{ pageIndex: 0, pageSize: 10 }}
         onPaginationChange={jest.fn()}
-        onAdd={actions.onAdd}
+        onCreate={actions.onCreate}
         onOpen={actions.onOpen}
         onUpdate={actions.onUpdate}
-        onRemove={actions.onRemove}
+        onDelete={actions.onDelete}
         serverError={serverError}
       />
     );
