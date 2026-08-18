@@ -7,6 +7,7 @@ import { z } from "zod";
 import { useMutation } from "@apollo/client/react";
 import { gql } from "@apollo/client";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 import { CreateCvDocument, type CreateCvMutation } from "@/gql/generated/graphql";
 import { useSession } from "@/lib/auth/session";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, Input, Textarea } from "@/components/ui";
@@ -123,9 +124,11 @@ export function CreateCvDialog({
         }
         onOpenChange(false);
         reset();
-      } catch {}
+      } catch {
+        toast.error(t("common.createCvFailed"));
+      }
     },
-    [createCv, userId, onCreated, onOpenChange, reset],
+    [createCv, userId, onCreated, onOpenChange, reset, t],
   );
 
   return (

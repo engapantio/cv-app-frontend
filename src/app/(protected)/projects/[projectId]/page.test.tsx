@@ -6,6 +6,7 @@ import { useQuery, useMutation } from "@apollo/client/react";
 import { usePermissions } from "@/lib/auth/permissions";
 
 jest.mock("lucide-react", () => require("@/test-utils/mocks").mockLucide());
+jest.mock("next-intl", () => require("@/test-utils/mocks").mockNextIntl());
 jest.mock("@apollo/client/react", () => ({ useQuery: jest.fn(), useMutation: jest.fn() }));
 jest.mock("@/lib/auth/permissions", () => ({ usePermissions: jest.fn() }));
 jest.mock("sonner", () => ({ toast: { success: jest.fn(), error: jest.fn() } }));
@@ -140,7 +141,7 @@ describe("ProjectDetailPage", () => {
     await user.click(screen.getByRole("button", { name: /update/i }));
     await user.click(screen.getByText("Confirm"));
     await waitFor(() => expect(updateProject).toHaveBeenCalled());
-    expect(require("sonner").toast.success).toHaveBeenCalledWith("Project updated");
+    expect(require("sonner").toast.success).toHaveBeenCalledWith("projectUpdatedSuccess");
   });
 
   it("shows an error toast when the update fails", async () => {
@@ -152,6 +153,6 @@ describe("ProjectDetailPage", () => {
     await user.click(screen.getByRole("button", { name: /update/i }));
     await user.click(screen.getByText("Confirm"));
     await waitFor(() => expect(updateProject).toHaveBeenCalled());
-    expect(require("sonner").toast.error).toHaveBeenCalledWith("Failed to update project");
+    expect(require("sonner").toast.error).toHaveBeenCalledWith("updateProjectFailed");
   });
 });

@@ -5,6 +5,9 @@ import { CreateCvDialog } from "./create-cv-dialog";
 import { DeleteCvDialog } from "./delete-cv-dialog";
 
 jest.mock("@apollo/client/react", () => ({ useMutation: jest.fn() }));
+jest.mock("@/lib/auth/session", () => ({
+  useSession: () => ({ user: null, loading: false, isAuthenticated: false }),
+}));
 jest.mock("next-intl", () => require("@/test-utils/mocks").mockNextIntl());
 jest.mock("@/components/ui", () => require("@/test-utils/ui-mock"));
 

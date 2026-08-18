@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { useCvSkillsPage } from "@/features/cvs-skills/hooks/use-cv-skills-page";
 import { MASTERY_MAP } from "@/features/cvs-skills/utils/mastery-mapping";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import type { Mastery, CvQuery } from "@/gql/generated/graphql";
 import type { SkillsCatalogInitial } from "@/lib/skills/group-skills";
 
@@ -71,8 +72,7 @@ export function CvSkillsClient({
             <button
               type="button"
               onClick={() => setAddDialogOpen(true)}
-              className="uppercase text-base font-medium bg-transparent border-none cursor-pointer"
-              style={{ color: "#767676" }}
+              className="uppercase text-base font-medium bg-transparent border-none cursor-pointer text-muted-solid"
             >
               + {t("buttons.addSkill")}
             </button>
@@ -150,7 +150,7 @@ export function CvSkillsClient({
                         (nameRemovable
                           ? "cursor-pointer hover:text-black dark:hover:text-white "
                           : "cursor-default ") +
-                        (isSelected ? "text-black dark:text-white " : "text-[#767676] ")
+                        (isSelected ? "text-black dark:text-white " : "text-muted-solid ")
                       }
                     >
                       {skill.name}
@@ -170,16 +170,14 @@ export function CvSkillsClient({
               <button
                 type="button"
                 onClick={() => setAddDialogOpen(true)}
-                className="uppercase text-base font-medium bg-transparent border-none cursor-pointer"
-                style={{ color: "#767676" }}
+                className="uppercase text-base font-medium bg-transparent border-none cursor-pointer text-muted-solid"
               >
                 + {t("buttons.addSkill")}
               </button>
               <button
                 type="button"
                 onClick={enterRemoveMode}
-                className="uppercase text-base font-medium inline-flex items-center gap-1.5 bg-transparent border-none cursor-pointer"
-                style={{ color: "#C63031" }}
+                className="uppercase text-base font-medium inline-flex items-center gap-1.5 bg-transparent border-none cursor-pointer text-primary"
               >
                 <Trash2 className="h-4 w-4" />
                 {t("buttons.removeSkills")}
@@ -197,21 +195,13 @@ export function CvSkillsClient({
               </Button>
               <Button
                 type="button"
+                variant="danger"
                 onClick={handleDeleteSkills}
                 disabled={selectedSkills.size === 0 || deletingSkill}
-                className="uppercase text-white min-w-30 py-1.5"
-                style={
-                  selectedSkills.size === 0 || deletingSkill
-                    ? undefined
-                    : { backgroundColor: "#e53935" }
-                }
+                className="uppercase min-w-30 py-1.5"
               >
                 {t("buttons.delete")}
-                {selectedSkills.size > 0 && (
-                  <span className="inline-flex items-center justify-center w-5 h-5 rounded-full text-xs font-bold text-[#e53935] bg-white border border-white">
-                    {selectedSkills.size}
-                  </span>
-                )}
+                {selectedSkills.size > 0 && <Badge variant="count">{selectedSkills.size}</Badge>}
               </Button>
             </>
           )}

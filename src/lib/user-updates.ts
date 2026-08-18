@@ -1,6 +1,6 @@
 import type { UpdateUserInput, UserRole } from "@/gql/generated/graphql";
 
-export interface UserEditFields {
+interface UserEditFields {
   userId: string;
   first_name: string;
   last_name: string;
@@ -9,7 +9,7 @@ export interface UserEditFields {
   role?: UserRole;
 }
 
-export interface UserEditBaseline {
+interface UserEditBaseline {
   first_name?: string | null;
   last_name?: string | null;
   departmentId?: string | null;
@@ -17,14 +17,14 @@ export interface UserEditBaseline {
   role?: UserRole | null;
 }
 
-export interface UserUpdateUpdaters {
+interface UserUpdateUpdaters {
   updateProfile: (options: {
     variables: { profile: { userId: string; first_name: string; last_name: string } };
   }) => Promise<unknown>;
   updateUser: (options: { variables: { user: UpdateUserInput } }) => Promise<unknown>;
 }
 
-export type UserUpdateOperation = {
+type UserUpdateOperation = {
   kind: "profile" | "user";
   run: () => Promise<unknown>;
 };

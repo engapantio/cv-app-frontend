@@ -18,7 +18,7 @@ interface Props {
 
 export function ProjectCard({ project, color, primary, labels }: Props) {
   const fg = color ?? "var(--foreground)";
-  const red = primary ?? "#c63031";
+  const red = primary ?? "var(--primary)";
   const l = labels ?? {};
 
   return (

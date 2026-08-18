@@ -2,7 +2,7 @@
 
 import { ArrowUp, ArrowDown } from "lucide-react";
 import type { ColumnDef } from "@tanstack/react-table";
-import type { CvProjectItem } from "./hooks/use-cv-projects-page";
+import type { CvProjectItem } from "./types";
 
 export function createProjectColumns(t: (key: string) => string): ColumnDef<CvProjectItem>[] {
   return [

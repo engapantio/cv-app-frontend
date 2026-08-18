@@ -1,12 +1,9 @@
 "use client";
 
 import { useState, useCallback, useMemo, useEffect } from "react";
-import { useQuery, useMutation } from "@apollo/client/react";
+import { useQuery } from "@apollo/client/react";
 import {
   LanguagesDocument,
-  CreateLanguageDocument,
-  UpdateLanguageDocument,
-  DeleteLanguageDocument,
   type CreateLanguageMutation,
   type UpdateLanguageMutation,
 } from "@/gql/generated/graphql";
@@ -67,8 +64,6 @@ export function useLanguagesPage(initialLanguages: LanguageItem[]) {
     setDeleteTarget(language);
   }, []);
 
-  const [createLanguage] = useMutation(CreateLanguageDocument);
-
   const handleCreated = useCallback(
     (_newLanguage: CreateLanguageMutation["createLanguage"]) => {
       toast.success(t("common.languageCreatedSuccess"));
@@ -77,8 +72,6 @@ export function useLanguagesPage(initialLanguages: LanguageItem[]) {
     [t, setPagination],
   );
 
-  const [updateLanguage, { loading: updating }] = useMutation(UpdateLanguageDocument);
-
   const handleUpdated = useCallback(
     (updated: UpdateLanguageMutation["updateLanguage"]) => {
       setLanguagesList((prev) => prev.map((l) => (l.id === updated.id ? updated : l)));
@@ -86,8 +79,6 @@ export function useLanguagesPage(initialLanguages: LanguageItem[]) {
     },
     [t],
   );
-
-  const [deleteLanguage, { loading: deleting }] = useMutation(DeleteLanguageDocument);
 
   const handleDeleted = useCallback(
     (languageId: string) => {
@@ -142,10 +133,5 @@ export function useLanguagesPage(initialLanguages: LanguageItem[]) {
     globalFilter,
     setGlobalFilter,
     languagesList,
-    updating,
-    deleting,
-    createLanguage,
-    updateLanguage,
-    deleteLanguage,
   };
 }

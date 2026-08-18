@@ -1,12 +1,9 @@
 "use client";
 
 import { useState, useCallback, useMemo, useEffect } from "react";
-import { useQuery, useMutation } from "@apollo/client/react";
+import { useQuery } from "@apollo/client/react";
 import {
   DepartmentsDocument,
-  CreateDepartmentDocument,
-  UpdateDepartmentDocument,
-  DeleteDepartmentDocument,
   type CreateDepartmentMutation,
   type UpdateDepartmentMutation,
 } from "@/gql/generated/graphql";
@@ -65,8 +62,6 @@ export function useDepartmentsPage(initialDepartments: DepartmentItem[]) {
     setDeleteTarget(department);
   }, []);
 
-  const [createDepartment] = useMutation(CreateDepartmentDocument);
-
   const handleCreated = useCallback(
     (_newDepartment: CreateDepartmentMutation["createDepartment"]) => {
       toast.success(t("common.departmentCreatedSuccess"));
@@ -75,8 +70,6 @@ export function useDepartmentsPage(initialDepartments: DepartmentItem[]) {
     [t, setPagination],
   );
 
-  const [updateDepartment, { loading: updating }] = useMutation(UpdateDepartmentDocument);
-
   const handleUpdated = useCallback(
     (updated: UpdateDepartmentMutation["updateDepartment"]) => {
       setDepartmentsList((prev) => prev.map((d) => (d.id === updated.id ? updated : d)));
@@ -84,8 +77,6 @@ export function useDepartmentsPage(initialDepartments: DepartmentItem[]) {
     },
     [t],
   );
-
-  const [deleteDepartment, { loading: deleting }] = useMutation(DeleteDepartmentDocument);
 
   const handleDeleted = useCallback(
     (departmentId: string) => {
@@ -140,10 +131,5 @@ export function useDepartmentsPage(initialDepartments: DepartmentItem[]) {
     globalFilter,
     setGlobalFilter,
     departmentsList,
-    updating,
-    deleting,
-    createDepartment,
-    updateDepartment,
-    deleteDepartment,
   };
 }

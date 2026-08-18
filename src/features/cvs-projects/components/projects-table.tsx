@@ -27,7 +27,7 @@ import { useTranslations } from "next-intl";
 import { useProjectsVisibleColumnCount } from "@/hooks/use-projects-visible-column-count";
 import { ProjectRow } from "./project-row";
 import { createProjectColumns } from "../columns";
-import type { CvProjectItem } from "../hooks/use-cv-projects-page";
+import type { CvProjectItem } from "../types";
 
 interface ProjectsTableProps {
   loading: boolean;

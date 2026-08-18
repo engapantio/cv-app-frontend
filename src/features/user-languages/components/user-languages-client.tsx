@@ -16,6 +16,7 @@ import {
 import { toast } from "sonner";
 import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { usePermissions } from "@/lib/auth/permissions";
 import { cn } from "@/lib/utils";
 import { PROFICIENCY_MAP } from "../utils/proficiency-mapping";
@@ -88,16 +89,21 @@ export function UserLanguagesClient({ userId, initialUser }: UserLanguagesClient
   };
 
   const handleUpdateLanguage = async (name: string, proficiency: Proficiency) => {
-    await updateLanguage({
-      variables: {
-        language: {
-          userId,
-          name,
-          proficiency,
+    try {
+      await updateLanguage({
+        variables: {
+          language: {
+            userId,
+            name,
+            proficiency,
+          },
         },
-      },
-    });
-    toast.success(t("common.languageUpdatedSuccess"));
+      });
+      toast.success(t("common.languageUpdatedSuccess"));
+    } catch (error) {
+      toast.error(t("common.updateLanguageFailed"));
+      throw error;
+    }
   };
 
   const enterRemoveMode = () => {
@@ -112,17 +118,21 @@ export function UserLanguagesClient({ userId, initialUser }: UserLanguagesClient
 
   const handleDeleteLanguages = async () => {
     if (selectedLanguages.length === 0) return;
-    await deleteLanguages({
-      variables: {
-        language: {
-          userId,
-          name: selectedLanguages,
+    try {
+      await deleteLanguages({
+        variables: {
+          language: {
+            userId,
+            name: selectedLanguages,
+          },
         },
-      },
-    });
-    toast.success(t("common.languagesDeletedSuccess"));
-    setSelectedLanguages([]);
-    setRemoveMode(false);
+      });
+      toast.success(t("common.languagesDeletedSuccess"));
+      setSelectedLanguages([]);
+      setRemoveMode(false);
+    } catch {
+      toast.error(t("common.languagesDeletedFailed"));
+    }
   };
 
   const toggleLanguageSelection = (name: string) => {
@@ -159,7 +169,7 @@ export function UserLanguagesClient({ userId, initialUser }: UserLanguagesClient
                   style={
                     removeMode && isSelected
                       ? undefined
-                      : { color: PROFICIENCY_MAP[lang.proficiency]?.color ?? "#767676" }
+                      : { color: PROFICIENCY_MAP[lang.proficiency]?.color ?? "var(--muted-solid)" }
                   }
                 >
                   {lang.proficiency}
@@ -196,16 +206,14 @@ export function UserLanguagesClient({ userId, initialUser }: UserLanguagesClient
               <button
                 type="button"
                 onClick={() => setAddDialogOpen(true)}
-                className="uppercase text-base font-medium bg-transparent border-none cursor-pointer"
-                style={{ color: "#767676" }}
+                className="uppercase text-base font-medium bg-transparent border-none cursor-pointer text-muted-solid"
               >
                 + {t("buttons.addLanguage")}
               </button>
               <button
                 type="button"
                 onClick={enterRemoveMode}
-                className="uppercase text-base font-medium inline-flex items-center gap-1.5 bg-transparent border-none cursor-pointer"
-                style={{ color: "#C63031" }}
+                className="uppercase text-base font-medium inline-flex items-center gap-1.5 bg-transparent border-none cursor-pointer text-primary"
               >
                 <Trash2 className="h-4 w-4" />
                 {t("buttons.removeLanguages")}
@@ -223,20 +231,14 @@ export function UserLanguagesClient({ userId, initialUser }: UserLanguagesClient
               </Button>
               <Button
                 type="button"
+                variant="danger"
                 onClick={handleDeleteLanguages}
                 disabled={selectedLanguages.length === 0 || deleting}
-                className="uppercase text-white min-w-30 py-1.5"
-                style={
-                  selectedLanguages.length === 0 || deleting
-                    ? undefined
-                    : { backgroundColor: "#e53935" }
-                }
+                className="uppercase min-w-30 py-1.5"
               >
                 {t("buttons.delete")}
                 {selectedLanguages.length > 0 && (
-                  <span className="inline-flex items-center justify-center w-5 h-5 rounded-full text-xs font-bold text-[#e53935] bg-white border border-white">
-                    {selectedLanguages.length}
-                  </span>
+                  <Badge variant="count">{selectedLanguages.length}</Badge>
                 )}
               </Button>
             </>

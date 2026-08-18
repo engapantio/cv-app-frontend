@@ -3,6 +3,7 @@
 import { useCallback } from "react";
 import { useMutation } from "@apollo/client/react";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 import { DeleteDepartmentDocument } from "@/gql/generated/graphql";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui";
 import { DialogActions } from "@/components/shared/dialog-actions";
@@ -38,8 +39,10 @@ export function DeleteDepartmentDialog({
       await deleteDepartment({ variables: { department: { departmentId: target.id } } });
       onDeleted(target.id);
       onClose();
-    } catch {}
-  }, [target, deleteDepartment, onDeleted, onClose]);
+    } catch {
+      toast.error(t("common.deleteDepartmentFailed"));
+    }
+  }, [target, deleteDepartment, onDeleted, onClose, t]);
 
   return (
     <Dialog open={!!target} onOpenChange={(open) => !open && onClose()}>

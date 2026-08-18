@@ -93,7 +93,7 @@ export async function createServerApolloClientForRequest(): Promise<{
         return { client: createServerApolloClient(rotated), accessToken: rotated };
       }
     } catch {
-      // refresh failed; fall back to forwarding whatever token is available
+      // fall back to forwarding whatever token is available
     }
   }
 

@@ -4,6 +4,7 @@ import { useCallback } from "react";
 import { useMutation } from "@apollo/client/react";
 import type { DocumentNode } from "graphql";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import type { Mastery } from "@/gql/generated/graphql";
 
 interface UseSkillMutationsOptions {
@@ -25,6 +26,7 @@ export function useSkillMutations({
   refetch,
   skillCategoryMap,
 }: UseSkillMutationsOptions) {
+  const t = useTranslations();
   const [addSkill, { loading: addingSkill }] = useMutation(addDocument);
 
   const handleAddSkill = useCallback(
@@ -63,11 +65,11 @@ export function useSkillMutations({
         refetch();
         return true;
       } catch {
-        toast.error("Failed to delete skills");
+        toast.error(t("common.removeSkillsFailed"));
         return false;
       }
     },
-    [deleteSkills, entityId, idField, refetch],
+    [deleteSkills, entityId, idField, refetch, t],
   );
 
   return {

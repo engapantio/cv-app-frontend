@@ -1,12 +1,9 @@
 "use client";
 
 import { useState, useCallback, useMemo, useEffect } from "react";
-import { useQuery, useMutation } from "@apollo/client/react";
+import { useQuery } from "@apollo/client/react";
 import {
   SkillsDocument,
-  CreateSkillDocument,
-  UpdateSkillDocument,
-  DeleteSkillDocument,
   type CreateSkillMutation,
   type UpdateSkillMutation,
   type SkillCategoriesQuery,
@@ -75,8 +72,6 @@ export function useSkillsPage(
     [categoriesData, initialCategories],
   );
 
-  const [createSkill] = useMutation(CreateSkillDocument);
-
   const handleCreated = useCallback(
     (newSkill: CreateSkillMutation["createSkill"]) => {
       const matched = categories.find((c) => c.name === newSkill.category_name);
@@ -91,8 +86,6 @@ export function useSkillsPage(
     },
     [categories, t, setPagination],
   );
-
-  const [updateSkill, { loading: updating }] = useMutation(UpdateSkillDocument);
 
   const handleUpdated = useCallback(
     (updated: UpdateSkillMutation["updateSkill"]) => {
@@ -112,8 +105,6 @@ export function useSkillsPage(
     },
     [categories, t],
   );
-
-  const [deleteSkill, { loading: deleting }] = useMutation(DeleteSkillDocument);
 
   const handleDeleted = useCallback(
     (skillId: string) => {
@@ -168,10 +159,5 @@ export function useSkillsPage(
     globalFilter,
     setGlobalFilter,
     skillsList,
-    updating,
-    deleting,
-    createSkill,
-    updateSkill,
-    deleteSkill,
   };
 }

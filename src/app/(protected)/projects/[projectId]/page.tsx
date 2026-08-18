@@ -12,9 +12,11 @@ import { Input } from "@/components/ui/input";
 import { Pill } from "@/components/shared/pill";
 import { UpdateProjectDialog } from "@/features/projects/components/update-project-dialog";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 export default function ProjectDetailPage({ params }: { params: Promise<{ projectId: string }> }) {
   const { projectId } = use(params);
+  const t = useTranslations();
   const { isAdmin } = usePermissions();
 
   const projectIdValid = !!projectId;
@@ -44,12 +46,12 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ projec
       try {
         await updateProject({ variables: { project: input } });
         setUpdateOpen(false);
-        toast.success("Project updated");
+        toast.success(t("common.projectUpdatedSuccess"));
       } catch {
-        toast.error("Failed to update project");
+        toast.error(t("common.updateProjectFailed"));
       }
     },
-    [updateProject],
+    [updateProject, t],
   );
 
   if (error) {
@@ -86,7 +88,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ projec
           Projects
         </Link>
         <ChevronRight className="size-5" />
-        <span style={{ color: "#c63031" }}>{project.name}</span>
+        <span className="text-primary">{project.name}</span>
       </div>
 
       <div className="max-w-2xl mx-auto space-y-5">
@@ -170,8 +172,8 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ projec
         {isAdmin && (
           <div className="flex justify-end">
             <Button
-              className="uppercase text-white min-w-30 py-1.5 hover:brightness-90"
-              style={{ backgroundColor: "#e53935" }}
+              variant="danger"
+              className="uppercase min-w-30 py-1.5"
               onClick={() => setUpdateOpen(true)}
             >
               UPDATE

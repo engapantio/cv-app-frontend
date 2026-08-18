@@ -38,7 +38,7 @@ async function queryServer<TQuery>(
   }
 }
 
-export interface InitialRowsResult<TItem, TExtra = null> {
+interface InitialRowsResult<TItem, TExtra = null> {
   initial: TItem[];
   serverError: string | null;
   extra: TExtra;
@@ -85,7 +85,7 @@ export async function fetchInitialRows<TQuery, TItem, TExtra = null>({
   };
 }
 
-export interface InitialRecordResult<TRecord> {
+interface InitialRecordResult<TRecord> {
   initial: TRecord | null;
   serverError: string | null;
 }

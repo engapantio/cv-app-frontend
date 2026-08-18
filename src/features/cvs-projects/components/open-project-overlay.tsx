@@ -4,7 +4,7 @@ import { format } from "date-fns";
 import { useTranslations } from "next-intl";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, Input } from "@/components/ui";
 import { EnvPill } from "@/components/shared";
-import type { CvProjectItem } from "../hooks/use-cv-projects-page";
+import type { CvProjectItem } from "../types";
 
 interface OpenProjectOverlayProps {
   open: boolean;

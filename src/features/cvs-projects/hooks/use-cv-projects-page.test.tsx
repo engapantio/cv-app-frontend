@@ -4,6 +4,7 @@ import { useCvProjectsPage } from "./use-cv-projects-page";
 import { makeCv, makeCvProject } from "@/test-utils/cv-fixtures";
 
 jest.mock("@apollo/client/react", () => ({ useQuery: jest.fn(), useMutation: jest.fn() }));
+jest.mock("next-intl", () => require("@/test-utils/mocks").mockNextIntl());
 jest.mock("@/lib/auth/permissions", () => ({
   usePermissions: () => ({ canEdit: mockCanEditValue() }),
 }));

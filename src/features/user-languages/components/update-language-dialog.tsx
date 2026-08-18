@@ -54,8 +54,12 @@ export function UpdateLanguageDialog({
 
   const handleConfirm = useCallback(async () => {
     if (!currentLanguage) return;
-    await onConfirm(currentLanguage.name, selectedProficiency);
-    onOpenChange(false);
+    try {
+      await onConfirm(currentLanguage.name, selectedProficiency);
+      onOpenChange(false);
+    } catch {
+      // The parent surfaces the failure toast; keep the dialog open for retry.
+    }
   }, [currentLanguage, selectedProficiency, onConfirm, onOpenChange]);
 
   return (

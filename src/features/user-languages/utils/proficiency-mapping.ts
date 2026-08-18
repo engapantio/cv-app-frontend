@@ -1,6 +1,6 @@
 import type { Proficiency } from "@/gql/generated/graphql";
 
-export interface ProficiencyConfig {
+interface ProficiencyConfig {
   color: string;
 }
 

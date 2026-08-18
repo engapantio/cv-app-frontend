@@ -1,4 +1,4 @@
-export interface ParsedRoles {
+interface ParsedRoles {
   roles: string[];
   responsibilities: string[];
 }

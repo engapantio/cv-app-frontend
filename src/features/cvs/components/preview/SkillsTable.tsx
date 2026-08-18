@@ -30,7 +30,7 @@ export function SkillsTable({
   labels,
 }: Props) {
   const fg = color ?? "var(--foreground)";
-  const red = primary ?? "#c63031";
+  const red = primary ?? "var(--primary)";
   const borderColor = muted ?? "#bdbdbd";
   const l = labels ?? {};
 

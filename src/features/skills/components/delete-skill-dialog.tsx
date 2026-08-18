@@ -3,6 +3,7 @@
 import { useCallback } from "react";
 import { useMutation } from "@apollo/client/react";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 import { DeleteSkillDocument } from "@/gql/generated/graphql";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui";
 import { DialogActions } from "@/components/shared/dialog-actions";
@@ -34,8 +35,10 @@ export function DeleteSkillDialog({ target, onClose, onDeleted }: DeleteSkillDia
       await deleteSkill({ variables: { skill: { skillId: target.id } } });
       onDeleted(target.id);
       onClose();
-    } catch {}
-  }, [target, deleteSkill, onDeleted, onClose]);
+    } catch {
+      toast.error(t("common.deleteSkillFailed"));
+    }
+  }, [target, deleteSkill, onDeleted, onClose, t]);
 
   return (
     <Dialog open={!!target} onOpenChange={(open) => !open && onClose()}>

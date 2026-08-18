@@ -9,6 +9,7 @@ import { gql } from "@apollo/client";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { CreateLanguageDocument } from "@/gql/generated/graphql";
+import { isDuplicateKeyError } from "@/lib/apollo/duplicate-key-error";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, Input } from "@/components/ui";
 import { DialogActions, FloatingField } from "@/components/shared";
 
@@ -103,7 +104,11 @@ export function CreateLanguageDialog({ open, onOpenChange, onCreated }: CreateLa
         }
         reset();
         onOpenChange(false);
-      } catch {
+      } catch (error) {
+        if (isDuplicateKeyError(error)) {
+          toast.error(t("common.languageAlreadyExists"));
+          return;
+        }
         toast.error(t("common.createLanguageFailed"));
       }
     },

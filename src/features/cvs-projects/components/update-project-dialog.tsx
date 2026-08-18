@@ -19,7 +19,7 @@ import {
   PopoverContent,
   Calendar,
 } from "@/components/ui";
-import type { CvProjectItem } from "../hooks/use-cv-projects-page";
+import type { CvProjectItem } from "../types";
 import { parseRoles } from "../utils/roles-parser";
 
 interface UpdateProjectDialogProps {
