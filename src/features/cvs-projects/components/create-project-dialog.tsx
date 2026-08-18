@@ -38,7 +38,7 @@ interface ProjectOption {
   environment: string[];
 }
 
-interface AddProjectDialogProps {
+interface CreateProjectDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   allProjects: ProjectOption[];
@@ -52,13 +52,13 @@ interface AddProjectDialogProps {
   loading: boolean;
 }
 
-export function AddProjectDialog({
+export function CreateProjectDialog({
   open,
   onOpenChange,
   allProjects,
   onConfirm,
   loading,
-}: AddProjectDialogProps) {
+}: CreateProjectDialogProps) {
   const t = useTranslations();
   const [selectedProject, setSelectedProject] = useState<ProjectOption | null>(null);
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);

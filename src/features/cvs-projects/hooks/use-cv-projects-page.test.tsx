@@ -107,7 +107,7 @@ describe("useCvProjectsPage", () => {
     expect(result.current.allProjects.map((p) => p.id)).toEqual(["prj3"]);
   });
 
-  it("merges an added project into the local list, closes the dialog and refetches", async () => {
+  it("merges a created project into the local list, closes the dialog and refetches", async () => {
     const addCvProject = jest.fn().mockResolvedValue({
       data: {
         addCvProject: {
@@ -137,7 +137,7 @@ describe("useCvProjectsPage", () => {
     await waitFor(() => expect(result.current.projects).toHaveLength(2));
 
     await act(async () => {
-      await result.current.handleAdd({
+      await result.current.handleCreate({
         projectId: "prj3",
         start_date: "2024-03-01",
         end_date: null,
@@ -159,7 +159,7 @@ describe("useCvProjectsPage", () => {
       },
     });
     expect(result.current.projects.map((p) => p.id)).toEqual(["cp3", "cp1", "cp2"]);
-    expect(result.current.addOpen).toBe(false);
+    expect(result.current.createOpen).toBe(false);
     expect(mockRefetch).toHaveBeenCalled();
   });
 
@@ -197,7 +197,7 @@ describe("useCvProjectsPage", () => {
     expect(result.current.updateTarget).toBeNull();
   });
 
-  it("removes a project from the local list on handleRemove", async () => {
+  it("deletes a project from the local list on handleDelete", async () => {
     const removeCvProject = jest.fn().mockResolvedValue({
       data: {
         removeCvProject: {
@@ -218,7 +218,7 @@ describe("useCvProjectsPage", () => {
     await waitFor(() => expect(result.current.projects).toHaveLength(2));
 
     await act(async () => {
-      await result.current.handleRemove("prj1");
+      await result.current.handleDelete("prj1");
     });
 
     expect(removeCvProject).toHaveBeenCalledWith({
@@ -239,11 +239,11 @@ describe("useCvProjectsPage", () => {
     expect(result.current.globalFilter).toBe("al");
     act(() => result.current.setOpenProject(alpha));
     expect(result.current.openProject).toBe(alpha);
-    act(() => result.current.setAddOpen(true));
-    expect(result.current.addOpen).toBe(true);
+    act(() => result.current.setCreateOpen(true));
+    expect(result.current.createOpen).toBe(true);
     act(() => result.current.setUpdateTarget(alpha));
     expect(result.current.updateTarget).toBe(alpha);
-    act(() => result.current.setRemoveTarget(beta));
-    expect(result.current.removeTarget).toBe(beta);
+    act(() => result.current.setDeleteTarget(beta));
+    expect(result.current.deleteTarget).toBe(beta);
   });
 });

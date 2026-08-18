@@ -9,6 +9,7 @@ import { gql } from "@apollo/client";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { CreatePositionDocument } from "@/gql/generated/graphql";
+import { prependCreated } from "@/lib/apollo/cache-utils";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, Input } from "@/components/ui";
 import { DialogActions, FloatingField } from "@/components/shared";
 
@@ -27,23 +28,18 @@ export function CreatePositionDialog({ open, onOpenChange, onCreated }: CreatePo
   const [createPosition, { loading: creating }] = useMutation(CreatePositionDocument, {
     update(cache, { data }) {
       if (!data?.createPosition) return;
-      cache.modify({
-        fields: {
-          positions(existingRefs = []) {
-            const newRef = cache.writeFragment({
-              data: data.createPosition,
-              fragment: gql`
-                fragment NewPosition on Position {
-                  id
-                  created_at
-                  name
-                }
-              `,
-            });
-            return [newRef, ...existingRefs];
-          },
-        },
-      });
+      prependCreated(
+        cache,
+        data.createPosition,
+        gql`
+          fragment NewPosition on Position {
+            id
+            created_at
+            name
+          }
+        `,
+        "positions",
+      );
     },
   });
 

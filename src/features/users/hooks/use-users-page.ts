@@ -353,7 +353,7 @@ export function useUsersPage(
     [handleNavigate, handleUpdate, handleDelete, tColumns, tButtons],
   );
 
-  // eslint-disable-next-line react-hooks/incompatible-library
+  // eslint-disable-next-line react-hooks/incompatible-library -- TanStack Table requires the table instance to be created directly in the render body
   const table = useReactTable<UserItem>({
     data: orderedUsers,
     columns,
@@ -362,7 +362,7 @@ export function useUsersPage(
     onSortingChange: setSorting,
     onGlobalFilterChange: setGlobalFilter,
     onPaginationChange: setPagination,
-    autoResetPageIndex: false,
+    autoResetPageIndex: false, // pagination is controlled here and reset explicitly on create
     globalFilterFn: (row, _columnId, filterValue) => {
       const user = row.original;
       const query = String(filterValue ?? "")

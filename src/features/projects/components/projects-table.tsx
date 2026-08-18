@@ -73,7 +73,7 @@ export function ProjectsTable({
     onSortingChange: setSorting,
     onGlobalFilterChange: setGlobalFilter,
     onPaginationChange,
-    autoResetPageIndex: false,
+    autoResetPageIndex: false, // pagination is controlled here and reset explicitly on create
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),

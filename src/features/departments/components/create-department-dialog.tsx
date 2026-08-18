@@ -9,6 +9,7 @@ import { gql } from "@apollo/client";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { CreateDepartmentDocument } from "@/gql/generated/graphql";
+import { prependCreated } from "@/lib/apollo/cache-utils";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, Input } from "@/components/ui";
 import { DialogActions, FloatingField } from "@/components/shared";
 
@@ -31,23 +32,18 @@ export function CreateDepartmentDialog({
   const [createDepartment, { loading: creating }] = useMutation(CreateDepartmentDocument, {
     update(cache, { data }) {
       if (!data?.createDepartment) return;
-      cache.modify({
-        fields: {
-          departments(existingRefs = []) {
-            const newRef = cache.writeFragment({
-              data: data.createDepartment,
-              fragment: gql`
-                fragment NewDepartment on Department {
-                  id
-                  created_at
-                  name
-                }
-              `,
-            });
-            return [newRef, ...existingRefs];
-          },
-        },
-      });
+      prependCreated(
+        cache,
+        data.createDepartment,
+        gql`
+          fragment NewDepartment on Department {
+            id
+            created_at
+            name
+          }
+        `,
+        "departments",
+      );
     },
   });
 

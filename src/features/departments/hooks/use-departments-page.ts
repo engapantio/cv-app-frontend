@@ -96,7 +96,7 @@ export function useDepartmentsPage(initialDepartments: DepartmentItem[]) {
     [handleOpen, handleUpdate, handleDelete, tColumns, tButtons],
   );
 
-  // eslint-disable-next-line react-hooks/incompatible-library
+  // eslint-disable-next-line react-hooks/incompatible-library -- TanStack Table requires the table instance to be created directly in the render body
   const table = useReactTable({
     data: departmentsList,
     columns,
@@ -104,7 +104,7 @@ export function useDepartmentsPage(initialDepartments: DepartmentItem[]) {
     onSortingChange: setSorting,
     onGlobalFilterChange: setGlobalFilter,
     onPaginationChange: setPagination,
-    autoResetPageIndex: false,
+    autoResetPageIndex: false, // pagination is controlled here and reset explicitly on create
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),

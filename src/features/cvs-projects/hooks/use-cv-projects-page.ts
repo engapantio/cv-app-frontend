@@ -34,6 +34,9 @@ export function useCvProjectsPage(
     variables: { cvId },
     fetchPolicy: "cache-and-network",
     errorPolicy: "all",
+    // Skip the fetch when SSR already succeeded (serverError === null):
+    // initialCv carries the data, so the client only needs to query when the
+    // initial load failed and the page is retrying.
     skip: serverError == null,
   });
 
@@ -48,6 +51,8 @@ export function useCvProjectsPage(
   const [localProjects, setLocalProjects] = useState<CvProjectItem[]>(() => extractProjects(cv));
 
   const projects = useMemo(() => {
+    // Prefer locally edited rows; fall back to the server/SSR list until the
+    // first mutation provides an authoritative result.
     if (localProjects.length > 0) return localProjects;
     return extractProjects(cv);
   }, [cv, localProjects]);
@@ -63,15 +68,15 @@ export function useCvProjectsPage(
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
 
   const [openProject, setOpenProject] = useState<CvProjectItem | null>(null);
-  const [addOpen, setAddOpen] = useState(false);
+  const [createOpen, setCreateOpen] = useState(false);
   const [updateTarget, setUpdateTarget] = useState<CvProjectItem | null>(null);
-  const [removeTarget, setRemoveTarget] = useState<CvProjectItem | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<CvProjectItem | null>(null);
 
-  const [addCvProject, { loading: adding }] = useMutation(AddCvProjectDocument);
+  const [addCvProject, { loading: creating }] = useMutation(AddCvProjectDocument);
   const [updateCvProject, { loading: updating }] = useMutation(UpdateCvProjectDocument);
-  const [removeCvProject, { loading: removing }] = useMutation(RemoveCvProjectDocument);
+  const [removeCvProject, { loading: deleting }] = useMutation(RemoveCvProjectDocument);
 
-  const handleAdd = useCallback(
+  const handleCreate = useCallback(
     async (data: {
       projectId: string;
       start_date: string;
@@ -106,8 +111,10 @@ export function useCvProjectsPage(
         toast.success(t("common.cvsProjectAddedSuccess"));
         setPagination((prev) => ({ ...prev, pageIndex: 0 }));
       }
+      // Keep the server list fresh for other views; a no-op while the query
+      // is skipped, since the local state above already applied the change.
       refetchCv();
-      setAddOpen(false);
+      setCreateOpen(false);
     },
     [addCvProject, cvId, refetchCv, t, setPagination],
   );
@@ -143,7 +150,7 @@ export function useCvProjectsPage(
     [updateCvProject, cvId, refetchCv, t],
   );
 
-  const handleRemove = useCallback(
+  const handleDelete = useCallback(
     async (projectId: string) => {
       const result = await removeCvProject({
         variables: {
@@ -171,17 +178,17 @@ export function useCvProjectsPage(
     onPaginationChange: setPagination,
     openProject,
     setOpenProject,
-    addOpen,
-    setAddOpen,
+    createOpen,
+    setCreateOpen,
     updateTarget,
     setUpdateTarget,
-    removeTarget,
-    setRemoveTarget,
-    handleAdd,
+    deleteTarget,
+    setDeleteTarget,
+    handleCreate,
     handleUpdate,
-    handleRemove,
-    adding,
+    handleDelete,
+    creating,
     updating,
-    removing,
+    deleting,
   };
 }

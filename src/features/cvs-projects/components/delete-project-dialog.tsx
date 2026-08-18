@@ -7,19 +7,19 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { DialogActions } from "@/components/shared/dialog-actions";
 import type { CvProjectItem } from "../types";
 
-interface RemoveProjectDialogProps {
+interface DeleteProjectDialogProps {
   target: CvProjectItem | null;
   onClose: () => void;
   onConfirm: (projectId: string) => Promise<void>;
   loading: boolean;
 }
 
-export function RemoveProjectDialog({
+export function DeleteProjectDialog({
   target,
   onClose,
   onConfirm,
   loading,
-}: RemoveProjectDialogProps) {
+}: DeleteProjectDialogProps) {
   const t = useTranslations();
   const handleConfirm = useCallback(async () => {
     if (!target) return;

@@ -22,7 +22,7 @@ interface ProjectRowProps {
   isLast: boolean;
   onOpen: (project: CvProjectItem) => void;
   onUpdate: (project: CvProjectItem) => void;
-  onRemove: (project: CvProjectItem) => void;
+  onDelete: (project: CvProjectItem) => void;
 }
 
 export function ProjectRow({
@@ -32,7 +32,7 @@ export function ProjectRow({
   isLast,
   onOpen,
   onUpdate,
-  onRemove,
+  onDelete,
 }: ProjectRowProps) {
   const tButtons = useTranslations("buttons");
   const tCommon = useTranslations("common");
@@ -85,7 +85,7 @@ export function ProjectRow({
                   {tButtons("update")}
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  onClick={() => onRemove(project)}
+                  onClick={() => onDelete(project)}
                   disabled={!canMutate}
                   variant="destructive"
                   className="justify-center cursor-pointer"

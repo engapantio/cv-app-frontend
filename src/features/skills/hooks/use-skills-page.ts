@@ -73,18 +73,11 @@ export function useSkillsPage(
   );
 
   const handleCreated = useCallback(
-    (newSkill: CreateSkillMutation["createSkill"]) => {
-      const matched = categories.find((c) => c.name === newSkill.category_name);
-      const item: SkillItem = {
-        ...newSkill,
-        category_parent_name: newSkill.category_parent_name ?? matched?.parent?.name ?? null,
-        category: matched ?? null,
-      } as SkillItem;
-      setSkillsList((prev) => [...prev, item]);
+    (_newSkill: CreateSkillMutation["createSkill"]) => {
       toast.success(t("common.skillCreatedSuccess"));
       setPagination((prev) => ({ ...prev, pageIndex: 0 }));
     },
-    [categories, t, setPagination],
+    [t, setPagination],
   );
 
   const handleUpdated = useCallback(
@@ -124,7 +117,7 @@ export function useSkillsPage(
     [handleOpen, handleUpdate, handleDelete, tColumns, tButtons],
   );
 
-  // eslint-disable-next-line react-hooks/incompatible-library
+  // eslint-disable-next-line react-hooks/incompatible-library -- TanStack Table requires the table instance to be created directly in the render body
   const table = useReactTable({
     data: skillsList,
     columns,
@@ -132,7 +125,7 @@ export function useSkillsPage(
     onSortingChange: setSorting,
     onGlobalFilterChange: setGlobalFilter,
     onPaginationChange: setPagination,
-    autoResetPageIndex: false,
+    autoResetPageIndex: false, // pagination is controlled here and reset explicitly on create
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),

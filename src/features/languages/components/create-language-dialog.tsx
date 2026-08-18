@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { CreateLanguageDocument } from "@/gql/generated/graphql";
 import { isDuplicateKeyError } from "@/lib/apollo/duplicate-key-error";
+import { prependCreated } from "@/lib/apollo/cache-utils";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, Input } from "@/components/ui";
 import { DialogActions, FloatingField } from "@/components/shared";
 
@@ -36,25 +37,20 @@ export function CreateLanguageDialog({ open, onOpenChange, onCreated }: CreateLa
   const [createLanguage, { loading: creating }] = useMutation(CreateLanguageDocument, {
     update(cache, { data }) {
       if (!data?.createLanguage) return;
-      cache.modify({
-        fields: {
-          languages(existingRefs = []) {
-            const newRef = cache.writeFragment({
-              data: data.createLanguage,
-              fragment: gql`
-                fragment NewLanguage on Language {
-                  id
-                  created_at
-                  iso2
-                  name
-                  native_name
-                }
-              `,
-            });
-            return [newRef, ...existingRefs];
-          },
-        },
-      });
+      prependCreated(
+        cache,
+        data.createLanguage,
+        gql`
+          fragment NewLanguage on Language {
+            id
+            created_at
+            iso2
+            name
+            native_name
+          }
+        `,
+        "languages",
+      );
     },
   });
 
@@ -105,6 +101,8 @@ export function CreateLanguageDialog({ open, onOpenChange, onCreated }: CreateLa
         reset();
         onOpenChange(false);
       } catch (error) {
+        // A duplicate key is almost always a user error (the name already
+        // exists), so surface a targeted message instead of the generic one.
         if (isDuplicateKeyError(error)) {
           toast.error(t("common.languageAlreadyExists"));
           return;

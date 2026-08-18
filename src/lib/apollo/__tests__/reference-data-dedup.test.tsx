@@ -1,11 +1,4 @@
-import {
-  ApolloClient,
-  ApolloLink,
-  InMemoryCache,
-  gql,
-  type DocumentNode,
-  type Reference,
-} from "@apollo/client";
+import { ApolloClient, ApolloLink, InMemoryCache, gql, type DocumentNode } from "@apollo/client";
 import { ApolloProvider, useQuery } from "@apollo/client/react";
 import { MockLink } from "@apollo/client/testing";
 import { act, render, screen, waitFor } from "@testing-library/react";
@@ -18,6 +11,7 @@ import {
 import { useDepartmentsList } from "@/lib/apollo/use-departments-list";
 import { usePositionsList } from "@/lib/apollo/use-positions-list";
 import { useSkillsList } from "@/lib/apollo/use-skills-list";
+import { prependCreated, removeById } from "@/lib/apollo/cache-utils";
 
 function ConsumerA() {
   useDepartmentsList();
@@ -227,25 +221,12 @@ describe("shared reference-data hooks deduplicate network requests", () => {
         expect(operationCounts.get(name)).toBe(undefined);
 
         await act(async () => {
-          client.cache.modify({
-            id: "ROOT_QUERY",
-            fields: {
-              [field](existingRefs: unknown) {
-                const newRef = client.cache.writeFragment({
-                  data: added,
-                  fragment,
-                });
-                if (typeof newRef === "undefined") return existingRefs;
-                const current = Array.isArray(existingRefs) ? existingRefs : [];
-                return [...current, newRef];
-              },
-            },
-          });
+          prependCreated(client.cache, added, fragment, field);
         });
 
         await waitFor(() =>
           expect(screen.getByTestId("list-names").textContent).toBe(
-            `${initial.name},${added.name}`,
+            `${added.name as string},${initial.name as string}`,
           ),
         );
 
@@ -293,10 +274,7 @@ describe("shared reference-data hooks deduplicate network requests", () => {
       client.cache.modify({
         id: "ROOT_QUERY",
         fields: {
-          [field](existingRefs: unknown, { readField }) {
-            const current = Array.isArray(existingRefs) ? existingRefs : [];
-            return current.filter((ref: Reference) => readField("id", ref) !== initial.id);
-          },
+          [field]: removeById(initial.id as string),
         },
       });
 
