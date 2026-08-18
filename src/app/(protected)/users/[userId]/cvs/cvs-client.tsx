@@ -24,7 +24,7 @@ export default function UserCvsClient({
       {...tableData}
       serverError={serverError}
       createUserId={userId}
-      tableClassName="table-fixed w-full [&_tr]:border-b-table-border [border-collapse:collapse]"
+      tableClassName="w-full [&_tr]:border-b-table-border [border-collapse:collapse]"
     />
   );
 }

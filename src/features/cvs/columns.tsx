@@ -94,7 +94,7 @@ export function createCvsColumns(
       header: ({ column }) => <SortableHeader column={column} label={t("education")} />,
       accessorFn: (row) => row.education ?? "",
       enableGlobalFilter: true,
-      meta: { className: "max-md:hidden" },
+      meta: { className: "max-md:hidden max-md:w-0" },
     },
     {
       id: "employee",
@@ -107,6 +107,7 @@ export function createCvsColumns(
       header: "",
       enableSorting: false,
       enableGlobalFilter: false,
+      meta: { className: "w-12" },
       cell: ({ row }) => (
         <ActionsCell cv={row.original} tb={tb} actions={actions} pageOwnerId={pageOwnerId} />
       ),

@@ -156,4 +156,33 @@ describe("CvsTable", () => {
     renderTable({ serverError: "Failed to load CVs" });
     expect(screen.getByText("Failed to load CVs")).toBeInTheDocument();
   });
+
+  it("aligns the colgroup with every rendered row (4 cols, 4 header cells, 4 body cells per main row, description row spans all)", () => {
+    const { view } = renderTable({});
+    const table = view.container.querySelector("table")!;
+
+    const cols = Array.from(table.querySelectorAll("colgroup > col"));
+    expect(cols).toHaveLength(4);
+    expect(cols.map((c) => c.getAttribute("class") ?? "")).toEqual([
+      "",
+      "max-md:hidden max-md:w-0",
+      "",
+      "w-12",
+    ]);
+
+    const heads = Array.from(table.querySelectorAll("thead th"));
+    expect(heads).toHaveLength(4);
+
+    const bodies = Array.from(table.querySelectorAll("tbody"));
+    expect(bodies).toHaveLength(cvs.length);
+
+    for (const tbody of bodies) {
+      const rows = Array.from(tbody.querySelectorAll("tr"));
+      expect(rows).toHaveLength(2);
+      expect(rows[0].querySelectorAll("td")).toHaveLength(4);
+      const descriptionCells = rows[1].querySelectorAll("td");
+      expect(descriptionCells).toHaveLength(1);
+      expect(descriptionCells[0]).toHaveAttribute("colspan", "4");
+    }
+  });
 });

@@ -11,6 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { type CreateCvMutation } from "@/gql/generated/graphql";
+import { TableColGroup } from "@/components/shared/table-colgroup";
 import { TableEmptyState } from "@/components/shared/table-empty-state";
 import { TablePagination } from "@/components/shared/table-pagination";
 import { TableToolbar } from "@/components/shared/table-toolbar";
@@ -81,12 +82,7 @@ export function CvsTable({
 
         <div className="overflow-x-hidden">
           <UITable className={tableClassName}>
-            <colgroup>
-              <col />
-              <col />
-              <col />
-              <col className="w-12" />
-            </colgroup>
+            <TableColGroup table={table} />
             <TableHeader className="[&_tr]:border-b">
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>

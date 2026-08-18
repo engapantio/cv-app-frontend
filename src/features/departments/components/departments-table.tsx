@@ -13,6 +13,7 @@ import {
 import { cn } from "@/lib/utils";
 import { usePermissions } from "@/lib/auth/permissions";
 import type { DepartmentItem } from "@/features/departments/types";
+import { TableColGroup } from "@/components/shared/table-colgroup";
 import { TableEmptyState } from "@/components/shared/table-empty-state";
 import { TablePagination } from "@/components/shared/table-pagination";
 import { TableToolbar } from "@/components/shared/table-toolbar";
@@ -92,10 +93,7 @@ export function DepartmentsTable({
 
         <div className="overflow-x-hidden">
           <UITable className="table-fixed">
-            <colgroup>
-              <col />
-              <col className="w-12" />
-            </colgroup>
+            <TableColGroup table={table} />
             <TableHeader className="[&_tr]:border-b">
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
@@ -153,21 +151,18 @@ export function DepartmentsTable({
                     className="cursor-pointer border-b-0 group-hover:bg-row-hover dark:group-hover:bg-white/15"
                     onClick={() => setOpenTarget(row.original)}
                   >
-                    {row
-                      .getVisibleCells()
-                      .filter((cell) => cell.column.id !== "id")
-                      .map((cell) => (
-                        <TableCell
-                          key={cell.id}
-                          className={cn(
-                            "max-md:py-2 md:max-[1439px]:py-3 min-[1440px]:py-4",
-                            (cell.column.columnDef.meta as { className?: string } | undefined)
-                              ?.className ?? "",
-                          )}
-                        >
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                        </TableCell>
-                      ))}
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell
+                        key={cell.id}
+                        className={cn(
+                          "max-md:py-2 md:max-[1439px]:py-3 min-[1440px]:py-4",
+                          (cell.column.columnDef.meta as { className?: string } | undefined)
+                            ?.className ?? "",
+                        )}
+                      >
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    ))}
                   </TableRow>
                 </TableBody>
               ))
